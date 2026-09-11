@@ -1,16 +1,31 @@
+# Cloudflare Workers configuration
+# ================================
+# The site deploys as a Worker with static assets (`npx wrangler deploy`), which
+# is what Cloudflare's Workers Builds runs. `dist/_worker.js/index.js` is the SSR
+# entry produced by the Astro Cloudflare adapter; everything else in `dist/` is
+# served straight from the CDN.
+#
+# Build it before deploying — `npm run deploy` does both in one step.
+
 name = "team-fairy-tight"
+main = "./dist/_worker.js/index.js"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "./dist"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[observability]
+enabled = true
 
 # ---------------------------------------------------------------------------
-# IMPORTANT: because this file sets `pages_build_output_dir`, Cloudflare Pages
-# reads the project's bindings from HERE and ignores bindings configured in the
-# dashboard. The database_id below must be a real id or the deployment fails.
+# Cloudflare D1. The database_id below must be a real id or the deployment has
+# no database — the site then still renders, but every section stays empty.
 #
 #   npx wrangler d1 create tft-db      # prints the database_id
 #
-# Paste it in, commit, deploy. See DEPLOYMENT.md for the full walkthrough.
+# See DEPLOYMENT.md for the full walkthrough.
 # ---------------------------------------------------------------------------
 [[d1_databases]]
 binding = "DB"
@@ -19,7 +34,6 @@ database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
 migrations_dir = "migrations"
 
 # No runtime [vars] are required. PUBLIC_SITE_URL is optional and only pins the
-# canonical URL: when it is unset the site uses the origin of the incoming
-# request, which is already correct on pages.dev, on previews and on a custom
-# domain. Set it as a BUILD variable in the Pages dashboard, not here — it is
-# read at build time, not at runtime.
+# canonical URL: unset, the site uses the origin of the incoming request, which
+# is already correct on workers.dev, on previews and on a custom domain. Set it
+# as a BUILD variable — it is read at build time, not at runtime.

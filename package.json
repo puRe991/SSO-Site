@@ -7,13 +7,14 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "build:ci": "astro build",
-    "preview": "wrangler pages dev ./dist",
+    "preview": "wrangler dev",
     "check": "astro check",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply tft-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply tft-db --remote",
     "db:seed:local": "wrangler d1 execute tft-db --local --file=./scripts/seed.sql",
-    "admin:hash": "node scripts/hash-password.mjs"
+    "admin:hash": "node scripts/hash-password.mjs",
+    "deploy": "npm run build:ci && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.10",

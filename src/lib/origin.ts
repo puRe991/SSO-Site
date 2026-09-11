@@ -8,19 +8,19 @@ import { siteConfig } from '@/data/site.config.mjs';
  *      canonical URLs stay stable even when a page is reached through another
  *      hostname.
  *   2. The origin of the incoming request — correct out of the box on
- *      `*.pages.dev`, on preview deployments and on a custom domain, with
+ *      `*.workers.dev`, on preview deployments and on a custom domain, with
  *      nothing to configure.
  *
- * This is why the site does not depend on a build-time URL: an unset variable
- * degrades to the right answer instead of to `team-fairy-tight.pages.dev`.
+ * So an unset variable degrades to the right answer rather than to a hardcoded
+ * default domain that would quietly follow the site onto its real one.
  */
 export function resolveOrigin(requestUrl: URL): string {
-  const configured = import.meta.env.PUBLIC_SITE_URL ?? siteConfig.url;
-  if (configured && !configured.includes('team-fairy-tight.pages.dev')) {
+  const configured = import.meta.env.PUBLIC_SITE_URL || siteConfig.url;
+  if (configured) {
     try {
       return new URL(configured).origin;
     } catch {
-      /* fall through to the request origin */
+      /* misconfigured value — fall through to the request origin */
     }
   }
   return requestUrl.origin;
