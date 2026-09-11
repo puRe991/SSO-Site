@@ -31,18 +31,33 @@ binding = "ASSETS"
 enabled = true
 
 # ---------------------------------------------------------------------------
-# Cloudflare D1. The database_id below must be a real id or the deployment has
-# no database — the site then still renders, but every section stays empty.
+# Cloudflare D1 — currently DISABLED.
 #
-#   npx wrangler d1 create tft-db      # prints the database_id
+# A d1 binding without a real `database_id` makes the whole deployment fail:
 #
-# See DEPLOYMENT.md for the full walkthrough.
+#   ✘ binding DB of type d1 must have a valid `database_id` specified [10021]
+#
+# So the binding stays commented out until a database exists. The site runs
+# without it: every page renders its empty state instead of failing (see
+# `safeRead` in src/server/services/content.ts). What does NOT work without a
+# database: login, the member dashboard, the admin area, applications and the
+# contact form — they all say so rather than pretending to work.
+#
+# To switch the database on (about two minutes):
+#
+#   1. npx wrangler d1 create tft-db          # or: dashboard → Storage → D1
+#   2. paste the printed database_id below
+#   3. uncomment the four lines
+#   4. commit and push, then:
+#        npx wrangler d1 migrations apply tft-db --remote
+#        npx wrangler d1 execute tft-db --remote --file=./scripts/seed.sql
+#        npm run admin:hash -- "your-password"   # run the printed INSERT
 # ---------------------------------------------------------------------------
-[[d1_databases]]
-binding = "DB"
-database_name = "tft-db"
-database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
-migrations_dir = "migrations"
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "tft-db"
+# database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
+# migrations_dir = "migrations"
 
 # No runtime [vars] are required. PUBLIC_SITE_URL is optional and only pins the
 # canonical URL: unset, the site uses the origin of the incoming request, which

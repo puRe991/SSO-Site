@@ -182,14 +182,15 @@ Then sign in at `/login`. Roles and their permissions are defined in `src/data/p
 
 **Full walkthrough: [DEPLOYMENT.md](./DEPLOYMENT.md).** In short:
 
+The D1 binding ships **commented out** in `wrangler.toml`, so the first deploy needs no database:
+
 ```bash
-npx wrangler login
-npx wrangler d1 create tft-db        # paste the database_id into wrangler.toml, commit
-npx wrangler d1 migrations apply tft-db --remote
-npx wrangler d1 execute tft-db --remote --file=./scripts/seed.sql
-npm run admin:hash -- "your-password"   # then run the printed INSERT with --remote
-npm run deploy                          # builds, then deploys
+npm run deploy        # builds, then deploys
 ```
+
+The site comes up and renders empty states everywhere. Login, the dashboard, the admin area,
+applications and the contact form stay off until a database exists, and say so. To switch D1 on
+later, see [DEPLOYMENT.md → Adding the database](./DEPLOYMENT.md#adding-the-database).
 
 For continuous deployment, import the repository under Workers & Pages and set:
 
@@ -213,7 +214,7 @@ D1 with 5 GB and 5M row reads/day.
 
 | Name | Type | Purpose |
 | --- | --- | --- |
-| `DB` | D1 binding (`wrangler.toml`) | The database. Without it the site still renders — every page falls back to an empty state. |
+| `DB` | D1 binding (`wrangler.toml`), optional | The database. Commented out by default; without it the site still renders and every page falls back to an empty state. |
 | `ASSETS` | Assets binding (`wrangler.toml`) | Static files, wired up by Workers Assets. |
 | `PUBLIC_SITE_URL` | **Build** variable, optional | Pins canonical/OG URLs to one domain. Unset, the site uses the origin of the incoming request, which is already correct on `workers.dev`, on previews and on a custom domain. |
 
