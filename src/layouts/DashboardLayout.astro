@@ -1,0 +1,55 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import AppSidebar from '@/components/AppSidebar.astro';
+import Toast from '@/components/Toast.astro';
+import type { IconName } from '@/lib/icons';
+import type { NavItem } from '@/data/navigation';
+
+interface Props {
+  title: string;
+  heading: string;
+  nav: NavItem[];
+  icons?: Record<string, IconName>;
+}
+
+const { title, heading, nav, icons } = Astro.props;
+
+const status = Astro.url.searchParams.get('status');
+const messages: Record<string, { text: string; tone: 'success' | 'danger' }> = {
+  saved: { text: 'Changes saved.', tone: 'success' },
+  created: { text: 'Entry created.', tone: 'success' },
+  deleted: { text: 'Entry deleted.', tone: 'success' },
+  error: { text: 'The action could not be completed.', tone: 'danger' },
+  forbidden: { text: 'You do not have permission for this action.', tone: 'danger' },
+};
+const toast = status ? messages[status] : undefined;
+---
+
+<BaseLayout title={title} noindex bodyClass="app">
+  <div class="shell">
+    <AppSidebar items={nav} heading={heading} icons={icons} />
+    <main id="main" class="content">
+      <slot />
+    </main>
+  </div>
+  <Toast message={toast?.text} tone={toast?.tone} />
+</BaseLayout>
+
+<style>
+  .shell {
+    display: grid;
+    min-height: 100svh;
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: var(--space-5) clamp(1rem, 3vw, 2.5rem) var(--space-8);
+    min-width: 0;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      grid-template-columns: 250px minmax(0, 1fr);
+    }
+  }
+</style>

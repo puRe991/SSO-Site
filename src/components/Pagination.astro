@@ -1,0 +1,125 @@
+---
+import { withParams } from '@/lib/format';
+
+interface Props {
+  page: number;
+  totalPages: number;
+  /** Query parameter carrying the page number. */
+  param?: string;
+}
+
+const { page, totalPages, param = 'page' } = Astro.props;
+const url = Astro.url;
+
+function pageList(current: number, total: number): (number | '…')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages = new Set<number>([1, total, current, current - 1, current + 1]);
+  const sorted = [...pages].filter((p) => p >= 1 && p <= total).sort((a, b) => a - b);
+  const result: (number | '…')[] = [];
+  let previous = 0;
+  for (const p of sorted) {
+    if (previous && p - previous > 1) result.push('…');
+    result.push(p);
+    previous = p;
+  }
+  return result;
+}
+---
+
+{
+  totalPages > 1 && (
+    <nav class="pagination" aria-label="Pagination">
+      <a
+        class="pagination__step"
+        href={withParams(url, { [param]: page > 1 ? page - 1 : null })}
+        aria-disabled={page <= 1}
+        rel="prev"
+      >
+        ← Prev
+      </a>
+
+      <ul role="list">
+        {pageList(page, totalPages).map((entry) =>
+          entry === '…' ? (
+            <li class="pagination__gap" aria-hidden="true">
+              …
+            </li>
+          ) : (
+            <li>
+              <a
+                href={withParams(url, { [param]: entry === 1 ? null : entry })}
+                class:list={['pagination__page', entry === page && 'pagination__page--active']}
+                aria-current={entry === page ? 'page' : undefined}
+              >
+                {entry}
+              </a>
+            </li>
+          ),
+        )}
+      </ul>
+
+      <a
+        class="pagination__step"
+        href={withParams(url, { [param]: page < totalPages ? page + 1 : null })}
+        aria-disabled={page >= totalPages}
+        rel="next"
+      >
+        Next →
+      </a>
+    </nav>
+  )
+}
+
+<style>
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+
+  .pagination ul {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pagination__page,
+  .pagination__step {
+    display: grid;
+    place-items: center;
+    min-width: 2.25rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .pagination__page:hover,
+  .pagination__step:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .pagination__page--active {
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    border-color: var(--border-brand);
+    color: var(--text);
+  }
+
+  [aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .pagination__gap {
+    padding: 0.45rem 0.2rem;
+    color: var(--text-subtle);
+  }
+</style>

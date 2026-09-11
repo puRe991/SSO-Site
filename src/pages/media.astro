@@ -1,0 +1,344 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Badge from '@/components/Badge.astro';
+import Icon from '@/components/Icon.astro';
+import DemoNotice from '@/components/DemoNotice.astro';
+import { listMedia } from '@/server/services/content';
+import { withParams } from '@/lib/format';
+
+const categories = [
+  { value: '', label: 'All' },
+  { value: 'screenshots', label: 'Screenshots' },
+  { value: 'clan', label: 'Clan' },
+  { value: 'events', label: 'Events' },
+  { value: 'games', label: 'Games' },
+  { value: 'videos', label: 'Videos' },
+  { value: 'artwork', label: 'Artwork' },
+];
+
+const active = Astro.url.searchParams.get('category') ?? '';
+const items = await listMedia(Astro.locals, { category: active || undefined });
+const images = items.filter((item) => item.kind === 'image');
+const videos = items.filter((item) => item.kind === 'video');
+const hasDemo = items.some((item) => item.isDemo);
+
+/** Builds a privacy-friendly embed URL; unknown providers are not embedded. */
+function embedUrl(url: string, provider: string | null): string | null {
+  try {
+    const parsed = new URL(url);
+    if (provider === 'youtube') {
+      const id = parsed.searchParams.get('v') ?? parsed.pathname.split('/').pop();
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+    }
+    if (provider === 'twitch') {
+      const channel = parsed.pathname.replace(/^\//, '');
+      return channel ? `https://player.twitch.tv/?channel=${channel}&parent=${Astro.url.hostname}` : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+---
+
+<PageLayout title="Media" description="Screenshots, clips and artwork from Team Fairy Tight.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Gallery</p>
+      <h1>Media</h1>
+      <p class="text-muted intro">
+        Only material the clan has uploaded itself is shown here — no stock images stand in for real
+        clan content.
+      </p>
+
+      <nav class="chips" aria-label="Media categories">
+        {
+          categories.map((category) => (
+            <a
+              href={withParams(Astro.url, { category: category.value || null })}
+              class:list={['chip', active === category.value && 'chip--active']}
+              aria-current={active === category.value ? 'true' : undefined}
+            >
+              {category.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      {hasDemo && <div class="notice"><DemoNotice what="media items" /></div>}
+
+      {
+        items.length === 0 && (
+          <EmptyState
+            title="No media yet."
+            description="Screenshots, clips and artwork are uploaded in the admin area."
+            icon="image"
+          />
+        )
+      }
+
+      {
+        images.length > 0 && (
+          <div class="gallery">
+            {images.map((item) => (
+              <button
+                class="gallery__item"
+                type="button"
+                data-lightbox
+                data-src={item.url}
+                data-title={item.title}
+                aria-label={`Open ${item.title} full screen`}
+              >
+                <img
+                  src={item.thumbnailUrl ?? item.url}
+                  alt={item.title}
+                  loading="lazy"
+                  decoding="async"
+                  width={item.width ?? undefined}
+                  height={item.height ?? undefined}
+                />
+                <span class="gallery__caption">
+                  {item.title}
+                  {item.isDemo && <Badge tone="warning" size="sm">Demo</Badge>}
+                </span>
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        videos.length > 0 && (
+          <section class="videos" aria-labelledby="videos-title">
+            <h2 id="videos-title">Latest videos</h2>
+            <div class="grid-auto" style="--min-col:320px">
+              {videos.map((item) => {
+                const embed = embedUrl(item.url, item.provider);
+                return (
+                  <figure class="video">
+                    {embed ? (
+                      <iframe
+                        src={embed}
+                        title={item.title}
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="strict-origin-when-cross-origin"
+                      />
+                    ) : (
+                      <a class="video__fallback" href={item.url} rel="noopener noreferrer" target="_blank">
+                        <Icon name="play" size={22} />
+                        Watch video
+                      </a>
+                    )}
+                    <figcaption>{item.title}</figcaption>
+                  </figure>
+                );
+              })}
+            </div>
+          </section>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Lightbox: native <dialog>, no library. -->
+  <dialog class="lightbox" data-lightbox-dialog aria-label="Image view">
+    <button class="lightbox__close" type="button" data-lightbox-close aria-label="Close">
+      <Icon name="close" size={22} />
+    </button>
+    <!-- Starts as a 1x1 transparent pixel so the closed dialog holds no broken image. -->
+    <img
+      data-lightbox-image
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+      alt=""
+    />
+    <p class="lightbox__title" data-lightbox-title></p>
+  </dialog>
+</PageLayout>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox-dialog]');
+  const image = document.querySelector<HTMLImageElement>('[data-lightbox-image]');
+  const caption = document.querySelector<HTMLElement>('[data-lightbox-title]');
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lightbox]').forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      if (!dialog || !image) return;
+      image.src = trigger.dataset.src ?? '';
+      image.alt = trigger.dataset.title ?? '';
+      if (caption) caption.textContent = trigger.dataset.title ?? '';
+      dialog.showModal();
+    });
+  });
+
+  document
+    .querySelector('[data-lightbox-close]')
+    ?.addEventListener('click', () => dialog?.close());
+
+  // Click on the backdrop closes as well.
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+</script>
+
+<style>
+  .intro {
+    margin-top: var(--space-2);
+    max-width: 60ch;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-block: var(--space-5);
+  }
+
+  .chip {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .chip:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .chip--active {
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    border-color: var(--border-brand);
+    color: var(--text);
+  }
+
+  .notice {
+    margin-bottom: var(--space-5);
+  }
+
+  .gallery {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  }
+
+  .gallery__item {
+    position: relative;
+    display: block;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    aspect-ratio: 4 / 3;
+    transition:
+      transform var(--duration) var(--ease-out),
+      border-color var(--duration) var(--ease-out);
+  }
+
+  .gallery__item:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-brand);
+  }
+
+  .gallery__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery__caption {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.75));
+    font-size: var(--text-xs);
+    color: #fff;
+    text-align: start;
+  }
+
+  .videos {
+    margin-top: var(--space-7);
+  }
+
+  .videos h2 {
+    margin-bottom: var(--space-5);
+    font-size: var(--text-xl);
+  }
+
+  .video {
+    margin: 0;
+  }
+
+  .video iframe,
+  .video__fallback {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .video__fallback {
+    display: grid;
+    place-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .video figcaption {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .lightbox {
+    width: min(94vw, 1100px);
+    padding: var(--space-4);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--background-elevated);
+    color: var(--text);
+  }
+
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 0.82);
+    backdrop-filter: blur(3px);
+  }
+
+  .lightbox img {
+    width: 100%;
+    max-height: 78svh;
+    object-fit: contain;
+    border-radius: var(--radius);
+  }
+
+  .lightbox__title {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .lightbox__close {
+    position: absolute;
+    top: var(--space-3);
+    inset-inline-end: var(--space-3);
+    display: grid;
+    place-items: center;
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    background: rgb(0 0 0 / 0.5);
+    color: #fff;
+  }
+</style>

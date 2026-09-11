@@ -1,0 +1,101 @@
+---
+import Card from './Card.astro';
+import Avatar from './Avatar.astro';
+import RankBadge from './RankBadge.astro';
+import Badge from './Badge.astro';
+import { orTBD } from '@/data/tbd';
+import { formatDate } from '@/lib/format';
+import type { Member, Rank } from '@/types';
+
+interface Props {
+  member: Member;
+  ranks: Rank[];
+}
+
+const { member, ranks } = Astro.props;
+const joined = formatDate(member.joinedAt);
+---
+
+<Card href={`/members/${member.slug}`} class="member-card">
+  <div class="member-card__head">
+    <Avatar name={member.username} src={member.avatarUrl} status={member.status} size={64} />
+    <div class="member-card__identity">
+      <p class="member-card__username">{member.username}</p>
+      {member.displayName && <p class="member-card__display">{member.displayName}</p>}
+      <div class="cluster">
+        <RankBadge rankId={member.rank} ranks={ranks} size="sm" />
+        {member.isDemo && <Badge tone="warning" size="sm">Demo</Badge>}
+      </div>
+    </div>
+  </div>
+
+  <dl class="member-card__meta">
+    <div>
+      <dt>Main game</dt>
+      <dd>{orTBD(member.mainGame)}</dd>
+    </div>
+    <div>
+      <dt>Role</dt>
+      <dd>{orTBD(member.role)}</dd>
+    </div>
+    <div>
+      <dt>Joined</dt>
+      <dd>{joined ?? '—'}</dd>
+    </div>
+  </dl>
+</Card>
+
+<style>
+  .member-card {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .member-card__head {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .member-card__identity {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .member-card__username {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .member-card__display {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .member-card__meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+
+  .member-card__meta dt {
+    font-size: 0.66rem;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .member-card__meta dd {
+    margin: 0.2rem 0 0;
+    font-size: var(--text-sm);
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+</style>

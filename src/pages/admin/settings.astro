@@ -1,0 +1,166 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import AdminHeader from '@/components/admin/AdminHeader.astro';
+import Card from '@/components/Card.astro';
+import Field from '@/components/Field.astro';
+import Button from '@/components/Button.astro';
+import Alert from '@/components/Alert.astro';
+import { getSettings, isSettingKey, setSetting, SETTING_KEYS } from '@/server/services/settings';
+import { adminIcons, visibleAdminNav } from '@/lib/admin-nav';
+import { can } from '@/data/permissions';
+import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
+import { isTBD } from '@/data/tbd';
+import { hasDatabase } from '@/server/database/client';
+
+const user = Astro.locals.user!;
+if (!can(user.role, 'manage_settings')) {
+  return new Response('Forbidden', { status: 403 });
+}
+
+let notice: string | null = null;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
+    error = 'Your session expired. Please save again.';
+  } else if (!hasDatabase(Astro.locals)) {
+    error = 'No database is configured.';
+  } else {
+    for (const [key, value] of form.entries()) {
+      if (typeof value !== 'string' || !isSettingKey(key)) continue;
+      await setSetting(Astro.locals, key, value.slice(0, 40000));
+    }
+    notice = 'Settings saved.';
+  }
+}
+
+const settings = await getSettings(Astro.locals);
+
+/** Only real values are shown in the inputs — TBD tokens render as empty. */
+const valueOf = (key: (typeof SETTING_KEYS)[number]) => (isTBD(settings[key]) ? '' : settings[key]);
+
+const groups = [
+  {
+    title: 'Clan',
+    description: 'Texts shown on the home and clan pages.',
+    fields: [
+      { key: 'clan.description' as const, label: 'Clan description', type: 'textarea' as const },
+      { key: 'clan.history' as const, label: 'History', type: 'textarea' as const },
+      { key: 'clan.values' as const, label: 'Values', type: 'textarea' as const },
+      { key: 'clan.goals' as const, label: 'Goals', type: 'textarea' as const },
+      { key: 'clan.founded' as const, label: 'Founded', type: 'text' as const },
+    ],
+  },
+  {
+    title: 'Social media',
+    description: 'Only platforms with a real URL are shown on the site.',
+    fields: [
+      { key: 'social.discord' as const, label: 'Discord invite URL', type: 'url' as const },
+      { key: 'social.youtube' as const, label: 'YouTube', type: 'url' as const },
+      { key: 'social.twitch' as const, label: 'Twitch', type: 'url' as const },
+      { key: 'social.instagram' as const, label: 'Instagram', type: 'url' as const },
+      { key: 'social.tiktok' as const, label: 'TikTok', type: 'url' as const },
+      { key: 'social.x' as const, label: 'X', type: 'url' as const },
+      { key: 'social.facebook' as const, label: 'Facebook', type: 'url' as const },
+      { key: 'social.steam' as const, label: 'Steam', type: 'url' as const },
+      { key: 'contact.email' as const, label: 'Contact email', type: 'email' as const },
+    ],
+  },
+  {
+    title: 'Legal & rules',
+    description: 'Rules, imprint and privacy notice. Nothing here is generated automatically.',
+    fields: [
+      { key: 'rules.content' as const, label: 'Clan rules', type: 'textarea' as const },
+      { key: 'imprint.content' as const, label: 'Imprint', type: 'textarea' as const },
+      { key: 'privacy.content' as const, label: 'Privacy notice', type: 'textarea' as const },
+    ],
+  },
+];
+---
+
+<DashboardLayout
+  title="Admin — Settings"
+  heading="Administration"
+  nav={visibleAdminNav(user.role)}
+  icons={adminIcons}
+>
+  <AdminHeader
+    title="Settings"
+    description="Editable site content. Empty fields stay empty and appear as placeholders on the site."
+  />
+
+  {notice && <div class="block"><Alert tone="success">{notice}</Alert></div>}
+  {error && <div class="block"><Alert tone="danger">{error}</Alert></div>}
+
+  <form method="post" class="settings">
+    <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+
+    {
+      groups.map((group) => (
+        <Card>
+          <h2 class="h3">{group.title}</h2>
+          <p class="text-muted small">{group.description}</p>
+          <div class="fields">
+            {group.fields.map((field) => (
+              <Field
+                label={field.label}
+                name={field.key}
+                type={field.type}
+                value={valueOf(field.key)}
+                rows={6}
+              />
+            ))}
+          </div>
+        </Card>
+      ))
+    }
+
+    <div class="actions">
+      <Button type="submit" variant="primary">Save settings</Button>
+    </div>
+  </form>
+</DashboardLayout>
+
+<style>
+  .block {
+    margin-bottom: var(--space-4);
+  }
+
+  .settings {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 900px;
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+  }
+
+  .small {
+    margin-block: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .fields {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .actions {
+    position: sticky;
+    bottom: var(--space-4);
+    display: flex;
+    justify-content: end;
+  }
+
+  @media (min-width: 760px) {
+    .fields {
+      grid-template-columns: 1fr 1fr;
+    }
+    .fields > :global(.field:has(textarea)) {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

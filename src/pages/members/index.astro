@@ -1,0 +1,114 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import MemberCard from '@/components/MemberCard.astro';
+import FilterBar from '@/components/FilterBar.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Pagination from '@/components/Pagination.astro';
+import DemoNotice from '@/components/DemoNotice.astro';
+import { getRanks, listGames, listMembers } from '@/server/services/content';
+
+const params = Astro.url.searchParams;
+const query = {
+  rank: params.get('rank') ?? undefined,
+  status: params.get('status') ?? undefined,
+  game: params.get('game') ?? undefined,
+  search: params.get('q') ?? undefined,
+  sort: (params.get('sort') as 'rank' | 'name' | 'joined' | null) ?? 'rank',
+  page: Number.parseInt(params.get('page') ?? '1', 10) || 1,
+  pageSize: 12,
+};
+
+const [ranks, games, members] = await Promise.all([
+  getRanks(Astro.locals),
+  listGames(Astro.locals),
+  listMembers(Astro.locals, query),
+]);
+
+const hasDemo = members.items.some((member) => member.isDemo);
+---
+
+<PageLayout title="Members" description="The members of Team Fairy Tight.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Roster</p>
+      <h1>Members</h1>
+      <p class="text-muted intro">
+        {members.total} {members.total === 1 ? 'member' : 'members'} listed.
+      </p>
+
+      <div class="controls">
+        <FilterBar
+          searchValue={query.search ?? ''}
+          searchPlaceholder="Search members…"
+          groups={[
+            {
+              name: 'rank',
+              label: 'Rank',
+              value: query.rank,
+              options: ranks.map((rank) => ({ value: rank.id, label: rank.label })),
+            },
+            {
+              name: 'status',
+              label: 'Status',
+              value: query.status,
+              options: [
+                { value: 'online', label: 'Online' },
+                { value: 'away', label: 'Away' },
+                { value: 'dnd', label: 'Do not disturb' },
+                { value: 'offline', label: 'Offline' },
+              ],
+            },
+            {
+              name: 'game',
+              label: 'Game',
+              value: query.game,
+              options: games.map((game) => ({ value: game.slug, label: game.name })),
+            },
+            {
+              name: 'sort',
+              label: 'Sort',
+              allLabel: 'Sort: default',
+              value: params.get('sort') ?? undefined,
+              options: [
+                { value: 'rank', label: 'By rank' },
+                { value: 'name', label: 'By name' },
+                { value: 'joined', label: 'By join date' },
+              ],
+            },
+          ]}
+        />
+      </div>
+
+      {hasDemo && <div class="notice"><DemoNotice what="members" /></div>}
+
+      {
+        members.items.length > 0 ? (
+          <div class="grid-auto" style="--min-col:300px">
+            {members.items.map((member) => (
+              <MemberCard member={member} ranks={ranks} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No members found."
+            description="Adjust the filters, or add members in the admin area."
+            icon="users"
+          />
+        )
+      }
+
+      <Pagination page={members.page} totalPages={members.totalPages} />
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .intro {
+    margin-top: var(--space-2);
+  }
+
+  .controls,
+  .notice {
+    margin-block: var(--space-5);
+  }
+</style>

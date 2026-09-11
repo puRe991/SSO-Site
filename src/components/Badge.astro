@@ -1,0 +1,70 @@
+---
+interface Props {
+  tone?: 'primary' | 'secondary' | 'accent' | 'neutral' | 'success' | 'warning' | 'danger';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const { tone = 'neutral', size = 'md', class: className } = Astro.props;
+---
+
+<span class:list={['badge', `badge--${tone}`, `badge--${size}`, className]}>
+  <slot />
+</span>
+
+<style>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-strong);
+    background: var(--surface-secondary);
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge--sm {
+    padding: 0.15rem 0.5rem;
+    font-size: 0.66rem;
+  }
+  .badge--md {
+    padding: 0.25rem 0.7rem;
+    font-size: var(--text-xs);
+  }
+
+  .badge--primary {
+    border-color: color-mix(in oklab, var(--primary) 45%, transparent);
+    background: color-mix(in oklab, var(--primary) 16%, transparent);
+    color: var(--violet-300);
+  }
+  .badge--secondary {
+    border-color: color-mix(in oklab, var(--secondary) 45%, transparent);
+    background: color-mix(in oklab, var(--secondary) 15%, transparent);
+    color: var(--magenta-400);
+  }
+  .badge--accent {
+    border-color: color-mix(in oklab, var(--accent) 42%, transparent);
+    background: color-mix(in oklab, var(--accent) 13%, transparent);
+    color: var(--accent);
+  }
+  .badge--success {
+    border-color: color-mix(in oklab, var(--success) 45%, transparent);
+    background: color-mix(in oklab, var(--success) 14%, transparent);
+    color: var(--success);
+  }
+  .badge--warning {
+    border-color: color-mix(in oklab, var(--warning) 45%, transparent);
+    background: color-mix(in oklab, var(--warning) 14%, transparent);
+    color: var(--warning);
+  }
+  .badge--danger {
+    border-color: color-mix(in oklab, var(--danger) 45%, transparent);
+    background: color-mix(in oklab, var(--danger) 14%, transparent);
+    color: var(--danger);
+  }
+</style>

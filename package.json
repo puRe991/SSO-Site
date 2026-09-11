@@ -1,0 +1,32 @@
+{
+  "name": "team-fairy-tight",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "build:ci": "astro build",
+    "preview": "wrangler pages dev ./dist",
+    "check": "astro check",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply tft-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply tft-db --remote",
+    "db:seed:local": "wrangler d1 execute tft-db --local --file=./scripts/seed.sql",
+    "admin:hash": "node scripts/hash-password.mjs"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.10",
+    "astro": "^5.14.1",
+    "drizzle-orm": "^0.44.6",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@cloudflare/workers-types": "^5.20260911.1",
+    "drizzle-kit": "^0.31.5",
+    "lightningcss": "^1.33.0",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.42.0"
+  }
+}

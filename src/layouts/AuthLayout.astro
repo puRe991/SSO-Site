@@ -1,0 +1,57 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Logo from '@/components/Logo.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex>
+  <main id="main" class="auth">
+    <div class="auth__panel">
+      <Logo />
+      <slot />
+      <p class="auth__back"><a href="/">← Back to the site</a></p>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .auth {
+    display: grid;
+    place-items: center;
+    min-height: 100svh;
+    padding: var(--space-5) clamp(1rem, 4vw, 2rem);
+  }
+
+  .auth__panel {
+    display: grid;
+    gap: var(--space-5);
+    width: min(100%, 430px);
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 70%),
+      var(--surface);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .auth__back {
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  .auth__back a {
+    color: var(--text-subtle);
+    text-decoration: none;
+  }
+
+  .auth__back a:hover {
+    color: var(--text);
+  }
+</style>

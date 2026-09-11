@@ -1,0 +1,46 @@
+---
+/**
+ * Loading placeholder.
+ *
+ * Pages are server-rendered, so there is no loading state on a normal
+ * navigation. This primitive exists for views that fetch on the client
+ * (planned: live Discord status, infinite scroll in the gallery).
+ */
+interface Props {
+  /** Number of placeholder blocks. */
+  count?: number;
+  height?: string;
+}
+
+const { count = 3, height = '180px' } = Astro.props;
+---
+
+<div class="skeletons" aria-hidden="true">
+  {Array.from({ length: count }).map(() => <div class="skeleton" style={`height:${height}`} />)}
+</div>
+
+<style>
+  .skeletons {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  }
+
+  .skeleton {
+    border-radius: var(--radius-lg);
+    background: linear-gradient(
+      100deg,
+      var(--surface) 20%,
+      var(--surface-secondary) 40%,
+      var(--surface) 60%
+    );
+    background-size: 220% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+
+  @keyframes shimmer {
+    to {
+      background-position: -220% 0;
+    }
+  }
+</style>

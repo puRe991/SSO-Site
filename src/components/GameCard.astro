@@ -1,0 +1,116 @@
+---
+import Card from './Card.astro';
+import Badge from './Badge.astro';
+import Icon from './Icon.astro';
+import { orTBD } from '@/data/tbd';
+import type { Game, GameStatus } from '@/types';
+
+interface Props {
+  game: Game;
+}
+
+const { game } = Astro.props;
+
+const statusTone: Record<GameStatus, 'success' | 'accent' | 'neutral' | 'primary'> = {
+  active: 'success',
+  casual: 'accent',
+  inactive: 'neutral',
+  planned: 'primary',
+};
+---
+
+<Card href={`/games/${game.slug}`} padded={false} class="game-card">
+  <div class="game-card__cover">
+    {
+      game.coverUrl ? (
+        <img src={game.coverUrl} alt="" loading="lazy" decoding="async" />
+      ) : (
+        <span class="game-card__placeholder" aria-hidden="true">
+          <Icon name="gamepad" size={28} />
+        </span>
+      )
+    }
+    <span class="game-card__status">
+      <Badge tone={statusTone[game.status]} size="sm">{game.status}</Badge>
+    </span>
+  </div>
+
+  <div class="game-card__body">
+    <h3 class="game-card__title">{game.name}</h3>
+    <p class="game-card__genre">{orTBD(game.genre)}</p>
+    <div class="cluster game-card__platforms">
+      {game.platforms.slice(0, 3).map((platform) => <Badge size="sm">{platform}</Badge>)}
+      {game.isDemo && <Badge tone="warning" size="sm">Demo</Badge>}
+    </div>
+    <p class="game-card__members">
+      <Icon name="users" size={15} />
+      {game.memberCount ?? 0} {game.memberCount === 1 ? 'member' : 'members'}
+    </p>
+  </div>
+</Card>
+
+<style>
+  .game-card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .game-card__cover {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, var(--surface-secondary), var(--surface));
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .game-card__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .game-card:hover .game-card__cover img {
+    transform: scale(1.04);
+  }
+
+  .game-card__placeholder {
+    color: var(--text-subtle);
+  }
+
+  .game-card__status {
+    position: absolute;
+    top: var(--space-3);
+    inset-inline-start: var(--space-3);
+  }
+
+  .game-card__body {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+  }
+
+  .game-card__title {
+    font-size: var(--text-lg);
+  }
+
+  .game-card__genre {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .game-card__platforms {
+    gap: var(--space-2);
+  }
+
+  .game-card__members {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+  }
+</style>

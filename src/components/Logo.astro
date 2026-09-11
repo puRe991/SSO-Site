@@ -1,0 +1,104 @@
+---
+/**
+ * Clan logo.
+ *
+ * Currently a typographic mark built from the clan name — no game logo or
+ * third-party artwork is used. When a real clan logo exists, drop the file into
+ * /public and render it here; every usage across the site updates at once.
+ */
+import { siteConfig } from '@/data/site.config.mjs';
+
+interface Props {
+  variant?: 'full' | 'compact';
+  href?: string | null;
+  class?: string;
+}
+
+const { variant = 'full', href = '/', class: className } = Astro.props;
+const Tag = href ? 'a' : 'span';
+---
+
+<Tag class:list={['logo', `logo--${variant}`, className]} href={href ?? undefined}>
+  <span class="logo__mark" aria-hidden="true">
+    <svg viewBox="0 0 40 40" width="34" height="34" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="tft-mark" x1="0" y1="0" x2="40" y2="40">
+          <stop offset="0%" stop-color="var(--violet-400)"></stop>
+          <stop offset="55%" stop-color="var(--magenta-500)"></stop>
+          <stop offset="100%" stop-color="var(--cyan-400)"></stop>
+        </linearGradient>
+      </defs>
+      <path
+        d="M20 2.5 35.5 11v18L20 37.5 4.5 29V11z"
+        stroke="url(#tft-mark)"
+        stroke-width="2"
+        stroke-linejoin="round"></path>
+      <path d="M13 15h14M20 15v12" stroke="url(#tft-mark)" stroke-width="2.4" stroke-linecap="round"
+      ></path>
+    </svg>
+  </span>
+  <span class="logo__text">
+    {
+      variant === 'full' ? (
+        <>
+          <span class="logo__name">{siteConfig.name}</span>
+          <span class="logo__tagline">{siteConfig.shortName}</span>
+        </>
+      ) : (
+        <span class="logo__name">{siteConfig.shortName}</span>
+      )
+    }
+  </span>
+</Tag>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .logo:hover {
+    color: var(--text);
+  }
+
+  .logo__mark {
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 0 12px var(--glow));
+    transition: transform var(--duration) var(--ease-out);
+  }
+
+  .logo:hover .logo__mark {
+    transform: rotate(-6deg) scale(1.04);
+  }
+
+  .logo__text {
+    display: grid;
+    line-height: 1.05;
+  }
+
+  .logo__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .logo__tagline {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: var(--tracking-wider);
+    color: var(--text-subtle);
+  }
+
+  @media (max-width: 420px) {
+    .logo__name {
+      font-size: var(--text-xs);
+    }
+  }
+</style>

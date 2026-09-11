@@ -1,0 +1,38 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Alert from '@/components/Alert.astro';
+import { getSettings } from '@/server/services/settings';
+import { renderRichText } from '@/lib/text';
+import { isTBD } from '@/data/tbd';
+
+const settings = await getSettings(Astro.locals);
+const content = settings['imprint.content'];
+const hasContent = !isTBD(content);
+---
+
+<PageLayout title="Imprint" description="Imprint — Team Fairy Tight." noindex={!hasContent}>
+  <section class="section">
+    <div class="container container-narrow">
+      <h1>Imprint</h1>
+      {
+        hasContent ? (
+          <div class="prose body" set:html={renderRichText(content)} />
+        ) : (
+          <div class="notice">
+            <Alert tone="warning" title="Placeholder">
+              No imprint details have been supplied yet. Legal information is never invented — the operator enters it in the admin area.
+            </Alert>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .body,
+  .notice {
+    margin-top: var(--space-5);
+    max-width: none;
+  }
+</style>

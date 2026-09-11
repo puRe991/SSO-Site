@@ -1,0 +1,136 @@
+---
+import Logo from './Logo.astro';
+import SocialLinks from './SocialLinks.astro';
+import { footerNav } from '@/data/navigation';
+import { siteConfig } from '@/data/site.config.mjs';
+import type { SocialPlatform } from '@/types';
+
+interface Props {
+  socials: { platform: SocialPlatform; label: string; url: string }[];
+}
+
+const { socials } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <Logo />
+      <p class="footer__tagline">{siteConfig.tagline}</p>
+      <SocialLinks links={socials} />
+    </div>
+
+    {
+      footerNav.map((group) => (
+        <nav class="footer__group" aria-label={group.title}>
+          <h2 class="footer__heading">{group.title}</h2>
+          <ul role="list">
+            {group.items.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+
+  <div class="container footer__bottom">
+    <p>© {year} {siteConfig.name}. All rights reserved.</p>
+    <p class="footer__meta">
+      <a href="/imprint">Imprint</a>
+      <span aria-hidden="true">·</span>
+      <a href="/privacy">Privacy</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--space-9);
+    border-top: 1px solid var(--border);
+    background: linear-gradient(180deg, transparent, color-mix(in oklab, var(--surface) 55%, transparent));
+  }
+
+  .footer__inner {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7) var(--space-6);
+    grid-template-columns: 1fr;
+  }
+
+  .footer__brand {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .footer__tagline {
+    color: var(--text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .footer__heading {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: var(--space-3);
+  }
+
+  .footer__group ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer__group a {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .footer__group a:hover {
+    color: var(--text);
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: space-between;
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--border);
+    color: var(--text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  .footer__meta {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .footer__meta a {
+    color: var(--text-subtle);
+    text-decoration: none;
+  }
+
+  .footer__meta a:hover {
+    color: var(--text);
+  }
+
+  @media (min-width: 720px) {
+    .footer__inner {
+      grid-template-columns: 1.4fr repeat(3, 1fr);
+    }
+  }
+</style>

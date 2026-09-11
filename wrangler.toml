@@ -1,0 +1,18 @@
+name = "team-fairy-tight"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+# Cloudflare D1 (free tier). Create with:
+#   npx wrangler d1 create tft-db
+# then paste the returned database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "tft-db"
+database_id = "D1_DATABASE_ID_TBD"
+migrations_dir = "migrations"
+
+[vars]
+# Non-secret runtime config. Secrets (SESSION_SECRET) go through
+#   npx wrangler pages secret put SESSION_SECRET
+PUBLIC_SITE_URL = "https://team-fairy-tight.pages.dev"

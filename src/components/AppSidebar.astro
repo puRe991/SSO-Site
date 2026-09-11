@@ -1,0 +1,138 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import type { IconName } from '@/lib/icons';
+import { isActive, type NavItem } from '@/data/navigation';
+import { CSRF_FIELD } from '@/server/security/csrf';
+
+interface Props {
+  items: NavItem[];
+  heading: string;
+  icons?: Record<string, IconName>;
+}
+
+const { items, heading, icons = {} } = Astro.props;
+const pathname = Astro.url.pathname;
+const user = Astro.locals.user;
+---
+
+<aside class="sidebar">
+  <div class="sidebar__head">
+    <Logo variant="compact" />
+    <span class="sidebar__heading">{heading}</span>
+  </div>
+
+  <nav aria-label={heading}>
+    <ul role="list">
+      {
+        items.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={['sidebar__link', isActive(pathname, item) && 'sidebar__link--active']}
+              aria-current={isActive(pathname, item) ? 'page' : undefined}
+            >
+              <Icon name={icons[item.href] ?? 'chevron-right'} size={17} />
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <div class="sidebar__foot">
+    <a class="sidebar__link" href="/">
+      <Icon name="external" size={17} />
+      Back to site
+    </a>
+    {
+      user && (
+        <form method="post" action="/api/auth/logout">
+          <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+          <button class="sidebar__link sidebar__link--button" type="submit">
+            <Icon name="logout" size={17} />
+            Sign out
+          </button>
+        </form>
+      )
+    }
+    {user && <p class="sidebar__user">{user.email}</p>}
+  </div>
+</aside>
+
+<style>
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-4);
+    border-inline-end: 1px solid var(--border);
+    background: var(--background-elevated);
+  }
+
+  .sidebar__head {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .sidebar__heading {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .sidebar ul {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+    text-align: start;
+  }
+
+  .sidebar__link:hover {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .sidebar__link--active {
+    background: color-mix(in oklab, var(--primary) 15%, transparent);
+    color: var(--text);
+  }
+
+  .sidebar__link--button {
+    background: none;
+    border: none;
+    font: inherit;
+  }
+
+  .sidebar__foot {
+    display: grid;
+    gap: 2px;
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+
+  .sidebar__user {
+    padding: var(--space-2) 0.7rem 0;
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+    overflow-wrap: anywhere;
+  }
+</style>

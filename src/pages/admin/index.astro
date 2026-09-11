@@ -1,0 +1,209 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import AdminHeader from '@/components/admin/AdminHeader.astro';
+import Card from '@/components/Card.astro';
+import Badge from '@/components/Badge.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Alert from '@/components/Alert.astro';
+import { desc, eq } from 'drizzle-orm';
+import { getDatabase, schema } from '@/server/database/client';
+import { adminCounts } from '@/server/admin/resources';
+import { adminIcons, visibleAdminNav } from '@/lib/admin-nav';
+import { can } from '@/data/permissions';
+import { formatDate } from '@/lib/format';
+
+const user = Astro.locals.user!;
+const database = getDatabase(Astro.locals);
+
+const counts = database
+  ? await adminCounts(database)
+  : { members: 0, games: 0, events: 0, news: 0, media: 0, achievements: 0, applications: 0, messages: 0 };
+
+const [openApplications, upcomingEvents, latestNews] = database
+  ? await Promise.all([
+      database
+        .select()
+        .from(schema.applications)
+        .where(eq(schema.applications.status, 'submitted'))
+        .orderBy(desc(schema.applications.createdAt))
+        .limit(5),
+      database.select().from(schema.events).orderBy(desc(schema.events.startsAt)).limit(5),
+      database.select().from(schema.news).orderBy(desc(schema.news.createdAt)).limit(5),
+    ])
+  : [[], [], []];
+
+const tiles = [
+  { label: 'Members', value: counts.members, href: '/admin/members', permission: 'manage_members' as const },
+  { label: 'Applications', value: counts.applications, href: '/admin/applications', permission: 'manage_applications' as const },
+  { label: 'Events', value: counts.events, href: '/admin/events', permission: 'manage_events' as const },
+  { label: 'News', value: counts.news, href: '/admin/news', permission: 'manage_news' as const },
+  { label: 'Games', value: counts.games, href: '/admin/games', permission: 'manage_games' as const },
+  { label: 'Media', value: counts.media, href: '/admin/media', permission: 'manage_media' as const },
+];
+
+const visibleNav = visibleAdminNav(user.role);
+---
+
+<DashboardLayout title="Admin" heading="Administration" nav={visibleNav} icons={adminIcons}>
+  <AdminHeader title="Overview" description={`Signed in as ${user.email} (${user.role}).`} />
+
+  {
+    !database && (
+      <div class="block">
+        <Alert tone="warning" title="No database bound">
+          The D1 binding <code>DB</code> is missing. Content management is unavailable until the
+          database is configured (see README → Deployment).
+        </Alert>
+      </div>
+    )
+  }
+
+  <div class="tiles">
+    {
+      tiles
+        .filter((tile) => can(user.role, tile.permission))
+        .map((tile) => (
+          <a class="tile" href={tile.href}>
+            <span class="tile__label">{tile.label}</span>
+            <span class="tile__value">{tile.value}</span>
+          </a>
+        ))
+    }
+  </div>
+
+  <div class="columns">
+    <Card>
+      <h2 class="h3">Open applications</h2>
+      {
+        openApplications.length > 0 ? (
+          <ul class="list" role="list">
+            {openApplications.map((application) => (
+              <li>
+                <a href={`/admin/applications/${application.id}`}>{application.username}</a>
+                <Badge tone="warning" size="sm">
+                  {application.status}
+                </Badge>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No open applications." icon="inbox" />
+        )
+      }
+    </Card>
+
+    <Card>
+      <h2 class="h3">Events</h2>
+      {
+        upcomingEvents.length > 0 ? (
+          <ul class="list" role="list">
+            {upcomingEvents.map((event) => (
+              <li>
+                <a href={`/admin/events/${event.id}`}>{event.title}</a>
+                <span class="text-muted">
+                  {formatDate(new Date(event.startsAt * 1000).toISOString())}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No events." icon="calendar" />
+        )
+      }
+    </Card>
+
+    <Card>
+      <h2 class="h3">Latest news</h2>
+      {
+        latestNews.length > 0 ? (
+          <ul class="list" role="list">
+            {latestNews.map((article) => (
+              <li>
+                <a href={`/admin/news/${article.id}`}>{article.title}</a>
+                <Badge size="sm">{article.status}</Badge>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No articles." icon="news" />
+        )
+      }
+    </Card>
+  </div>
+</DashboardLayout>
+
+<style>
+  .block {
+    margin-bottom: var(--space-5);
+  }
+
+  .tiles {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+  }
+
+  .tile {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .tile:hover {
+    border-color: var(--border-brand);
+  }
+
+  .tile__label {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .tile__value {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .columns {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+    align-items: start;
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 1100px) {
+    .columns {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

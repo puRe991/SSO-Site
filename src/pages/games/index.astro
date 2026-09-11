@@ -1,0 +1,86 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import GameCard from '@/components/GameCard.astro';
+import FilterBar from '@/components/FilterBar.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import DemoNotice from '@/components/DemoNotice.astro';
+import { listGames } from '@/server/services/content';
+
+const params = Astro.url.searchParams;
+const query = {
+  status: params.get('status') ?? undefined,
+  platform: params.get('platform') ?? undefined,
+  search: params.get('q') ?? undefined,
+};
+
+const games = await listGames(Astro.locals, query);
+const platforms = [...new Set(games.flatMap((game) => game.platforms))].sort();
+const hasDemo = games.some((game) => game.isDemo);
+---
+
+<PageLayout title="Games" description="The games Team Fairy Tight plays.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Line-up</p>
+      <h1>Games</h1>
+      <p class="text-muted intro">
+        Only games the clan actually plays are listed here — nothing is added automatically.
+      </p>
+
+      <div class="controls">
+        <FilterBar
+          searchValue={query.search ?? ''}
+          searchPlaceholder="Search games…"
+          groups={[
+            {
+              name: 'status',
+              label: 'Activity',
+              value: query.status,
+              options: [
+                { value: 'active', label: 'Active' },
+                { value: 'casual', label: 'Casual' },
+                { value: 'inactive', label: 'Inactive' },
+                { value: 'planned', label: 'Planned' },
+              ],
+            },
+            {
+              name: 'platform',
+              label: 'Platform',
+              value: query.platform,
+              options: platforms.map((platform) => ({ value: platform, label: platform })),
+            },
+          ]}
+        />
+      </div>
+
+      {hasDemo && <div class="controls"><DemoNotice what="games" /></div>}
+
+      {
+        games.length > 0 ? (
+          <div class="grid-auto" style="--min-col:280px">
+            {games.map((game) => (
+              <GameCard game={game} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No games found."
+            description="Add the clan's games in the admin area, or reset the filters."
+            icon="gamepad"
+          />
+        )
+      }
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .intro {
+    margin-top: var(--space-2);
+    max-width: 60ch;
+  }
+
+  .controls {
+    margin-block: var(--space-5);
+  }
+</style>

@@ -1,0 +1,112 @@
+---
+import Card from './Card.astro';
+import Badge from './Badge.astro';
+import { formatDate, isoAttr, truncate } from '@/lib/format';
+import type { NewsArticle } from '@/types';
+
+interface Props {
+  article: NewsArticle;
+  featured?: boolean;
+}
+
+const { article, featured = false } = Astro.props;
+const published = formatDate(article.publishedAt);
+---
+
+<Card href={`/news/${article.slug}`} padded={false} class:list={['news-card', featured && 'news-card--featured']}>
+  <div class="news-card__image">
+    {
+      article.imageUrl ? (
+        <img src={article.imageUrl} alt="" loading="lazy" decoding="async" />
+      ) : (
+        <span class="news-card__gradient" aria-hidden="true" />
+      )
+    }
+  </div>
+  <div class="news-card__body">
+    <div class="cluster">
+      <Badge tone="accent" size="sm">{article.category}</Badge>
+      {article.status === 'draft' && <Badge tone="warning" size="sm">Draft</Badge>}
+      {article.isDemo && <Badge tone="warning" size="sm">Demo</Badge>}
+    </div>
+    <h3 class="news-card__title">{article.title}</h3>
+    {article.teaser && <p class="news-card__teaser">{truncate(article.teaser, 140)}</p>}
+    <p class="news-card__meta">
+      {published && <time datetime={isoAttr(article.publishedAt)}>{published}</time>}
+      {article.authorName && <span>· {article.authorName}</span>}
+    </p>
+  </div>
+</Card>
+
+<style>
+  .news-card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .news-card__image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--surface-secondary);
+  }
+
+  .news-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .news-card:hover .news-card__image img {
+    transform: scale(1.04);
+  }
+
+  .news-card__gradient {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(70% 120% at 20% 0%, color-mix(in oklab, var(--primary) 35%, transparent), transparent 70%),
+      radial-gradient(60% 100% at 90% 100%, color-mix(in oklab, var(--accent) 25%, transparent), transparent 70%),
+      var(--surface-secondary);
+  }
+
+  .news-card__body {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+  }
+
+  .news-card__title {
+    font-size: var(--text-lg);
+  }
+
+  .news-card__teaser {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .news-card__meta {
+    display: flex;
+    gap: 0.4em;
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+  }
+
+  @media (min-width: 860px) {
+    .news-card--featured {
+      grid-template-rows: none;
+      grid-template-columns: 1.2fr 1fr;
+    }
+
+    .news-card--featured .news-card__image {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+
+    .news-card--featured .news-card__title {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>

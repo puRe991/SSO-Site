@@ -1,0 +1,75 @@
+---
+import { initials } from '@/lib/format';
+import StatusBadge from './StatusBadge.astro';
+import type { PresenceStatus } from '@/types';
+
+interface Props {
+  name: string;
+  src?: string | null;
+  size?: number;
+  status?: PresenceStatus | null;
+  class?: string;
+}
+
+const { name, src, size = 56, status = null, class: className } = Astro.props;
+---
+
+<span class:list={['avatar', className]} style={`--avatar-size:${size}px`}>
+  {
+    src ? (
+      <img src={src} alt="" width={size} height={size} loading="lazy" decoding="async" />
+    ) : (
+      <span class="avatar__initials" aria-hidden="true">
+        {initials(name)}
+      </span>
+    )
+  }
+  {
+    status && (
+      <span class="avatar__status">
+        <StatusBadge status={status} compact />
+      </span>
+    )
+  }
+</span>
+
+<style>
+  .avatar {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--avatar-size);
+    block-size: var(--avatar-size);
+    flex: 0 0 auto;
+    border-radius: var(--radius-full);
+    background: linear-gradient(140deg, var(--surface-secondary), var(--surface));
+    border: 1px solid var(--border-strong);
+    overflow: visible;
+  }
+
+  .avatar img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  .avatar__initials {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: calc(var(--avatar-size) * 0.36);
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+
+  .avatar__status {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    display: grid;
+    place-items: center;
+    padding: 2px;
+    border-radius: var(--radius-full);
+    background: var(--background);
+  }
+</style>

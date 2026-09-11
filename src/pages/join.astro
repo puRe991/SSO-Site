@@ -1,0 +1,351 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Card from '@/components/Card.astro';
+import Field from '@/components/Field.astro';
+import Button from '@/components/Button.astro';
+import Alert from '@/components/Alert.astro';
+import Icon from '@/components/Icon.astro';
+import { joinRequirements, joinSteps } from '@/data/clan.config';
+import { applicationSchema, fieldErrors, formToObject } from '@/server/validation/schemas';
+import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
+import { clientIdentifier, rateLimit } from '@/server/security/rate-limit';
+import { getDatabase, schema } from '@/server/database/client';
+import { newId } from '@/server/security/crypto';
+import { getSettings } from '@/server/services/settings';
+import { isTBD } from '@/data/tbd';
+
+let errors: Record<string, string> = {};
+let values: Record<string, string> = {};
+let submitted = false;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  values = formToObject(form);
+
+  if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
+    errors._form = 'Your session expired. Please submit the form again.';
+  } else {
+    const database = getDatabase(Astro.locals);
+    const limit = await rateLimit(
+      database,
+      'application',
+      clientIdentifier(Astro.request),
+      3,
+      60 * 60,
+    );
+
+    if (!limit.allowed) {
+      errors._form = 'Too many applications from this connection. Please try again later.';
+    } else {
+      const parsed = applicationSchema.safeParse(values);
+      if (!parsed.success) {
+        errors = fieldErrors(parsed.error);
+      } else if (parsed.data.website) {
+        // Honeypot filled → silently accept without storing.
+        submitted = true;
+      } else if (!database) {
+        errors._form =
+          'Applications cannot be accepted right now because no database is configured.';
+      } else {
+        await database.insert(schema.applications).values({
+          id: newId('app'),
+          username: parsed.data.username,
+          displayName: parsed.data.displayName || null,
+          country: parsed.data.country || null,
+          games: parsed.data.games || null,
+          mainGame: parsed.data.mainGame || null,
+          discordUsername: parsed.data.discordUsername,
+          motivation: parsed.data.motivation,
+          referral: parsed.data.referral || null,
+          status: 'submitted',
+        });
+        submitted = true;
+        values = {};
+      }
+    }
+  }
+}
+
+const settings = await getSettings(Astro.locals);
+const discord = isTBD(settings['social.discord']) ? null : settings['social.discord'];
+---
+
+<PageLayout
+  title="Join Us"
+  description="Apply to Team Fairy Tight — requirements, process and application form."
+>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Recruiting</p>
+      <h1>Join Team Fairy Tight</h1>
+      <p class="text-muted intro">
+        We are looking for players who enjoy playing as a team. Read the requirements, then send us
+        your application.
+      </p>
+
+      <div class="layout">
+        <div class="layout__info">
+          <Card>
+            <h2 class="h3">Requirements</h2>
+            <ul class="list" role="list">
+              {
+                joinRequirements.map((requirement) => (
+                  <li>
+                    <Icon name="check" size={16} />
+                    <span>{requirement}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </Card>
+
+          <Card>
+            <h2 class="h3">How it works</h2>
+            <ol class="steps">
+              {
+                joinSteps.map((step, index) => (
+                  <li>
+                    <span class="steps__number" aria-hidden="true">
+                      {index + 1}
+                    </span>
+                    <span>
+                      <strong>{step.title}</strong>
+                      <span class="text-muted"> — {step.text}</span>
+                    </span>
+                  </li>
+                ))
+              }
+            </ol>
+          </Card>
+
+          <Card>
+            <h2 class="h3">Expectations</h2>
+            <p class="text-muted small">
+              The clan rules apply to all members. Please read them before applying:
+              <a href="/rules"> clan rules</a>.
+            </p>
+            {
+              discord && (
+                <Button href={discord} variant="ghost" size="sm" full>
+                  <Icon name="discord" size={16} /> Ask a question on Discord
+                </Button>
+              )
+            }
+          </Card>
+        </div>
+
+        <div class="layout__form">
+          <Card>
+            <h2 class="h3">Application</h2>
+
+            {
+              submitted ? (
+                <Alert tone="success" title="Application received">
+                  Thank you — your application has the status <strong>submitted</strong>. The team
+                  will review it and get back to you on Discord.
+                </Alert>
+              ) : (
+                <form method="post" novalidate>
+                  <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+
+                  {errors._form && <Alert tone="danger">{errors._form}</Alert>}
+
+                  <div class="grid">
+                    <Field
+                      label="Username"
+                      name="username"
+                      required
+                      value={values.username}
+                      error={errors.username}
+                      maxlength={40}
+                      hint="Your in-game name."
+                    />
+                    <Field
+                      label="Display name"
+                      name="displayName"
+                      value={values.displayName}
+                      error={errors.displayName}
+                      maxlength={60}
+                    />
+                    <Field
+                      label="Country"
+                      name="country"
+                      value={values.country}
+                      error={errors.country}
+                      maxlength={60}
+                      hint="Optional — helps with scheduling time zones."
+                    />
+                    <Field
+                      label="Discord username"
+                      name="discordUsername"
+                      required
+                      value={values.discordUsername}
+                      error={errors.discordUsername}
+                      maxlength={60}
+                    />
+                    <Field
+                      label="Games you play"
+                      name="games"
+                      value={values.games}
+                      error={errors.games}
+                      maxlength={300}
+                      hint="Comma separated."
+                    />
+                    <Field
+                      label="Main game"
+                      name="mainGame"
+                      value={values.mainGame}
+                      error={errors.mainGame}
+                      maxlength={80}
+                    />
+                  </div>
+
+                  <Field
+                    label="Why do you want to join?"
+                    name="motivation"
+                    type="textarea"
+                    required
+                    value={values.motivation}
+                    error={errors.motivation}
+                    maxlength={2000}
+                    hint="At least 20 characters."
+                  />
+
+                  <Field
+                    label="How did you find us?"
+                    name="referral"
+                    value={values.referral}
+                    error={errors.referral}
+                    maxlength={200}
+                  />
+
+                  <div class="honeypot" aria-hidden="true">
+                    <label>
+                      Website
+                      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+                    </label>
+                  </div>
+
+                  <p class="privacy-note">
+                    Your data is used only to process this application. See the
+                    <a href="/privacy"> privacy notice</a>.
+                  </p>
+
+                  <Button type="submit" variant="primary" size="lg" full>Send application</Button>
+                </form>
+              )
+            }
+          </Card>
+        </div>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .intro {
+    margin-top: var(--space-2);
+    max-width: 60ch;
+  }
+
+  .layout {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+    align-items: start;
+  }
+
+  .layout__info {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .list,
+  .steps {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .list li,
+  .steps li {
+    display: flex;
+    gap: var(--space-3);
+    align-items: start;
+    color: var(--text-muted);
+  }
+
+  .list :global(svg) {
+    flex: 0 0 auto;
+    margin-top: 0.2em;
+    color: var(--success);
+  }
+
+  .steps__number {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in oklab, var(--primary) 20%, transparent);
+    color: var(--violet-300);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .steps strong {
+    color: var(--text);
+  }
+
+  form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .privacy-note,
+  .small {
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+  }
+
+  .small {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+  }
+
+  @media (min-width: 700px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1040px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

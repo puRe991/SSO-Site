@@ -1,0 +1,109 @@
+---
+import '@/styles/global.css';
+import { siteConfig } from '@/data/site.config.mjs';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Absolute or root-relative OG image. Defaults to the generated social card. */
+  image?: string;
+  noindex?: boolean;
+  /** Extra JSON-LD blocks for this page. */
+  structuredData?: Record<string, unknown>[];
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description = siteConfig.description,
+  image = '/og.svg',
+  noindex = false,
+  structuredData = [],
+  bodyClass,
+} = Astro.props;
+
+const pageTitle = title ? `${title} — ${siteConfig.name}` : `${siteConfig.name} — Gaming Community`;
+const canonical = new URL(Astro.url.pathname, siteConfig.url).toString();
+const ogImage = new URL(image, siteConfig.url).toString();
+
+const baseStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: siteConfig.name,
+  alternateName: siteConfig.shortName,
+  url: siteConfig.url,
+  description: siteConfig.description,
+};
+---
+
+<!doctype html>
+<html lang={siteConfig.locale} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content={siteConfig.themeColor} />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} News`} href="/rss.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:title" content={title ?? siteConfig.name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title ?? siteConfig.name} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify([baseStructuredData, ...structuredData])}
+    />
+  </head>
+  <body class={bodyClass}>
+    <div class="backdrop" aria-hidden="true"></div>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+
+    <p class="offline-banner" role="status" hidden data-offline>
+      You are offline. Some content may be out of date.
+    </p>
+
+    <style>
+      .offline-banner {
+        position: fixed;
+        inset-block-end: 0;
+        inset-inline: 0;
+        z-index: var(--z-toast);
+        padding: var(--space-3);
+        background: var(--warning);
+        color: var(--text-inverse);
+        font-size: var(--text-sm);
+        text-align: center;
+      }
+    </style>
+
+    <script is:inline>
+      // Connection state. Inline and tiny so it works before hydration.
+      (function () {
+        var banner = document.querySelector('[data-offline]');
+        if (!banner) return;
+        var sync = function () {
+          banner.hidden = navigator.onLine;
+        };
+        window.addEventListener('online', sync);
+        window.addEventListener('offline', sync);
+        sync();
+      })();
+    </script>
+  </body>
+</html>
