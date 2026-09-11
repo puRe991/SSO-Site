@@ -1,0 +1,123 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Alert from '@/components/Alert.astro';
+
+/**
+ * Leaderboard.
+ *
+ * The ranking architecture is in place (see `members.xp` and the XP level model
+ * in `data/ranks.ts`), but there is no activity data source yet. Rather than
+ * showing invented numbers, the page states that plainly.
+ */
+const categories = [
+  { id: 'clan-xp', label: 'Clan XP' },
+  { id: 'activity', label: 'Activity' },
+  { id: 'events', label: 'Events attended' },
+  { id: 'wins', label: 'Wins' },
+  { id: 'contributions', label: 'Community contributions' },
+];
+
+const active = Astro.url.searchParams.get('category') ?? 'clan-xp';
+const entries: { username: string; slug: string; value: number }[] = [];
+---
+
+<PageLayout title="Leaderboard" description="Clan rankings of Team Fairy Tight.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Rankings</p>
+      <h1>Leaderboard</h1>
+
+      <div class="notice">
+        <Alert tone="info" title="No data source connected">
+          The ranking system is prepared but no activity data is being collected yet. As soon as a
+          source (clan XP, event attendance, match results) is connected, the tables fill
+          automatically.
+        </Alert>
+      </div>
+
+      <nav class="chips" aria-label="Leaderboard categories">
+        {
+          categories.map((category) => (
+            <a
+              href={`/leaderboard?category=${category.id}`}
+              class:list={['chip', active === category.id && 'chip--active']}
+              aria-current={active === category.id ? 'true' : undefined}
+            >
+              {category.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      {
+        entries.length > 0 ? (
+          <table class="board">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Member</th>
+                <th scope="col">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry, index) => (
+                <tr>
+                  <td>{index + 1}</td>
+                  <td>
+                    <a href={`/members/${entry.slug}`}>{entry.username}</a>
+                  </td>
+                  <td>{entry.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <EmptyState title="No statistics available yet." icon="star" />
+        )
+      }
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .notice {
+    margin-block: var(--space-5);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+  }
+
+  .chip {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .chip--active {
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    border-color: var(--border-brand);
+    color: var(--text);
+  }
+
+  .board {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .board th,
+  .board td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border);
+    text-align: start;
+  }
+</style>

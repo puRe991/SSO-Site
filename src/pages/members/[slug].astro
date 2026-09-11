@@ -1,0 +1,211 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Avatar from '@/components/Avatar.astro';
+import RankBadge from '@/components/RankBadge.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import Badge from '@/components/Badge.astro';
+import Card from '@/components/Card.astro';
+import SocialLinks from '@/components/SocialLinks.astro';
+import GameCard from '@/components/GameCard.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Button from '@/components/Button.astro';
+import { getMemberBySlug, getRanks } from '@/server/services/content';
+import { formatDate } from '@/lib/format';
+import { orTBD } from '@/data/tbd';
+import { renderRichText } from '@/lib/text';
+
+const { slug } = Astro.params;
+const member = slug ? await getMemberBySlug(Astro.locals, slug) : null;
+
+if (!member) {
+  return Astro.rewrite('/404');
+}
+
+const ranks = await getRanks(Astro.locals);
+const joined = formatDate(member.joinedAt);
+const name = member.displayName ?? member.username;
+---
+
+<PageLayout
+  title={member.username}
+  description={`${name} — member of Team Fairy Tight.`}
+  structuredData={[
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      mainEntity: { '@type': 'Person', name, identifier: member.username },
+    },
+  ]}
+>
+  <section class="section">
+    <div class="container">
+      <a class="back" href="/members">← All members</a>
+
+      <header class="profile">
+        <Avatar name={member.username} src={member.avatarUrl} status={member.status} size={112} />
+        <div class="profile__identity">
+          <h1>{member.username}</h1>
+          {member.displayName && <p class="profile__display">{member.displayName}</p>}
+          <div class="cluster">
+            <RankBadge rankId={member.rank} ranks={ranks} />
+            <StatusBadge status={member.status} />
+            {member.isDemo && <Badge tone="warning">Demo profile</Badge>}
+          </div>
+          {member.socials && <SocialLinks links={member.socials} />}
+        </div>
+      </header>
+
+      <div class="layout">
+        <div class="layout__main">
+          <Card>
+            <h2 class="h3">Bio</h2>
+            {
+              member.bio ? (
+                <div class="prose" set:html={renderRichText(member.bio)} />
+              ) : (
+                <p class="text-muted">No bio written yet.</p>
+              )
+            }
+          </Card>
+
+          <section aria-labelledby="member-games">
+            <h2 class="h3" id="member-games">Games</h2>
+            {
+              member.games && member.games.length > 0 ? (
+                <div class="grid-auto" style="--min-col:240px">
+                  {member.games.map((game) => (
+                    <GameCard game={game} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No games assigned yet." icon="gamepad" />
+              )
+            }
+          </section>
+
+          <section aria-labelledby="member-achievements">
+            <h2 class="h3" id="member-achievements">Achievements</h2>
+            <EmptyState
+              title="No achievements recorded for this member."
+              description="Achievements are linked to members in the admin area."
+              icon="trophy"
+            />
+          </section>
+        </div>
+
+        <aside class="layout__side">
+          <Card>
+            <h2 class="h3">Clan info</h2>
+            <dl class="meta">
+              <div>
+                <dt>Role</dt>
+                <dd>{orTBD(member.role)}</dd>
+              </div>
+              <div>
+                <dt>Main game</dt>
+                <dd>{orTBD(member.mainGame)}</dd>
+              </div>
+              <div>
+                <dt>Joined</dt>
+                <dd>{joined ?? '—'}</dd>
+              </div>
+            </dl>
+          </Card>
+
+          <Card>
+            <h2 class="h3">Clan stats</h2>
+            <p class="text-muted small">
+              No statistics available yet. Activity, events and XP appear here once a data source is
+              connected.
+            </p>
+          </Card>
+
+          <Button href="/members" variant="ghost" full>Back to roster</Button>
+        </aside>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .back:hover {
+    color: var(--text);
+  }
+
+  .profile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .profile__identity {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .profile__display {
+    color: var(--text-muted);
+  }
+
+  .layout {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+
+  .layout__main {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+
+  .layout__side {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  .meta {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .meta dt {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .meta dd {
+    margin: var(--space-1) 0 0;
+  }
+
+  .small {
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 940px) {
+    .layout {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+  }
+</style>

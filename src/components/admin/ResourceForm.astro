@@ -1,0 +1,75 @@
+---
+import AdminField from './AdminField.astro';
+import Button from '@/components/Button.astro';
+import Alert from '@/components/Alert.astro';
+import { CSRF_FIELD } from '@/server/security/csrf';
+import type { ResourceDef } from '@/server/admin/resources';
+import type { Lookups } from '@/server/admin/lookups';
+
+interface Props {
+  resource: ResourceDef;
+  values: Record<string, string>;
+  errors: Record<string, string>;
+  lookups: Lookups;
+  submitLabel: string;
+}
+
+const { resource, values, errors, lookups, submitLabel } = Astro.props;
+---
+
+<form method="post" novalidate class="resource-form">
+  <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+
+  {errors._form && <Alert tone="danger">{errors._form}</Alert>}
+
+  <div class="resource-form__fields">
+    {
+      resource.fields.map((field) => (
+        <div class:list={[(field.type === 'textarea' || field.type === 'checkbox') && 'span-2']}>
+          <AdminField
+            field={field}
+            value={values[field.name] ?? ''}
+            error={errors[field.name]}
+            lookups={lookups as unknown as Record<string, { value: string; label: string }[]>}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="resource-form__actions">
+    <Button type="submit" variant="primary">{submitLabel}</Button>
+    <Button href={`/admin/${resource.key}`} variant="ghost">Cancel</Button>
+  </div>
+</form>
+
+<style>
+  .resource-form {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 860px;
+  }
+
+  .resource-form__fields {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .resource-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (min-width: 760px) {
+    .resource-form__fields {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .span-2 {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

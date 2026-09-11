@@ -1,0 +1,26 @@
+---
+import Badge from './Badge.astro';
+import { rankById } from '@/data/ranks';
+import type { Rank } from '@/types';
+
+interface Props {
+  rankId: string | null | undefined;
+  ranks: Rank[];
+  size?: 'sm' | 'md';
+}
+
+const { rankId, ranks, size = 'md' } = Astro.props;
+const rank = rankById(ranks, rankId);
+---
+
+{
+  rank ? (
+    <Badge tone={rank.tone} size={size}>
+      {rank.label}
+    </Badge>
+  ) : (
+    <Badge tone="neutral" size={size}>
+      Rank TBD
+    </Badge>
+  )
+}

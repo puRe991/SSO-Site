@@ -1,0 +1,38 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Alert from '@/components/Alert.astro';
+import { getSettings } from '@/server/services/settings';
+import { renderRichText } from '@/lib/text';
+import { isTBD } from '@/data/tbd';
+
+const settings = await getSettings(Astro.locals);
+const content = settings['privacy.content'];
+const hasContent = !isTBD(content);
+---
+
+<PageLayout title="Privacy" description="Privacy — Team Fairy Tight." noindex={!hasContent}>
+  <section class="section">
+    <div class="container container-narrow">
+      <h1>Privacy</h1>
+      {
+        hasContent ? (
+          <div class="prose body" set:html={renderRichText(content)} />
+        ) : (
+          <div class="notice">
+            <Alert tone="warning" title="Placeholder">
+              No privacy notice has been supplied yet. It must be written by the site operator and is not generated automatically.
+            </Alert>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .body,
+  .notice {
+    margin-top: var(--space-5);
+    max-width: none;
+  }
+</style>

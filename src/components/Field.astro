@@ -1,0 +1,193 @@
+---
+interface Props {
+  label: string;
+  name: string;
+  type?: 'text' | 'email' | 'password' | 'number' | 'url' | 'date' | 'datetime-local' | 'textarea' | 'select' | 'checkbox';
+  value?: string | number | null;
+  required?: boolean;
+  placeholder?: string;
+  hint?: string;
+  error?: string;
+  rows?: number;
+  options?: { value: string; label: string }[];
+  checked?: boolean;
+  autocomplete?: string;
+  maxlength?: number;
+  min?: number;
+}
+
+const {
+  label,
+  name,
+  type = 'text',
+  value = '',
+  required = false,
+  placeholder,
+  hint,
+  error,
+  rows = 5,
+  options = [],
+  checked = false,
+  autocomplete,
+  maxlength,
+  min,
+} = Astro.props;
+
+const id = `field-${name}`;
+const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(' ');
+---
+
+<div class:list={['field', error && 'field--error', type === 'checkbox' && 'field--checkbox']}>
+  {
+    type === 'checkbox' ? (
+      <label class="field__inline" for={id}>
+        <input type="checkbox" id={id} name={name} value="true" checked={checked} />
+        <span>{label}</span>
+      </label>
+    ) : (
+      <>
+        <label class="field__label" for={id}>
+          {label}
+          {required && (
+            <span class="field__required" aria-hidden="true">
+              *
+            </span>
+          )}
+        </label>
+
+        {type === 'textarea' ? (
+          <textarea
+            id={id}
+            name={name}
+            rows={rows}
+            required={required}
+            placeholder={placeholder}
+            maxlength={maxlength}
+            aria-describedby={describedBy || undefined}
+            aria-invalid={error ? 'true' : undefined}
+          >
+            {value}
+          </textarea>
+        ) : type === 'select' ? (
+          <select
+            id={id}
+            name={name}
+            required={required}
+            aria-describedby={describedBy || undefined}
+            aria-invalid={error ? 'true' : undefined}
+          >
+            {options.map((option) => (
+              <option value={option.value} selected={String(value) === option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            id={id}
+            type={type}
+            name={name}
+            value={value ?? ''}
+            required={required}
+            placeholder={placeholder}
+            autocomplete={autocomplete}
+            maxlength={maxlength}
+            min={min}
+            aria-describedby={describedBy || undefined}
+            aria-invalid={error ? 'true' : undefined}
+          />
+        )}
+      </>
+    )
+  }
+
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  {error && <p class="field__error" id={`${id}-error`}>{error}</p>}
+</div>
+
+<style>
+  .field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .field__label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .field__required {
+    color: var(--secondary);
+    margin-inline-start: 0.2em;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--background-elevated);
+    color: var(--text);
+    font-size: var(--text-sm);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 7rem;
+    line-height: var(--leading-normal);
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: none;
+    border-color: var(--border-brand);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-subtle);
+  }
+
+  .field--error input,
+  .field--error textarea,
+  .field--error select {
+    border-color: color-mix(in oklab, var(--danger) 60%, transparent);
+  }
+
+  .field__hint {
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+  }
+
+  .field__error {
+    font-size: var(--text-xs);
+    color: var(--danger);
+  }
+
+  .field__inline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .field__inline input {
+    width: 1.1rem;
+    height: 1.1rem;
+    padding: 0;
+    accent-color: var(--primary);
+  }
+</style>

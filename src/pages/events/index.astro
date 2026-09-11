@@ -1,0 +1,177 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import EventCard from '@/components/EventCard.astro';
+import FilterBar from '@/components/FilterBar.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import { listEvents, listGames } from '@/server/services/content';
+import { formatDate } from '@/lib/format';
+
+const params = Astro.url.searchParams;
+const gameFilter = params.get('game') ?? undefined;
+const statusFilter = params.get('status') ?? undefined;
+
+const [games, upcoming, past] = await Promise.all([
+  listGames(Astro.locals),
+  listEvents(Astro.locals, { when: 'upcoming', game: gameFilter, status: statusFilter }),
+  listEvents(Astro.locals, { when: 'past', game: gameFilter, status: statusFilter, limit: 12 }),
+]);
+
+/** Groups upcoming events by month for the calendar overview. */
+const byMonth = new Map<string, typeof upcoming>();
+for (const event of upcoming) {
+  const key = new Date(event.startsAt).toLocaleDateString('en', { month: 'long', year: 'numeric' });
+  byMonth.set(key, [...(byMonth.get(key) ?? []), event]);
+}
+---
+
+<PageLayout title="Events" description="Clan evenings, tournaments and community events.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Calendar</p>
+      <h1>Events</h1>
+
+      <div class="controls">
+        <FilterBar
+          searchName="q"
+          searchPlaceholder="Search events…"
+          groups={[
+            {
+              name: 'game',
+              label: 'Game',
+              value: gameFilter,
+              options: games.map((game) => ({ value: game.slug, label: game.name })),
+            },
+            {
+              name: 'status',
+              label: 'Status',
+              value: statusFilter,
+              options: [
+                { value: 'upcoming', label: 'Upcoming' },
+                { value: 'live', label: 'Live' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'cancelled', label: 'Cancelled' },
+              ],
+            },
+          ]}
+        />
+      </div>
+
+      <SectionHeader eyebrow="Coming up" title="Upcoming events" />
+      {
+        upcoming.length > 0 ? (
+          [...byMonth.entries()].map(([month, monthEvents]) => (
+            <div class="month">
+              <h3 class="month__title">{month}</h3>
+              <div class="grid-auto" style="--min-col:300px">
+                {monthEvents.map((event) => (
+                  <EventCard event={event} countdown />
+                ))}
+              </div>
+            </div>
+          ))
+        ) : (
+          <EmptyState
+            title="No upcoming events."
+            description="New events appear here as soon as the team schedules them."
+            icon="calendar"
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Archive" title="Past events" />
+      {
+        past.length > 0 ? (
+          <ul class="past" role="list">
+            {past.map((event) => (
+              <li>
+                <a href={`/events/${event.slug}`}>
+                  <span class="past__date">{formatDate(event.startsAt) ?? '—'}</span>
+                  <span class="past__title">{event.title}</span>
+                  <span class="past__status">{event.status}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No past events recorded." icon="clock" />
+        )
+      }
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .controls {
+    margin-block: var(--space-5) var(--space-7);
+  }
+
+  .month + .month {
+    margin-top: var(--space-6);
+  }
+
+  .month__title {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .past {
+    display: grid;
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--border);
+  }
+
+  .past a {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    background: var(--surface);
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .past a:hover {
+    background: var(--surface-hover);
+  }
+
+  .past__date {
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+  }
+
+  .past__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .past__status {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 720px) {
+    .past a {
+      grid-template-columns: 8rem 1fr 8rem;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .past__status {
+      text-align: end;
+    }
+  }
+</style>

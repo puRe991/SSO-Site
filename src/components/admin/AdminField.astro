@@ -1,0 +1,31 @@
+---
+import Field from '@/components/Field.astro';
+import type { FieldDef } from '@/server/admin/resources';
+
+interface Props {
+  field: FieldDef;
+  value: string;
+  error?: string;
+  /** Dynamic option lists, keyed by `optionsFrom`. */
+  lookups: Record<string, { value: string; label: string }[]>;
+}
+
+const { field, value, error, lookups } = Astro.props;
+
+const options = field.optionsFrom
+  ? [{ value: '', label: '—' }, ...(lookups[field.optionsFrom] ?? [])]
+  : field.options;
+---
+
+<Field
+  label={field.label}
+  name={field.name}
+  type={field.type ?? 'text'}
+  value={value}
+  error={error}
+  required={field.required}
+  hint={field.hint}
+  options={options}
+  checked={field.type === 'checkbox' && value === 'true'}
+  maxlength={field.maxlength}
+/>

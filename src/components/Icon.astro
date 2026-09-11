@@ -1,0 +1,32 @@
+---
+/**
+ * Inline icon. Icons are inlined SVG (no icon font, no network request) and
+ * inherit `currentColor`, so they follow the design tokens automatically.
+ */
+import { iconPaths, type IconName } from '@/lib/icons';
+
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+  title?: string;
+}
+
+const { name, size = 20, class: className, title } = Astro.props;
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.7"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden={title ? undefined : 'true'}
+  role={title ? 'img' : undefined}
+  focusable="false"
+  set:html={(title ? `<title>${title}</title>` : '') + iconPaths[name]}
+/>

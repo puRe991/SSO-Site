@@ -1,0 +1,52 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import AchievementCard from '@/components/AchievementCard.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import DemoNotice from '@/components/DemoNotice.astro';
+import { listAchievements } from '@/server/services/content';
+
+const achievements = await listAchievements(Astro.locals);
+const hasDemo = achievements.some((achievement) => achievement.isDemo);
+---
+
+<PageLayout title="Achievements" description="Milestones and results of Team Fairy Tight.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Milestones</p>
+      <h1>Achievements</h1>
+      <p class="text-muted intro">
+        Only results the clan has actually recorded appear here. Nothing on this page is generated
+        or estimated.
+      </p>
+
+      {hasDemo && <div class="notice"><DemoNotice what="achievements" /></div>}
+
+      {
+        achievements.length > 0 ? (
+          <div class="grid-auto" style="--min-col:320px">
+            {achievements.map((achievement) => (
+              <AchievementCard achievement={achievement} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No achievements recorded yet."
+            description="Tournament results, milestones and clan goals are entered in the admin area."
+            icon="trophy"
+          />
+        )
+      }
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .intro {
+    margin-top: var(--space-2);
+    max-width: 60ch;
+  }
+
+  .notice {
+    margin-block: var(--space-5);
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import AdminHeader from '@/components/admin/AdminHeader.astro';
+import ResourceForm from '@/components/admin/ResourceForm.astro';
+import { getDatabase } from '@/server/database/client';
+import { getResource } from '@/server/admin/resources';
+import { handleResourceSubmit } from '@/server/admin/handle';
+import { loadLookups } from '@/server/admin/lookups';
+import { adminIcons, visibleAdminNav } from '@/lib/admin-nav';
+import { can } from '@/data/permissions';
+
+const resource = getResource(Astro.params.resource);
+if (!resource || !resource.canCreate) return Astro.rewrite('/404');
+
+const user = Astro.locals.user!;
+if (!can(user.role, resource.permission)) {
+  return new Response('Forbidden', { status: 403 });
+}
+
+let values: Record<string, string> = { status: resource.fields.find((f) => f.name === 'status')?.options?.[0]?.value ?? '', isVisible: 'true' };
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === 'POST') {
+  const result = await handleResourceSubmit(Astro, resource, null);
+  if (result.redirectTo) return Astro.redirect(result.redirectTo, 303);
+  values = result.values;
+  errors = result.errors;
+}
+
+const lookups = await loadLookups(getDatabase(Astro.locals));
+---
+
+<DashboardLayout
+  title={`Admin — New ${resource.singular}`}
+  heading="Administration"
+  nav={visibleAdminNav(user.role)}
+  icons={adminIcons}
+>
+  <AdminHeader
+    eyebrow={resource.label}
+    title={`New ${resource.singular.toLowerCase()}`}
+    description="Fields you leave empty stay empty — nothing is filled in automatically."
+  />
+  <ResourceForm
+    resource={resource}
+    values={values}
+    errors={errors}
+    lookups={lookups}
+    submitLabel="Create"
+  />
+</DashboardLayout>

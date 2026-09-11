@@ -1,0 +1,83 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import NewsCard from '@/components/NewsCard.astro';
+import FilterBar from '@/components/FilterBar.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Pagination from '@/components/Pagination.astro';
+import { listNews, listNewsCategories } from '@/server/services/content';
+
+const params = Astro.url.searchParams;
+const query = {
+  category: params.get('category') ?? undefined,
+  search: params.get('q') ?? undefined,
+  page: Number.parseInt(params.get('page') ?? '1', 10) || 1,
+  pageSize: 9,
+};
+
+const [categories, news] = await Promise.all([
+  listNewsCategories(Astro.locals),
+  listNews(Astro.locals, query),
+]);
+
+const [featured, ...rest] = news.items;
+const showFeatured = news.page === 1 && featured;
+---
+
+<PageLayout title="News" description="News and announcements from Team Fairy Tight.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Updates</p>
+      <h1>News</h1>
+
+      <div class="controls">
+        <FilterBar
+          searchValue={query.search ?? ''}
+          searchPlaceholder="Search news…"
+          groups={[
+            {
+              name: 'category',
+              label: 'Category',
+              value: query.category,
+              options: categories.map((category) => ({
+                value: category.id,
+                label: category.label,
+              })),
+            },
+          ]}
+        />
+      </div>
+
+      {
+        news.items.length > 0 ? (
+          <div class="list">
+            {showFeatured && featured && <NewsCard article={featured} featured />}
+            <div class="grid-auto" style="--min-col:280px">
+              {(showFeatured ? rest : news.items).map((article) => (
+                <NewsCard article={article} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <EmptyState
+            title="No news yet."
+            description="Announcements from the clan appear here."
+            icon="news"
+          />
+        )
+      }
+
+      <Pagination page={news.page} totalPages={news.totalPages} />
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .controls {
+    margin-block: var(--space-5);
+  }
+
+  .list {
+    display: grid;
+    gap: var(--space-5);
+  }
+</style>

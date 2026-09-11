@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1200" y2="630">
+      <stop offset="0%" stop-color="#c4a8ff"/>
+      <stop offset="50%" stop-color="#f06bd8"/>
+      <stop offset="100%" stop-color="#4fd8ef"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#8b4dff" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#07070c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#07070c"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g fill="none" stroke="#232334" stroke-width="1" opacity="0.55">
+    <path d="M0 90h1200M0 180h1200M0 270h1200M0 360h1200M0 450h1200M0 540h1200"/>
+    <path d="M100 0v630M200 0v630M300 0v630M400 0v630M500 0v630M600 0v630M700 0v630M800 0v630M900 0v630M1000 0v630M1100 0v630"/>
+  </g>
+  <g transform="translate(96 210)">
+    <path d="M34 0 64 17v34L34 68 4 51V17z" fill="none" stroke="url(#brand)" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M18 22h32M34 22v28" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="96" y="360" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="92" font-weight="700" letter-spacing="-2" fill="url(#brand)">TEAM FAIRY TIGHT</text>
+  <text x="100" y="426" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="34" letter-spacing="9" fill="#a0a0b6">GAMING • COMMUNITY • TEAMWORK</text>
+</svg>

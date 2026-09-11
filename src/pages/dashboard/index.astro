@@ -1,0 +1,322 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import Card from '@/components/Card.astro';
+import Field from '@/components/Field.astro';
+import Button from '@/components/Button.astro';
+import Alert from '@/components/Alert.astro';
+import Badge from '@/components/Badge.astro';
+import Avatar from '@/components/Avatar.astro';
+import RankBadge from '@/components/RankBadge.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import { eq } from 'drizzle-orm';
+import { getDatabase, schema } from '@/server/database/client';
+import { getRanks, getNotifications } from '@/server/services/content';
+import { mapMember } from '@/server/services/mappers';
+import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
+import { fieldErrors, formToObject, passwordChangeSchema, profileSchema } from '@/server/validation/schemas';
+import { hashPassword, verifyPassword } from '@/server/security/crypto';
+import { canAccessAdmin } from '@/data/permissions';
+import type { NavItem } from '@/data/navigation';
+import type { IconName } from '@/lib/icons';
+
+const user = Astro.locals.user!;
+const database = getDatabase(Astro.locals);
+
+let errors: Record<string, string> = {};
+let notice: string | null = null;
+
+if (Astro.request.method === 'POST' && database) {
+  const form = await Astro.request.formData();
+  const values = formToObject(form);
+
+  if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
+    errors._form = 'Your session expired. Please try again.';
+  } else if (values.intent === 'profile' && user.memberId) {
+    const parsed = profileSchema.safeParse(values);
+    if (!parsed.success) {
+      errors = fieldErrors(parsed.error);
+    } else {
+      await database
+        .update(schema.members)
+        .set({
+          displayName: parsed.data.displayName || null,
+          bio: parsed.data.bio || null,
+          avatarUrl: parsed.data.avatarUrl || null,
+          status: parsed.data.status,
+          updatedAt: Math.floor(Date.now() / 1000),
+        })
+        .where(eq(schema.members.id, user.memberId));
+      notice = 'Profile updated.';
+    }
+  } else if (values.intent === 'password') {
+    const parsed = passwordChangeSchema.safeParse(values);
+    if (!parsed.success) {
+      errors = fieldErrors(parsed.error);
+    } else {
+      const rows = await database
+        .select({ passwordHash: schema.users.passwordHash })
+        .from(schema.users)
+        .where(eq(schema.users.id, user.id))
+        .limit(1);
+      const current = rows[0];
+      if (!current || !(await verifyPassword(parsed.data.currentPassword, current.passwordHash))) {
+        errors.currentPassword = 'Current password is incorrect.';
+      } else {
+        await database
+          .update(schema.users)
+          .set({
+            passwordHash: await hashPassword(parsed.data.password),
+            updatedAt: Math.floor(Date.now() / 1000),
+          })
+          .where(eq(schema.users.id, user.id));
+        notice = 'Password changed.';
+      }
+    }
+  }
+}
+
+const [ranks, notifications] = await Promise.all([
+  getRanks(Astro.locals),
+  getNotifications(Astro.locals, user.id),
+]);
+
+const memberRows =
+  database && user.memberId
+    ? await database.select().from(schema.members).where(eq(schema.members.id, user.memberId)).limit(1)
+    : [];
+const member = memberRows[0] ? mapMember(memberRows[0]) : null;
+
+const events =
+  database
+    ? await database
+        .select({ event: schema.events })
+        .from(schema.eventParticipants)
+        .innerJoin(schema.events, eq(schema.events.id, schema.eventParticipants.eventId))
+        .where(eq(schema.eventParticipants.userId, user.id))
+        .limit(10)
+    : [];
+
+const nav: NavItem[] = [
+  { label: 'Overview', href: '/dashboard', match: '^/dashboard/?$' },
+  { label: 'Members', href: '/members' },
+  { label: 'Events', href: '/events' },
+  { label: 'Join Us', href: '/join' },
+];
+const icons: Record<string, IconName> = {
+  '/dashboard': 'dashboard',
+  '/members': 'users',
+  '/events': 'calendar',
+  '/join': 'inbox',
+};
+---
+
+<DashboardLayout title="Dashboard" heading="Member area" nav={nav} icons={icons}>
+  <header class="head">
+    <div>
+      <p class="eyebrow">Dashboard</p>
+      <h1>Welcome back</h1>
+      <p class="text-muted">{user.email}</p>
+    </div>
+    <div class="cluster">
+      <Badge tone="accent">{user.role}</Badge>
+      {canAccessAdmin(user.role) && <Button href="/admin" variant="secondary" size="sm">Admin area</Button>}
+    </div>
+  </header>
+
+  {notice && <div class="block"><Alert tone="success">{notice}</Alert></div>}
+  {errors._form && <div class="block"><Alert tone="danger">{errors._form}</Alert></div>}
+
+  <div class="grid">
+    <Card>
+      <h2 class="h3">Clan profile</h2>
+      {
+        member ? (
+          <>
+            <div class="profile">
+              <Avatar name={member.username} src={member.avatarUrl} status={member.status} size={64} />
+              <div>
+                <p class="profile__name">{member.username}</p>
+                <RankBadge rankId={member.rank} ranks={ranks} size="sm" />
+              </div>
+            </div>
+
+            <form method="post" novalidate>
+              <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+              <input type="hidden" name="intent" value="profile" />
+              <Field label="Display name" name="displayName" value={member.displayName ?? ''} error={errors.displayName} maxlength={60} />
+              <Field label="Avatar URL" name="avatarUrl" type="url" value={member.avatarUrl ?? ''} error={errors.avatarUrl} />
+              <Field
+                label="Status"
+                name="status"
+                type="select"
+                value={member.status}
+                options={[
+                  { value: 'online', label: 'Online' },
+                  { value: 'away', label: 'Away' },
+                  { value: 'dnd', label: 'Do not disturb' },
+                  { value: 'offline', label: 'Offline' },
+                ]}
+              />
+              <Field label="Bio" name="bio" type="textarea" value={member.bio ?? ''} error={errors.bio} maxlength={2000} />
+              <Button type="submit" variant="primary" full>Save profile</Button>
+            </form>
+          </>
+        ) : (
+          <EmptyState
+            title="No clan profile linked."
+            description="Your account is not linked to a clan member yet. An admin can connect the two."
+            icon="user"
+          />
+        )
+      }
+    </Card>
+
+    <div class="column">
+      <Card>
+        <h2 class="h3">My events</h2>
+        {
+          events.length > 0 ? (
+            <ul class="list" role="list">
+              {events.map(({ event }) => (
+                <li>
+                  <a href={`/events/${event.slug}`}>{event.title}</a>
+                  <span class="text-muted">{new Date(event.startsAt * 1000).toLocaleDateString('en')}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-muted small">You are not signed up for any events.</p>
+          )
+        }
+      </Card>
+
+      <Card>
+        <h2 class="h3">Notifications</h2>
+        {
+          notifications.length > 0 ? (
+            <ul class="list" role="list">
+              {notifications.map((item) => (
+                <li>
+                  {item.href ? <a href={item.href}>{item.title}</a> : <span>{item.title}</span>}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-muted small">No notifications.</p>
+          )
+        }
+      </Card>
+
+      <Card>
+        <h2 class="h3">Change password</h2>
+        <form method="post" novalidate>
+          <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+          <input type="hidden" name="intent" value="password" />
+          <Field
+            label="Current password"
+            name="currentPassword"
+            type="password"
+            required
+            error={errors.currentPassword}
+            autocomplete="current-password"
+          />
+          <Field
+            label="New password"
+            name="password"
+            type="password"
+            required
+            error={errors.password}
+            autocomplete="new-password"
+            hint="At least 12 characters."
+          />
+          <Field
+            label="Repeat new password"
+            name="passwordConfirm"
+            type="password"
+            required
+            error={errors.passwordConfirm}
+            autocomplete="new-password"
+          />
+          <Button type="submit" variant="secondary" full>Change password</Button>
+        </form>
+      </Card>
+    </div>
+  </div>
+</DashboardLayout>
+
+<style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .block {
+    margin-top: var(--space-4);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+    align-items: start;
+  }
+
+  .column {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  .profile__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+  }
+
+  form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .list li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .small {
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 1000px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Navbar from '@/components/Navbar.astro';
+import Footer from '@/components/Footer.astro';
+import { getSettings } from '@/server/services/settings';
+import type { SocialPlatform } from '@/types';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  structuredData?: Record<string, unknown>[];
+}
+
+const settings = await getSettings(Astro.locals);
+
+const socials: { platform: SocialPlatform; label: string; url: string }[] = [
+  { platform: 'discord', label: 'Discord', url: settings['social.discord'] },
+  { platform: 'youtube', label: 'YouTube', url: settings['social.youtube'] },
+  { platform: 'twitch', label: 'Twitch', url: settings['social.twitch'] },
+  { platform: 'instagram', label: 'Instagram', url: settings['social.instagram'] },
+  { platform: 'tiktok', label: 'TikTok', url: settings['social.tiktok'] },
+  { platform: 'x', label: 'X', url: settings['social.x'] },
+  { platform: 'facebook', label: 'Facebook', url: settings['social.facebook'] },
+  { platform: 'steam', label: 'Steam', url: settings['social.steam'] },
+];
+---
+
+<BaseLayout {...Astro.props}>
+  <Navbar discordUrl={settings['social.discord']} />
+  <main id="main">
+    <slot />
+  </main>
+  <Footer socials={socials} />
+</BaseLayout>

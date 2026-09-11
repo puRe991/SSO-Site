@@ -1,0 +1,81 @@
+---
+import Icon from './Icon.astro';
+import type { IconName } from '@/lib/icons';
+import { isTBD } from '@/data/tbd';
+import type { SocialPlatform } from '@/types';
+
+interface Props {
+  links: { platform: SocialPlatform | string; label?: string; url: string }[];
+  size?: number;
+  class?: string;
+}
+
+const { links, size = 18, class: className } = Astro.props;
+
+const iconFor: Record<string, IconName> = {
+  discord: 'discord',
+  youtube: 'youtube',
+  twitch: 'twitch',
+  instagram: 'instagram',
+  tiktok: 'tiktok',
+  x: 'x',
+  facebook: 'facebook',
+  steam: 'steam',
+  github: 'github',
+};
+
+// A platform appears only when its URL is real — placeholders are never linked.
+const visible = links.filter((link) => !isTBD(link.url));
+---
+
+{
+  visible.length > 0 && (
+    <ul class:list={['socials', className]} role="list">
+      {visible.map((link) => (
+        <li>
+          <a
+            href={link.url}
+            class="socials__link"
+            rel="noopener noreferrer me"
+            target="_blank"
+            aria-label={link.label ?? link.platform}
+            title={link.label ?? link.platform}
+          >
+            <Icon name={iconFor[link.platform] ?? 'link'} size={size} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .socials__link {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .socials__link:hover {
+    color: var(--text);
+    border-color: var(--border-brand);
+    transform: translateY(-2px);
+  }
+</style>

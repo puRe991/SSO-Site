@@ -1,0 +1,265 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Card from '@/components/Card.astro';
+import Badge from '@/components/Badge.astro';
+import Button from '@/components/Button.astro';
+import { getSettings } from '@/server/services/settings';
+import { getClanStats, getRanks, listGames } from '@/server/services/content';
+import { clanConfig } from '@/data/clan.config';
+import { isTBD, orTBD } from '@/data/tbd';
+import { renderRichText } from '@/lib/text';
+
+const [settings, stats, games, ranks] = await Promise.all([
+  getSettings(Astro.locals),
+  getClanStats(Astro.locals),
+  listGames(Astro.locals),
+  getRanks(Astro.locals),
+]);
+
+const description = settings['clan.description'];
+const history = settings['clan.history'];
+const values = settings['clan.values'];
+const goals = settings['clan.goals'];
+---
+
+<PageLayout
+  title="The Clan"
+  description={`About ${clanConfig.name} — the clan, its values and its activities.`}
+>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">About</p>
+      <h1>About {clanConfig.name}</h1>
+      <p class="lead text-muted">{clanConfig.type}</p>
+
+      <dl class="facts">
+        <div>
+          <dt>Short name</dt>
+          <dd>{clanConfig.shortName}</dd>
+        </div>
+        <div>
+          <dt>Founded</dt>
+          <dd>{orTBD(settings['clan.founded'])}</dd>
+        </div>
+        <div>
+          <dt>Members</dt>
+          <dd>{stats.totalMembers ?? '—'}</dd>
+        </div>
+        <div>
+          <dt>Active games</dt>
+          <dd>{stats.activeGames ?? '—'}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Who we are" title="The clan" />
+      {
+        isTBD(description) ? (
+          <EmptyState
+            title="No clan description yet."
+            description="This text is written by the team in the admin area. Until then nothing is filled in here — the history of Team Fairy Tight is not invented."
+            icon="info"
+          />
+        ) : (
+          <div class="prose" set:html={renderRichText(description)} />
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="History" title="How it started" />
+      {
+        isTBD(history) ? (
+          <EmptyState
+            title="The clan history has not been documented yet."
+            description="Founding date, milestones and the story of the team are added by the clan itself."
+            icon="clock"
+          />
+        ) : (
+          <div class="prose" set:html={renderRichText(history)} />
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col">
+      <div>
+        <SectionHeader eyebrow="What we stand for" title="Values" />
+        {
+          values.trim() ? (
+            <div class="prose" set:html={renderRichText(values)} />
+          ) : (
+            <EmptyState title="No values recorded yet." icon="shield" />
+          )
+        }
+      </div>
+      <div>
+        <SectionHeader eyebrow="Where we are heading" title="Goals" />
+        {
+          goals.trim() ? (
+            <div class="prose" set:html={renderRichText(goals)} />
+          ) : (
+            <EmptyState title="No goals recorded yet." icon="star" />
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Rank hierarchy -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader
+        eyebrow="Structure"
+        title="Rank hierarchy"
+        description="A configurable rank model. These ranks are the system default and can be renamed, reordered or removed by the clan at any time."
+      />
+      <ol class="hierarchy" role="list">
+        {
+          ranks.map((rank, index) => (
+            <li class="hierarchy__item">
+              <Badge tone={rank.tone}>{rank.label}</Badge>
+              {index < ranks.length - 1 && (
+                <span class="hierarchy__arrow" aria-hidden="true">
+                  ↓
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Activities" title="Games and community" href="/games" />
+      {
+        games.length > 0 ? (
+          <ul class="games" role="list">
+            {games.map((game) => (
+              <li>
+                <Card href={`/games/${game.slug}`} class="games__item">
+                  <span>{game.name}</span>
+                  <Badge size="sm">{game.status}</Badge>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState
+            title="No games listed yet."
+            description="The games the clan plays are maintained in the admin area."
+            icon="gamepad"
+          />
+        )
+      }
+
+      <div class="cta">
+        <Button href="/members" variant="secondary">Meet the members</Button>
+        <Button href="/join" variant="primary">Join the team</Button>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .lead {
+    margin-top: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .facts dt {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .facts dd {
+    margin: var(--space-1) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+  }
+
+  .two-col {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .hierarchy {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: center;
+    margin: 0;
+    padding: var(--space-5);
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--surface) 55%, transparent);
+  }
+
+  .hierarchy__item {
+    display: grid;
+    gap: var(--space-1);
+    justify-items: center;
+  }
+
+  .hierarchy__arrow {
+    color: var(--text-subtle);
+    font-size: var(--text-sm);
+  }
+
+  .games {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  }
+
+  .games__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  @media (min-width: 860px) {
+    .facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,222 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Badge from '@/components/Badge.astro';
+import Card from '@/components/Card.astro';
+import MemberCard from '@/components/MemberCard.astro';
+import EventCard from '@/components/EventCard.astro';
+import AchievementCard from '@/components/AchievementCard.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Icon from '@/components/Icon.astro';
+import { getGameBySlug, getRanks } from '@/server/services/content';
+import { orTBD } from '@/data/tbd';
+import { renderRichText } from '@/lib/text';
+
+const { slug } = Astro.params;
+const data = slug ? await getGameBySlug(Astro.locals, slug) : null;
+
+if (!data) {
+  return Astro.rewrite('/404');
+}
+
+const { game, members, events, achievements } = data;
+const ranks = await getRanks(Astro.locals);
+---
+
+<PageLayout
+  title={game.name}
+  description={game.description ?? `${game.name} in Team Fairy Tight.`}
+  structuredData={[
+    { '@context': 'https://schema.org', '@type': 'VideoGame', name: game.name, genre: game.genre ?? undefined },
+  ]}
+>
+  <section class="section">
+    <div class="container">
+      <a class="back" href="/games">← All games</a>
+
+      <header class="game-head">
+        <div class="game-head__cover">
+          {
+            game.coverUrl ? (
+              <img src={game.coverUrl} alt="" loading="eager" />
+            ) : (
+              <span class="game-head__placeholder" aria-hidden="true">
+                <Icon name="gamepad" size={36} />
+              </span>
+            )
+          }
+        </div>
+        <div class="game-head__body">
+          <div class="cluster">
+            <Badge tone="primary">{game.status}</Badge>
+            {game.isDemo && <Badge tone="warning">Demo</Badge>}
+          </div>
+          <h1>{game.name}</h1>
+          <p class="text-muted">{orTBD(game.genre)}</p>
+          <div class="cluster">
+            {game.platforms.map((platform) => <Badge size="sm">{platform}</Badge>)}
+          </div>
+        </div>
+      </header>
+
+      <div class="game-body">
+        <div class="game-body__main">
+          <Card>
+            <h2 class="h3">About</h2>
+            {
+              game.description ? (
+                <div class="prose" set:html={renderRichText(game.description)} />
+              ) : (
+                <p class="text-muted">No description written for this game yet.</p>
+              )
+            }
+          </Card>
+
+          <section aria-labelledby="game-members">
+            <h2 class="h3" id="game-members">Clan members</h2>
+            {
+              members.length > 0 ? (
+                <div class="grid-auto" style="--min-col:280px">
+                  {members.map((member) => (
+                    <MemberCard member={member} ranks={ranks} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No members assigned to this game yet." icon="users" />
+              )
+            }
+          </section>
+
+          <section aria-labelledby="game-events">
+            <h2 class="h3" id="game-events">Events</h2>
+            {
+              events.length > 0 ? (
+                <div class="grid-auto" style="--min-col:300px">
+                  {events.map((event) => (
+                    <EventCard event={event} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No events for this game yet." icon="calendar" />
+              )
+            }
+          </section>
+
+          <section aria-labelledby="game-achievements">
+            <h2 class="h3" id="game-achievements">Achievements</h2>
+            {
+              achievements.length > 0 ? (
+                <div class="grid-auto" style="--min-col:320px">
+                  {achievements.map((achievement) => (
+                    <AchievementCard achievement={achievement} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No achievements recorded for this game." icon="trophy" />
+              )
+            }
+          </section>
+        </div>
+
+        <aside class="game-body__side">
+          <Card>
+            <h2 class="h3">Statistics</h2>
+            <p class="text-muted small">
+              No statistics available yet. Match results and player stats appear here once a data
+              source is connected.
+            </p>
+          </Card>
+          <Card>
+            <h2 class="h3">Media</h2>
+            <p class="text-muted small">
+              Screenshots and videos for this game are managed in the <a href="/media">gallery</a>.
+            </p>
+          </Card>
+        </aside>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .game-head {
+    display: grid;
+    gap: var(--space-5);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .game-head__cover {
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-secondary);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .game-head__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .game-head__placeholder {
+    color: var(--text-subtle);
+  }
+
+  .game-head__body {
+    display: grid;
+    gap: var(--space-3);
+    align-content: center;
+  }
+
+  .game-body {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+
+  .game-body__main {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+
+  .game-body__side {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  .small {
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 860px) {
+    .game-head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      align-items: center;
+    }
+  }
+
+  @media (min-width: 1040px) {
+    .game-body {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+  }
+</style>

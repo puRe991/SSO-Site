@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  check:
+    name: Type check and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build:ci
+
+  deploy:
+    name: Deploy to Cloudflare Pages
+    needs: check
+    runs-on: ubuntu-latest
+    # Optional: only runs once CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are
+    # set as repository secrets. Without them the job is skipped, so the default
+    # path (Cloudflare's own Git integration, see DEPLOYMENT.md) keeps working.
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_VIA_ACTIONS == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build:ci
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=team-fairy-tight

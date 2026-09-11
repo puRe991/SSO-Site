@@ -1,0 +1,18 @@
+---
+import Alert from './Alert.astro';
+
+/**
+ * Shown wherever placeholder content is visible, so demo rows are never
+ * mistaken for real clan data.
+ */
+interface Props {
+  what: string;
+}
+
+const { what } = Astro.props;
+---
+
+<Alert tone="warning" title="Demo content">
+  Some {what} on this page are marked <strong>Demo</strong>. Those entries are placeholders for
+  layout purposes, not real Team Fairy Tight data, and can be deleted in the admin area.
+</Alert>

@@ -1,0 +1,145 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import Field from '@/components/Field.astro';
+import Button from '@/components/Button.astro';
+import Alert from '@/components/Alert.astro';
+import { eq } from 'drizzle-orm';
+import { getDatabase, schema } from '@/server/database/client';
+import { verifyPassword } from '@/server/security/crypto';
+import { createSession, purgeExpiredSessions } from '@/server/security/session';
+import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
+import { clientIdentifier, rateLimit } from '@/server/security/rate-limit';
+import { loginSchema, formToObject } from '@/server/validation/schemas';
+import { canAccessAdmin } from '@/data/permissions';
+
+/** Only same-origin paths are accepted as a redirect target (open-redirect guard). */
+function safeNext(value: string | null | undefined): string | null {
+  if (!value || !value.startsWith('/') || value.startsWith('//')) return null;
+  return value;
+}
+
+const nextParam = safeNext(Astro.url.searchParams.get('next'));
+
+if (Astro.locals.user) {
+  return Astro.redirect(nextParam ?? '/dashboard', 302);
+}
+
+let error: string | null = null;
+let values: Record<string, string> = {};
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  values = formToObject(form);
+
+  if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
+    error = 'Your session expired. Please sign in again.';
+  } else {
+    const database = getDatabase(Astro.locals);
+    const identifier = clientIdentifier(Astro.request);
+    const limit = await rateLimit(database, 'login', identifier, 8, 15 * 60);
+
+    if (!limit.allowed) {
+      error = `Too many login attempts. Try again in ${Math.ceil(limit.retryAfterSeconds / 60)} minutes.`;
+    } else {
+      const parsed = loginSchema.safeParse(values);
+      if (!parsed.success) {
+        error = 'Please enter a valid email address and your password.';
+      } else if (!database) {
+        error = 'Login is unavailable because no database is configured.';
+      } else {
+        const rows = await database
+          .select()
+          .from(schema.users)
+          .where(eq(schema.users.emailNormalized, parsed.data.email.toLowerCase()))
+          .limit(1);
+
+        const user = rows[0];
+        // Always run a verification so timing does not reveal whether the
+        // account exists.
+        const dummyHash = 'pbkdf2$210000$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
+        const valid = await verifyPassword(parsed.data.password, user?.passwordHash ?? dummyHash);
+
+        if (!user || !valid || !user.isActive) {
+          error = 'Email address or password is incorrect.';
+        } else {
+          await purgeExpiredSessions(database);
+          await createSession(
+            database,
+            Astro.cookies,
+            Astro.url,
+            user.id,
+            Astro.request.headers.get('user-agent'),
+          );
+          await database
+            .update(schema.users)
+            .set({ lastLoginAt: Math.floor(Date.now() / 1000) })
+            .where(eq(schema.users.id, user.id));
+
+          const target =
+            safeNext(typeof values.next === 'string' ? values.next : null) ??
+            (canAccessAdmin(user.role) ? '/admin' : '/dashboard');
+          return Astro.redirect(target, 303);
+        }
+      }
+    }
+  }
+}
+---
+
+<AuthLayout title="Login" description="Sign in to the Team Fairy Tight member area.">
+  <div>
+    <h1 class="title">Login</h1>
+    <p class="text-muted subtitle">Sign in to the member area.</p>
+  </div>
+
+  {error && <Alert tone="danger">{error}</Alert>}
+
+  <form method="post" novalidate>
+    <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+    {nextParam && <input type="hidden" name="next" value={nextParam} />}
+
+    <Field
+      label="Email"
+      name="email"
+      type="email"
+      required
+      value={values.email}
+      autocomplete="email"
+    />
+    <Field
+      label="Password"
+      name="password"
+      type="password"
+      required
+      autocomplete="current-password"
+    />
+
+    <Button type="submit" variant="primary" size="lg" full>Sign in</Button>
+  </form>
+
+  <p class="text-muted hint">
+    No account yet? <a href="/register">Register</a> — or apply to the clan at
+    <a href="/join"> Join Us</a>.
+  </p>
+</AuthLayout>
+
+<style>
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .hint {
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+</style>

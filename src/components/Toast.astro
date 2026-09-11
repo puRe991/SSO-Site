@@ -1,0 +1,84 @@
+---
+/**
+ * Server-rendered toast. Pages pass `?status=…` after a redirect and this
+ * renders the resulting message — no client state needed.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  message?: string | null;
+  tone?: 'success' | 'danger' | 'info';
+}
+
+const { message, tone = 'success' } = Astro.props;
+---
+
+{
+  message && (
+    <div class:list={['toast', `toast--${tone}`]} role="status">
+      <Icon name={tone === 'danger' ? 'alert' : 'check'} size={16} />
+      <span>{message}</span>
+      <button type="button" class="toast__close" aria-label="Dismiss" data-toast-close>
+        <Icon name="close" size={14} />
+      </button>
+    </div>
+  )
+}
+
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-toast-close]')
+    .forEach((button) => button.addEventListener('click', () => button.closest('.toast')?.remove()));
+</script>
+
+<style>
+  .toast {
+    position: fixed;
+    inset-block-end: var(--space-5);
+    inset-inline: var(--space-4);
+    z-index: var(--z-toast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: fit-content;
+    max-width: min(92vw, 520px);
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--background-elevated);
+    box-shadow: var(--shadow-lg);
+    font-size: var(--text-sm);
+    animation: toast-in var(--duration) var(--ease-out);
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  .toast--success {
+    border-color: color-mix(in oklab, var(--success) 50%, transparent);
+  }
+  .toast--success :global(svg) {
+    color: var(--success);
+  }
+  .toast--danger {
+    border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+  }
+  .toast--danger :global(svg) {
+    color: var(--danger);
+  }
+
+  .toast__close {
+    color: var(--text-subtle);
+    display: grid;
+    place-items: center;
+  }
+
+  .toast__close:hover {
+    color: var(--text);
+  }
+</style>

@@ -1,0 +1,110 @@
+---
+import { TBD_DISPLAY } from '@/data/tbd';
+import { formatDate } from '@/lib/format';
+import type { ClanStats } from '@/types';
+
+/**
+ * Live clan status. Values come from the database; when no data source is
+ * connected every tile shows the neutral placeholder instead of a made-up number.
+ */
+interface Props {
+  stats: ClanStats;
+}
+
+const { stats } = Astro.props;
+
+const tiles = [
+  { label: 'Total members', value: stats.totalMembers },
+  { label: 'Online members', value: stats.onlineMembers },
+  { label: 'Active games', value: stats.activeGames },
+];
+
+const nextEventLabel = stats.nextEvent
+  ? (formatDate(stats.nextEvent.startsAt) ?? TBD_DISPLAY)
+  : TBD_DISPLAY;
+---
+
+<section class="section" aria-labelledby="team-status">
+  <div class="container">
+    <p class="eyebrow" id="team-status">Team status</p>
+    <dl class="stats">
+      {
+        tiles.map((tile) => (
+          <div class="stat">
+            <dt>{tile.label}</dt>
+            <dd>{tile.value === null ? TBD_DISPLAY : tile.value}</dd>
+          </div>
+        ))
+      }
+      <div class="stat">
+        <dt>Next event</dt>
+        <dd class="stat__value--sm">
+          {
+            stats.nextEvent ? (
+              <a href={`/events/${stats.nextEvent.slug}`}>{nextEventLabel}</a>
+            ) : (
+              TBD_DISPLAY
+            )
+          }
+        </dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .stats {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat {
+    padding: var(--space-5) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--surface) 65%, transparent);
+    text-align: center;
+    transition: border-color var(--duration) var(--ease-out);
+  }
+
+  .stat:hover {
+    border-color: var(--border-brand);
+  }
+
+  .stat dt {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .stat dd {
+    margin: var(--space-2) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .stat__value--sm {
+    font-size: var(--text-xl) !important;
+  }
+
+  .stat a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .stat a:hover {
+    color: var(--primary-hover);
+  }
+
+  @media (min-width: 720px) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

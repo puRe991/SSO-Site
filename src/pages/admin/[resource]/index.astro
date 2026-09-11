@@ -1,0 +1,217 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import AdminHeader from '@/components/admin/AdminHeader.astro';
+import Badge from '@/components/Badge.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import { eq } from 'drizzle-orm';
+import { getDatabase } from '@/server/database/client';
+import { getResource } from '@/server/admin/resources';
+import { adminIcons, visibleAdminNav } from '@/lib/admin-nav';
+import { can } from '@/data/permissions';
+import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
+import { formatDate } from '@/lib/format';
+
+/**
+ * Generic list view. One page serves every managed resource; the registry in
+ * `server/admin/resources.ts` supplies columns, permissions and queries.
+ */
+const resource = getResource(Astro.params.resource);
+if (!resource) return Astro.rewrite('/404');
+
+const user = Astro.locals.user!;
+if (!can(user.role, resource.permission)) {
+  return new Response('Forbidden', { status: 403 });
+}
+
+const database = getDatabase(Astro.locals);
+
+// Deletions are POSTs to this same page, guarded by CSRF and the permission above.
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const id = form.get('id');
+  if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
+    return Astro.redirect(`/admin/${resource.key}?status=forbidden`, 303);
+  }
+  if (!resource.canDelete || typeof id !== 'string' || !database) {
+    return Astro.redirect(`/admin/${resource.key}?status=error`, 303);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await database.delete(resource.table).where(eq((resource.table as any).id, id));
+  return Astro.redirect(`/admin/${resource.key}?status=deleted`, 303);
+}
+
+const rows = database ? await resource.list(database) : [];
+
+function cell(row: Record<string, unknown>, key: string): string {
+  const value = row[key];
+  if (value === null || value === undefined || value === '') return '—';
+  if (key.endsWith('At') && typeof value === 'number') {
+    return formatDate(new Date(value * 1000).toISOString()) ?? '—';
+  }
+  return String(value);
+}
+---
+
+<DashboardLayout
+  title={`Admin — ${resource.label}`}
+  heading="Administration"
+  nav={visibleAdminNav(user.role)}
+  icons={adminIcons}
+>
+  <AdminHeader
+    title={resource.label}
+    description={`${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}.`}
+    actionHref={resource.canCreate ? `/admin/${resource.key}/new` : undefined}
+    actionLabel={`New ${resource.singular.toLowerCase()}`}
+  />
+
+  {
+    rows.length > 0 ? (
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              {resource.columns.map((column) => (
+                <th scope="col">{column.label}</th>
+              ))}
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr>
+                {resource.columns.map((column) => (
+                  <td class:list={[column.secondary && 'muted']}>
+                    {column.key === 'status' || column.key === 'kind' ? (
+                      <Badge size="sm">{cell(row, column.key)}</Badge>
+                    ) : (
+                      cell(row, column.key)
+                    )}
+                    {column.key === resource.columns[0]?.key && row.isDemo ? (
+                      <Badge tone="warning" size="sm">Demo</Badge>
+                    ) : null}
+                  </td>
+                ))}
+                <td class="actions">
+                  <a
+                    class="action"
+                    href={`/admin/${resource.key}/${String(row.id)}`}
+                    aria-label="Edit"
+                  >
+                    <Icon name="edit" size={16} />
+                  </a>
+                  {resource.canDelete && (
+                    <form method="post" data-confirm={`Really delete “${cell(row, resource.columns[0]!.key)}”?`}>
+                      <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+                      <input type="hidden" name="id" value={String(row.id)} />
+                      <button class="action action--danger" type="submit" aria-label="Delete">
+                        <Icon name="trash" size={16} />
+                      </button>
+                    </form>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <EmptyState
+        title={`No ${resource.label.toLowerCase()} yet.`}
+        description={
+          resource.canCreate
+            ? 'Create the first entry to get started.'
+            : 'Entries appear here as soon as they arrive.'
+        }
+        icon="info"
+      >
+        {resource.canCreate && (
+          <Button href={`/admin/${resource.key}/new`} variant="primary" size="sm">
+            New {resource.singular.toLowerCase()}
+          </Button>
+        )}
+      </EmptyState>
+    )
+  }
+</DashboardLayout>
+
+<script>
+  // Delete is destructive, so confirm before the form submits.
+  document.querySelectorAll<HTMLFormElement>('form[data-confirm]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      if (!window.confirm(form.dataset.confirm ?? 'Delete this entry?')) event.preventDefault();
+    });
+  });
+</script>
+
+<style>
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    min-width: 520px;
+  }
+
+  th {
+    padding: var(--space-3) var(--space-4);
+    text-align: start;
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    background: var(--surface-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: color-mix(in oklab, var(--surface) 70%, transparent);
+  }
+
+  .muted {
+    color: var(--text-muted);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: end;
+  }
+
+  .action {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+  }
+
+  .action:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .action--danger:hover {
+    color: var(--danger);
+    border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+  }
+</style>

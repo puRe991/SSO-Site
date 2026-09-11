@@ -1,0 +1,243 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Hero from '@/components/Hero.astro';
+import StatsGrid from '@/components/StatsGrid.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import MemberCard from '@/components/MemberCard.astro';
+import GameCard from '@/components/GameCard.astro';
+import EventCard from '@/components/EventCard.astro';
+import NewsCard from '@/components/NewsCard.astro';
+import AchievementCard from '@/components/AchievementCard.astro';
+import EmptyState from '@/components/EmptyState.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import Card from '@/components/Card.astro';
+import {
+  getClanStats, getRanks, listAchievements, listEvents, listGames, listMembers, listNews,
+} from '@/server/services/content';
+import { getSettings } from '@/server/services/settings';
+import { isTBD } from '@/data/tbd';
+import { siteConfig } from '@/data/site.config.mjs';
+import { renderRichText } from '@/lib/text';
+
+const [settings, stats, ranks, members, games, events, news, achievements] = await Promise.all([
+  getSettings(Astro.locals),
+  getClanStats(Astro.locals),
+  getRanks(Astro.locals),
+  listMembers(Astro.locals, { pageSize: 6 }),
+  listGames(Astro.locals),
+  listEvents(Astro.locals, { when: 'upcoming', limit: 3 }),
+  listNews(Astro.locals, { pageSize: 3 }),
+  listAchievements(Astro.locals),
+]);
+
+const description = settings['clan.description'];
+const hasDescription = !isTBD(description);
+const discord = isTBD(settings['social.discord']) ? null : settings['social.discord'];
+---
+
+<PageLayout description={siteConfig.description}>
+  <Hero discordUrl={settings['social.discord']} />
+
+  <StatsGrid stats={stats} />
+
+  <!-- What is Team Fairy Tight -->
+  <section class="section" aria-labelledby="about-title">
+    <div class="container">
+      <SectionHeader
+        eyebrow="About"
+        title="What is Team Fairy Tight?"
+        href="/clan"
+        linkLabel="More about the clan"
+      />
+      {
+        hasDescription ? (
+          <div class="prose" set:html={renderRichText(description)} />
+        ) : (
+          <EmptyState
+            title="The clan description has not been written yet."
+            description="Once the team supplies its description, it appears here. Nothing is invented in the meantime."
+            icon="info"
+          >
+            <Button href="/clan" variant="ghost" size="sm">
+              Go to the clan page
+            </Button>
+          </EmptyState>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Games -->
+  <section class="section" aria-labelledby="games-title">
+    <div class="container">
+      <SectionHeader eyebrow="Games" title="Our games" href="/games" />
+      {
+        games.length > 0 ? (
+          <div class="grid-auto" style="--min-col:260px">
+            {games.slice(0, 3).map((game) => (
+              <GameCard game={game} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No games listed yet."
+            description="The games the clan plays will be listed here."
+            icon="gamepad"
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section class="section" aria-labelledby="events-title">
+    <div class="container">
+      <SectionHeader eyebrow="Calendar" title="Upcoming events" href="/events" />
+      {
+        events.length > 0 ? (
+          <div class="grid-auto" style="--min-col:300px">
+            {events.map((event) => (
+              <EventCard event={event} countdown />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No upcoming events."
+            description="New clan evenings and tournaments show up here as soon as they are scheduled."
+            icon="calendar"
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Members -->
+  <section class="section" aria-labelledby="members-title">
+    <div class="container">
+      <SectionHeader eyebrow="Roster" title="Our members" href="/members" />
+      {
+        members.items.length > 0 ? (
+          <div class="grid-auto" style="--min-col:300px">
+            {members.items.map((member) => (
+              <MemberCard member={member} ranks={ranks} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No members found."
+            description="The roster is filled from the admin area."
+            icon="users"
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <!-- News -->
+  <section class="section" aria-labelledby="news-title">
+    <div class="container">
+      <SectionHeader eyebrow="Updates" title="Latest news" href="/news" />
+      {
+        news.items.length > 0 ? (
+          <div class="grid-auto" style="--min-col:280px">
+            {news.items.map((article) => (
+              <NewsCard article={article} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState title="No news yet." description="Clan announcements appear here." icon="news" />
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Achievements -->
+  <section class="section" aria-labelledby="achievements-title">
+    <div class="container">
+      <SectionHeader eyebrow="Milestones" title="Achievements" href="/achievements" />
+      {
+        achievements.length > 0 ? (
+          <div class="grid-auto" style="--min-col:320px">
+            {achievements.slice(0, 4).map((achievement) => (
+              <AchievementCard achievement={achievement} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No achievements recorded yet."
+            description="Results and milestones are entered by the team — nothing is listed here that did not happen."
+            icon="trophy"
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Community / Discord -->
+  <section class="section" aria-labelledby="community-title">
+    <div class="container">
+      <Card class="community">
+        <div class="community__text">
+          <p class="eyebrow">Community</p>
+          <h2 id="community-title">Join the community</h2>
+          <p class="text-muted">
+            Voice evenings, clan nights, tournaments and everyday gaming — the team coordinates on
+            Discord.
+          </p>
+        </div>
+        <div class="community__actions">
+          {
+            discord ? (
+              <Button href={discord} variant="primary" size="lg">
+                <Icon name="discord" size={18} />
+                Join our Discord
+              </Button>
+            ) : (
+              <p class="community__pending">
+                The Discord invite link has not been published yet.
+              </p>
+            )
+          }
+          <Button href="/join" variant="secondary" size="lg">Apply to the clan</Button>
+        </div>
+      </Card>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .community {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+    padding: var(--space-7) var(--space-5);
+    text-align: center;
+    justify-items: center;
+    background:
+      radial-gradient(60% 120% at 50% 0%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 70%),
+      var(--surface);
+  }
+
+  .community__text {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: center;
+    max-width: 56ch;
+  }
+
+  .community__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+  }
+
+  .community__pending {
+    padding: 0.9rem 1.2rem;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    font-size: var(--text-sm);
+    color: var(--text-subtle);
+  }
+</style>

@@ -1,0 +1,143 @@
+---
+import Icon from './Icon.astro';
+
+export interface FilterGroup {
+  name: string;
+  label: string;
+  options: { value: string; label: string }[];
+  value?: string;
+  /** Label of the neutral first option (default: "<label>: all"). */
+  allLabel?: string;
+}
+
+interface Props {
+  groups: FilterGroup[];
+  searchName?: string;
+  searchValue?: string;
+  searchPlaceholder?: string;
+  action?: string;
+}
+
+const {
+  groups,
+  searchName = 'q',
+  searchValue = '',
+  searchPlaceholder = 'Search…',
+  action = Astro.url.pathname,
+} = Astro.props;
+---
+
+<form class="filters" method="get" action={action} role="search">
+  <div class="filters__search">
+    <Icon name="search" size={17} />
+    <input
+      type="search"
+      name={searchName}
+      value={searchValue}
+      placeholder={searchPlaceholder}
+      aria-label="Search"
+    />
+  </div>
+
+  {
+    groups.map((group) => (
+      <label class="filters__group">
+        <span class="visually-hidden">{group.label}</span>
+        <select name={group.name}>
+          <option value="">{group.allLabel ?? `${group.label}: all`}</option>
+          {group.options.map((option) => (
+            <option value={option.value} selected={group.value === option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    ))
+  }
+
+  <button class="filters__submit" type="submit">
+    <Icon name="filter" size={16} />
+    Apply
+  </button>
+  <a class="filters__reset" href={action}>Reset</a>
+</form>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--surface) 70%, transparent);
+  }
+
+  .filters__search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 1 1 220px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--background-elevated);
+    color: var(--text-subtle);
+  }
+
+  .filters__search input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.55rem 0;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-size: var(--text-sm);
+  }
+
+  .filters__search input:focus {
+    outline: none;
+  }
+
+  .filters__search:focus-within {
+    border-color: var(--border-brand);
+  }
+
+  select {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--background-elevated);
+    color: var(--text);
+    font-size: var(--text-sm);
+  }
+
+  .filters__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.55rem 0.9rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-brand);
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+    color: var(--text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .filters__submit:hover {
+    background: color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+
+  .filters__reset {
+    padding: 0.55rem 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--text-subtle);
+    text-decoration: none;
+  }
+
+  .filters__reset:hover {
+    color: var(--text);
+  }
+</style>

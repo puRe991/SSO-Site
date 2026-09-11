@@ -1,0 +1,42 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import Button from '@/components/Button.astro';
+---
+
+<PageLayout title="Page not found" noindex>
+  <section class="section">
+    <div class="container error">
+      <p class="code" aria-hidden="true">404</p>
+      <h1>Page not found</h1>
+      <p class="text-muted">
+        This page does not exist or has been moved.
+      </p>
+      <div class="cluster">
+        <Button href="/" variant="primary">Back to home</Button>
+        <Button href="/search" variant="ghost">Search the site</Button>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .error {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+    padding-block: var(--space-8);
+    text-align: center;
+  }
+
+  .code {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 18vw, 9rem);
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(120deg, var(--violet-400), var(--magenta-500), var(--cyan-400));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.85;
+  }
+</style>

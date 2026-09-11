@@ -1,0 +1,147 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import Field from '@/components/Field.astro';
+import Button from '@/components/Button.astro';
+import Alert from '@/components/Alert.astro';
+import { eq } from 'drizzle-orm';
+import { getDatabase, schema } from '@/server/database/client';
+import { hashPassword, newId } from '@/server/security/crypto';
+import { createSession } from '@/server/security/session';
+import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
+import { clientIdentifier, rateLimit } from '@/server/security/rate-limit';
+import { registerSchema, fieldErrors, formToObject } from '@/server/validation/schemas';
+
+if (Astro.locals.user) {
+  return Astro.redirect('/dashboard', 302);
+}
+
+let errors: Record<string, string> = {};
+let values: Record<string, string> = {};
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  values = formToObject(form);
+
+  if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
+    errors._form = 'Your session expired. Please submit the form again.';
+  } else {
+    const database = getDatabase(Astro.locals);
+    const limit = await rateLimit(
+      database,
+      'register',
+      clientIdentifier(Astro.request),
+      5,
+      60 * 60,
+    );
+
+    if (!limit.allowed) {
+      errors._form = 'Too many registrations from this connection. Please try again later.';
+    } else {
+      const parsed = registerSchema.safeParse(values);
+      if (!parsed.success) {
+        errors = fieldErrors(parsed.error);
+      } else if (!database) {
+        errors._form = 'Registration is unavailable because no database is configured.';
+      } else {
+        const email = parsed.data.email;
+        const normalized = email.toLowerCase();
+        const existing = await database
+          .select({ id: schema.users.id })
+          .from(schema.users)
+          .where(eq(schema.users.emailNormalized, normalized))
+          .limit(1);
+
+        if (existing.length > 0) {
+          // Do not confirm which addresses are registered.
+          errors._form = 'This email address cannot be used for registration.';
+        } else {
+          const id = newId('usr');
+          await database.insert(schema.users).values({
+            id,
+            email,
+            emailNormalized: normalized,
+            passwordHash: await hashPassword(parsed.data.password),
+            role: 'user',
+          });
+          await createSession(
+            database,
+            Astro.cookies,
+            Astro.url,
+            id,
+            Astro.request.headers.get('user-agent'),
+          );
+          return Astro.redirect('/dashboard', 303);
+        }
+      }
+    }
+  }
+}
+---
+
+<AuthLayout title="Register" description="Create an account for the Team Fairy Tight site.">
+  <div>
+    <h1 class="title">Create account</h1>
+    <p class="text-muted subtitle">
+      An account lets you sign up for events and manage your profile. Clan membership is applied for
+      separately at <a href="/join">Join Us</a>.
+    </p>
+  </div>
+
+  {errors._form && <Alert tone="danger">{errors._form}</Alert>}
+
+  <form method="post" novalidate>
+    <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
+
+    <Field
+      label="Email"
+      name="email"
+      type="email"
+      required
+      value={values.email}
+      error={errors.email}
+      autocomplete="email"
+    />
+    <Field
+      label="Password"
+      name="password"
+      type="password"
+      required
+      error={errors.password}
+      autocomplete="new-password"
+      hint="At least 12 characters, with letters and numbers."
+    />
+    <Field
+      label="Repeat password"
+      name="passwordConfirm"
+      type="password"
+      required
+      error={errors.passwordConfirm}
+      autocomplete="new-password"
+    />
+
+    <Button type="submit" variant="primary" size="lg" full>Register</Button>
+  </form>
+
+  <p class="text-muted hint">Already have an account? <a href="/login">Sign in</a>.</p>
+</AuthLayout>
+
+<style>
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .hint {
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+</style>

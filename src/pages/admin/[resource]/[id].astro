@@ -1,0 +1,129 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import AdminHeader from '@/components/admin/AdminHeader.astro';
+import ResourceForm from '@/components/admin/ResourceForm.astro';
+import Card from '@/components/Card.astro';
+import { getDatabase } from '@/server/database/client';
+import { getResource } from '@/server/admin/resources';
+import { handleResourceSubmit } from '@/server/admin/handle';
+import { loadLookups } from '@/server/admin/lookups';
+import { adminIcons, visibleAdminNav } from '@/lib/admin-nav';
+import { can } from '@/data/permissions';
+import { formatDateTime } from '@/lib/format';
+
+const resource = getResource(Astro.params.resource);
+const id = Astro.params.id;
+if (!resource || !id) return Astro.rewrite('/404');
+
+const user = Astro.locals.user!;
+if (!can(user.role, resource.permission)) {
+  return new Response('Forbidden', { status: 403 });
+}
+
+const database = getDatabase(Astro.locals);
+
+let errors: Record<string, string> = {};
+let submitted: Record<string, string> | null = null;
+
+if (Astro.request.method === 'POST') {
+  const result = await handleResourceSubmit(Astro, resource, id);
+  if (result.redirectTo) return Astro.redirect(result.redirectTo, 303);
+  errors = result.errors;
+  submitted = result.values;
+}
+
+const row = database ? await resource.find(database, id) : null;
+if (!row) return Astro.rewrite('/404');
+
+const values = submitted ?? resource.toForm(row);
+const lookups = await loadLookups(database);
+
+/** Read-only context for resources that also carry submitted data (applications). */
+const readonlyEntries =
+  resource.key === 'applications'
+    ? ([
+        ['Username', row.username],
+        ['Display name', row.displayName],
+        ['Country', row.country],
+        ['Discord', row.discordUsername],
+        ['Games', row.games],
+        ['Main game', row.mainGame],
+        ['Motivation', row.motivation],
+        ['Found us via', row.referral],
+        ['Submitted', row.createdAt ? formatDateTime(new Date(Number(row.createdAt) * 1000).toISOString()) : null],
+      ] as [string, unknown][])
+    : [];
+---
+
+<DashboardLayout
+  title={`Admin — ${resource.singular}`}
+  heading="Administration"
+  nav={visibleAdminNav(user.role)}
+  icons={adminIcons}
+>
+  <AdminHeader eyebrow={resource.label} title={`Edit ${resource.singular.toLowerCase()}`} />
+
+  {
+    readonlyEntries.length > 0 && (
+      <div class="context">
+        <Card>
+          <h2 class="h3">Submitted data</h2>
+          <dl class="details">
+            {readonlyEntries.map(([label, value]) => (
+              <div>
+                <dt>{label}</dt>
+                <dd>{value ? String(value) : '—'}</dd>
+              </div>
+            ))}
+          </dl>
+        </Card>
+      </div>
+    )
+  }
+
+  <ResourceForm
+    resource={resource}
+    values={values}
+    errors={errors}
+    lookups={lookups}
+    submitLabel="Save"
+  />
+</DashboardLayout>
+
+<style>
+  .context {
+    margin-bottom: var(--space-5);
+    max-width: 860px;
+  }
+
+  .h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .details {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  .details dt {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .details dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    white-space: pre-wrap;
+  }
+
+  @media (min-width: 700px) {
+    .details {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

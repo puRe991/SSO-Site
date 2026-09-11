@@ -1,0 +1,188 @@
+---
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import { siteConfig } from '@/data/site.config.mjs';
+import { isTBD } from '@/data/tbd';
+
+interface Props {
+  discordUrl: string;
+}
+
+const { discordUrl } = Astro.props;
+const discord = isTBD(discordUrl) ? null : discordUrl;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="hero__particles" aria-hidden="true">
+    {
+      Array.from({ length: 14 }).map((_, index) => (
+        <span
+          class="hero__particle"
+          style={`--x:${(index * 37) % 100}%; --delay:${(index % 7) * 1.6}s; --duration:${14 + (index % 5) * 4}s; --size:${2 + (index % 3)}px`}
+        />
+      ))
+    }
+  </div>
+
+  <div class="container hero__inner">
+    <p class="hero__eyebrow">Clan · Team · Guild</p>
+    <h1 class="hero__title" id="hero-title">
+      <span class="text-gradient">Team Fairy Tight</span>
+    </h1>
+    <p class="hero__tagline">{siteConfig.tagline}</p>
+    <p class="hero__lead">
+      The home base of the {siteConfig.shortName} community — members, games, events and everything
+      the team is working on, in one place.
+    </p>
+
+    <div class="hero__actions">
+      <Button href="/clan" variant="primary" size="lg">Discover the clan</Button>
+      <Button href="/join" variant="secondary" size="lg">Join the team</Button>
+      {
+        discord && (
+          <Button href={discord} variant="ghost" size="lg">
+            <Icon name="discord" size={18} />
+            Join Discord
+          </Button>
+        )
+      }
+    </div>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true">
+    <Icon name="chevron-down" size={18} />
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: min(86svh, 780px);
+    padding-block: var(--space-8) var(--space-9);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero__glow {
+    position: absolute;
+    inset: -20% -10% auto;
+    height: 70%;
+    z-index: -1;
+    background:
+      radial-gradient(45rem 22rem at 50% 0%, color-mix(in oklab, var(--primary) 30%, transparent), transparent 70%),
+      radial-gradient(30rem 18rem at 75% 30%, color-mix(in oklab, var(--secondary) 22%, transparent), transparent 70%);
+    filter: blur(8px);
+    animation: hero-drift 18s var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes hero-drift {
+    to {
+      transform: translate3d(-3%, 2%, 0) scale(1.06);
+    }
+  }
+
+  .hero__particles {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .hero__particle {
+    position: absolute;
+    bottom: -10px;
+    left: var(--x);
+    width: var(--size);
+    height: var(--size);
+    border-radius: var(--radius-full);
+    background: color-mix(in oklab, var(--violet-300) 70%, transparent);
+    box-shadow: 0 0 8px var(--glow);
+    opacity: 0;
+    animation: float var(--duration) linear var(--delay) infinite;
+  }
+
+  @keyframes float {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    10% {
+      opacity: 0.8;
+    }
+    90% {
+      opacity: 0.2;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-72svh);
+    }
+  }
+
+  .hero__inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .hero__eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+
+  .hero__title {
+    font-size: var(--text-hero);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+  }
+
+  .hero__tagline {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hero__lead {
+    max-width: 56ch;
+    color: var(--text-muted);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .hero__scroll {
+    position: absolute;
+    inset-block-end: var(--space-5);
+    inset-inline: 0;
+    display: grid;
+    place-items: center;
+    color: var(--text-subtle);
+    animation: bob 2.4s var(--ease-in-out) infinite;
+  }
+
+  @keyframes bob {
+    50% {
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__particle {
+      display: none;
+    }
+  }
+</style>

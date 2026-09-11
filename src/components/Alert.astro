@@ -1,0 +1,71 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  tone?: 'info' | 'success' | 'warning' | 'danger';
+  title?: string;
+}
+
+const { tone = 'info', title } = Astro.props;
+const icons = { info: 'info', success: 'check', warning: 'alert', danger: 'alert' } as const;
+---
+
+<div class:list={['alert', `alert--${tone}`]} role={tone === 'danger' ? 'alert' : 'status'}>
+  <Icon name={icons[tone]} size={18} />
+  <div>
+    {title && <p class="alert__title">{title}</p>}
+    <slot />
+  </div>
+</div>
+
+<style>
+  .alert {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .alert :global(svg) {
+    flex: 0 0 auto;
+    margin-top: 0.15em;
+  }
+
+  .alert__title {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .alert--info {
+    border-color: color-mix(in oklab, var(--info) 40%, transparent);
+    color: var(--text-muted);
+  }
+  .alert--info :global(svg) {
+    color: var(--info);
+  }
+  .alert--success {
+    border-color: color-mix(in oklab, var(--success) 45%, transparent);
+    background: color-mix(in oklab, var(--success) 8%, var(--surface));
+  }
+  .alert--success :global(svg) {
+    color: var(--success);
+  }
+  .alert--warning {
+    border-color: color-mix(in oklab, var(--warning) 45%, transparent);
+    background: color-mix(in oklab, var(--warning) 8%, var(--surface));
+  }
+  .alert--warning :global(svg) {
+    color: var(--warning);
+  }
+  .alert--danger {
+    border-color: color-mix(in oklab, var(--danger) 50%, transparent);
+    background: color-mix(in oklab, var(--danger) 8%, var(--surface));
+  }
+  .alert--danger :global(svg) {
+    color: var(--danger);
+  }
+</style>
