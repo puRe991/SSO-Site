@@ -198,9 +198,9 @@ For continuous deployment, import the repository under Workers & Pages and set:
 
 (Or leave the build command empty and use `npm run deploy` as the deploy command, which does both.)
 
-The `--config` flag is not optional: a bare `wrangler deploy` runs wrangler's framework
-autodetection, which mis-identifies this Astro project as a Pages project and then fails with
-*"Missing entry-point to Worker script"*.
+The `--config` flag is optional but recommended: it makes a stale or wrong config fail
+immediately with a clear message, instead of warning and then failing with the
+unrelated-looking *"Missing entry-point to Worker script"*.
 
 The site ships as a Worker with static assets: `dist/_worker.js/index.js` serves SSR, the rest of
 `dist/` comes from the CDN, and `public/.assetsignore` keeps the server bundle from being served
