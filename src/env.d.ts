@@ -4,8 +4,11 @@
 type CloudflareRuntime = import('@astrojs/cloudflare').Runtime<Env>;
 
 interface Env {
+  /** D1 database. Absent when the binding is not configured — the site then
+   *  renders honest empty states instead of failing. */
   DB?: D1Database;
-  SESSION_SECRET?: string;
+  /** Static asset binding provided by Workers Assets. */
+  ASSETS?: Fetcher;
   PUBLIC_SITE_URL?: string;
 }
 

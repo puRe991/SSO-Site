@@ -8,7 +8,8 @@ import { siteConfig } from './src/data/site.config.mjs';
 //  - SSR on Cloudflare Pages Functions (free tier), static assets on the CDN
 //  - zero client JS by default; interactive parts are opt-in islands
 export default defineConfig({
-  site: siteConfig.url,
+  // Optional: only set when PUBLIC_SITE_URL pins the site to one domain.
+  site: siteConfig.url || undefined,
   output: 'server',
   adapter: cloudflare({
     imageService: 'compile',

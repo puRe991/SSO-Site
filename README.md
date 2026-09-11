@@ -15,7 +15,7 @@ admin area, built to be extended rather than replaced.
 - [Build](#build)
 - [Database](#database)
 - [Admin setup](#admin-setup)
-- [Deployment on Cloudflare Pages](#deployment-on-cloudflare-pages)
+- [Deployment on Cloudflare Workers](#deployment-on-cloudflare-workers)
 - [Environment variables](#environment-variables)
 - [Content model & the TBD system](#content-model--the-tbd-system)
 - [Security](#security)
@@ -30,7 +30,7 @@ admin area, built to be extended rather than replaced.
 | Layer | Choice | Why |
 | --- | --- | --- |
 | Framework | **Astro 5** (SSR) | Ships zero client JS by default — the whole site runs on ~2 KB of JavaScript. Interactive parts are opt-in. |
-| Hosting | **Cloudflare Pages** + Pages Functions | Free tier, global CDN, SSR at the edge. |
+| Hosting | **Cloudflare Workers** with static assets | Free tier, global CDN, SSR at the edge. |
 | Database | **Cloudflare D1** (SQLite) | Free tier, same platform as the hosting, no extra service to run. |
 | ORM | **Drizzle ORM** | Typed queries and generated SQL migrations; no runtime code generation. |
 | Validation | **Zod** | One schema per form, reused by pages and the JSON API. |
@@ -120,7 +120,7 @@ npm run admin:hash -- "…"  # generate a password hash for the first admin
 
 ```bash
 npm run build      # runs `astro check` first, then builds into ./dist
-npm run preview    # serves the build through wrangler
+npm run preview    # serves the built Worker locally through wrangler (workerd + local D1)
 ```
 
 ---
@@ -178,7 +178,7 @@ Then sign in at `/login`. Roles and their permissions are defined in `src/data/p
 
 ---
 
-## Deployment on Cloudflare Pages
+## Deployment on Cloudflare Workers
 
 **Full walkthrough: [DEPLOYMENT.md](./DEPLOYMENT.md).** In short:
 
@@ -188,25 +188,32 @@ npx wrangler d1 create tft-db        # paste the database_id into wrangler.toml,
 npx wrangler d1 migrations apply tft-db --remote
 npx wrangler d1 execute tft-db --remote --file=./scripts/seed.sql
 npm run admin:hash -- "your-password"   # then run the printed INSERT with --remote
+npm run deploy                          # builds, then deploys
 ```
 
-Then connect the repository in the Cloudflare dashboard (Workers & Pages → Create → Pages):
+For continuous deployment, import the repository under Workers & Pages and set:
 
 - Build command: `npm run build:ci`
-- Output directory: `dist`
+- Deploy command: `npx wrangler deploy`
 
-Because `wrangler.toml` sets `pages_build_output_dir`, **Cloudflare reads the bindings from that
-file** and ignores bindings configured in the dashboard — the `database_id` there has to be real.
+(Or leave the build command empty and use `npm run deploy` as the deploy command — Workers Builds
+runs the deploy command even without a build step, and `wrangler deploy` fails if `dist/` was
+never produced.)
 
-Everything fits in the free tier: Pages (unlimited static requests, 100k function requests/day)
-and D1 (5 GB, 5M row reads/day).
+The site ships as a Worker with static assets: `dist/_worker.js/index.js` serves SSR, the rest of
+`dist/` comes from the CDN, and `public/.assetsignore` keeps the server bundle from being served
+publicly. Bindings come from `wrangler.toml`, so the `database_id` there has to be real.
+
+Everything fits in the free tier: 100k Worker requests/day, unlimited static asset requests, and
+D1 with 5 GB and 5M row reads/day.
 
 ## Environment variables
 
 | Name | Type | Purpose |
 | --- | --- | --- |
 | `DB` | D1 binding (`wrangler.toml`) | The database. Without it the site still renders — every page falls back to an empty state. |
-| `PUBLIC_SITE_URL` | **Build** variable, optional | Pins canonical/OG URLs to one domain. Unset, the site uses the origin of the incoming request, which is already correct on `pages.dev`, on previews and on a custom domain. |
+| `ASSETS` | Assets binding (`wrangler.toml`) | Static files, wired up by Workers Assets. |
+| `PUBLIC_SITE_URL` | **Build** variable, optional | Pins canonical/OG URLs to one domain. Unset, the site uses the origin of the incoming request, which is already correct on `workers.dev`, on previews and on a custom domain. |
 
 No secrets are ever exposed to the browser: everything under `src/server/` runs server-side only.
 

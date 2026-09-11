@@ -1,0 +1,5 @@
+# Keeps the SSR bundle out of the publicly served asset directory.
+# Without this, `dist/_worker.js/` — the compiled server code, including
+# everything under src/server/ — would be downloadable from the live site.
+_worker.js
+_routes.json
