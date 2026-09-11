@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { listEvents, listGames, listMembers, listNews } from '@/server/services/content';
-import { siteConfig } from '@/data/site.config.mjs';
+import { resolveOrigin } from '@/lib/origin';
 
 /** Dynamic sitemap: static routes plus every published entity. */
 const STATIC_PATHS = [
@@ -8,8 +8,8 @@ const STATIC_PATHS = [
   '/achievements', '/leaderboard', '/join', '/rules', '/contact', '/imprint', '/privacy',
 ];
 
-export const GET: APIRoute = async ({ locals, site }) => {
-  const origin = (site ?? new URL(siteConfig.url)).origin;
+export const GET: APIRoute = async ({ locals, url }) => {
+  const origin = resolveOrigin(url);
 
   const [members, games, events, news] = await Promise.all([
     listMembers(locals, { pageSize: 48 }),

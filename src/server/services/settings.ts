@@ -57,10 +57,19 @@ export async function getSettings(locals: App.Locals): Promise<SettingsMap> {
   const database = getDatabase(locals);
   if (!database) return values;
 
-  const rows = await database
-    .select()
-    .from(schema.settings)
-    .where(inArray(schema.settings.key, [...SETTING_KEYS]));
+  let rows: { key: string; value: string }[] = [];
+  try {
+    rows = await database
+      .select()
+      .from(schema.settings)
+      .where(inArray(schema.settings.key, [...SETTING_KEYS]));
+  } catch (error) {
+    // Runs on every page through PageLayout: a database that is unreachable or
+    // mid-migration must not take the whole site down, so fall back to the
+    // compile-time defaults (which render as TBD placeholders).
+    console.error('[settings:getSettings]', error);
+    return values;
+  }
 
   for (const row of rows) {
     if ((SETTING_KEYS as readonly string[]).includes(row.key) && row.value.trim() !== '') {

@@ -180,28 +180,33 @@ Then sign in at `/login`. Roles and their permissions are defined in `src/data/p
 
 ## Deployment on Cloudflare Pages
 
-1. **Create the database** and paste its `database_id` into `wrangler.toml` (see above).
-2. **Connect the repository** in the Cloudflare dashboard → Workers & Pages → Create → Pages.
-3. **Build settings:**
-   - Build command: `npm run build:ci`
-   - Output directory: `dist`
-4. **Bindings** (Settings → Functions):
-   - D1 database: variable name `DB` → `tft-db`
-5. **Variables:**
-   - `PUBLIC_SITE_URL` = your final URL (e.g. `https://teamfairytight.com`)
-6. **Deploy.** Apply migrations against the remote database once (`npm run db:migrate:remote`).
+**Full walkthrough: [DEPLOYMENT.md](./DEPLOYMENT.md).** In short:
 
-Everything used here fits in Cloudflare's free tier: Pages (unlimited static requests, 100k
-function requests/day) and D1 (5 GB storage, 5M row reads/day).
+```bash
+npx wrangler login
+npx wrangler d1 create tft-db        # paste the database_id into wrangler.toml, commit
+npx wrangler d1 migrations apply tft-db --remote
+npx wrangler d1 execute tft-db --remote --file=./scripts/seed.sql
+npm run admin:hash -- "your-password"   # then run the printed INSERT with --remote
+```
 
----
+Then connect the repository in the Cloudflare dashboard (Workers & Pages → Create → Pages):
+
+- Build command: `npm run build:ci`
+- Output directory: `dist`
+
+Because `wrangler.toml` sets `pages_build_output_dir`, **Cloudflare reads the bindings from that
+file** and ignores bindings configured in the dashboard — the `database_id` there has to be real.
+
+Everything fits in the free tier: Pages (unlimited static requests, 100k function requests/day)
+and D1 (5 GB, 5M row reads/day).
 
 ## Environment variables
 
 | Name | Type | Purpose |
 | --- | --- | --- |
-| `PUBLIC_SITE_URL` | Variable | Canonical URL, used for SEO tags and the sitemap. |
-| `DB` | D1 binding | The database. Without it the site runs read-only with empty states. |
+| `DB` | D1 binding (`wrangler.toml`) | The database. Without it the site still renders — every page falls back to an empty state. |
+| `PUBLIC_SITE_URL` | **Build** variable, optional | Pins canonical/OG URLs to one domain. Unset, the site uses the origin of the incoming request, which is already correct on `pages.dev`, on previews and on a custom domain. |
 
 No secrets are ever exposed to the browser: everything under `src/server/` runs server-side only.
 
@@ -247,6 +252,9 @@ The site never invents clan data. Anything unconfirmed is a placeholder token in
 - **Headers**: CSP, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`,
   `Permissions-Policy`, `Cross-Origin-Opener-Policy` (see `src/middleware.ts`).
 - **Bot protection**: honeypot fields on public forms, silently discarded.
+- **Availability**: every public read degrades to its empty state if the database is unreachable
+  or mid-migration, so a database problem never takes the site down (`safeRead` in
+  `server/services/content.ts`).
 
 ---
 

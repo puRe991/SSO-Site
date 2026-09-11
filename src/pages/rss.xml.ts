@@ -1,10 +1,11 @@
 import type { APIRoute } from 'astro';
 import { listNews } from '@/server/services/content';
+import { resolveOrigin } from '@/lib/origin';
 import { siteConfig } from '@/data/site.config.mjs';
 import { escapeHtml } from '@/lib/text';
 
-export const GET: APIRoute = async ({ locals, site }) => {
-  const origin = (site ?? new URL(siteConfig.url)).origin;
+export const GET: APIRoute = async ({ locals, url }) => {
+  const origin = resolveOrigin(url);
   const news = await listNews(locals, { pageSize: 20 });
 
   const items = news.items

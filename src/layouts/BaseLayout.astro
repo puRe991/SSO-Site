@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import { siteConfig } from '@/data/site.config.mjs';
+import { absoluteUrl, resolveOrigin } from '@/lib/origin';
 
 interface Props {
   title?: string;
@@ -23,15 +24,16 @@ const {
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${siteConfig.name}` : `${siteConfig.name} — Gaming Community`;
-const canonical = new URL(Astro.url.pathname, siteConfig.url).toString();
-const ogImage = new URL(image, siteConfig.url).toString();
+const origin = resolveOrigin(Astro.url);
+const canonical = absoluteUrl(Astro.url.pathname, Astro.url);
+const ogImage = absoluteUrl(image, Astro.url);
 
 const baseStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: siteConfig.name,
   alternateName: siteConfig.shortName,
-  url: siteConfig.url,
+  url: origin,
   description: siteConfig.description,
 };
 ---

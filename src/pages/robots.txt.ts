@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
-import { siteConfig } from '@/data/site.config.mjs';
+import { resolveOrigin } from '@/lib/origin';
 
-export const GET: APIRoute = ({ site }) => {
-  const origin = (site ?? new URL(siteConfig.url)).origin;
+export const GET: APIRoute = ({ url }) => {
+  const origin = resolveOrigin(url);
   const body = `User-agent: *
 Allow: /
 Disallow: /admin

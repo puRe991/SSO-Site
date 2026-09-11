@@ -3,16 +3,23 @@ compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "./dist"
 
-# Cloudflare D1 (free tier). Create with:
-#   npx wrangler d1 create tft-db
-# then paste the returned database_id below.
+# ---------------------------------------------------------------------------
+# IMPORTANT: because this file sets `pages_build_output_dir`, Cloudflare Pages
+# reads the project's bindings from HERE and ignores bindings configured in the
+# dashboard. The database_id below must be a real id or the deployment fails.
+#
+#   npx wrangler d1 create tft-db      # prints the database_id
+#
+# Paste it in, commit, deploy. See DEPLOYMENT.md for the full walkthrough.
+# ---------------------------------------------------------------------------
 [[d1_databases]]
 binding = "DB"
 database_name = "tft-db"
-database_id = "D1_DATABASE_ID_TBD"
+database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
 migrations_dir = "migrations"
 
-[vars]
-# Non-secret runtime config. Secrets (SESSION_SECRET) go through
-#   npx wrangler pages secret put SESSION_SECRET
-PUBLIC_SITE_URL = "https://team-fairy-tight.pages.dev"
+# No runtime [vars] are required. PUBLIC_SITE_URL is optional and only pins the
+# canonical URL: when it is unset the site uses the origin of the incoming
+# request, which is already correct on pages.dev, on previews and on a custom
+# domain. Set it as a BUILD variable in the Pages dashboard, not here — it is
+# read at build time, not at runtime.

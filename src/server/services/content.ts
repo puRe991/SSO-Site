@@ -28,13 +28,29 @@ function emptyPage<T>(page = 1, pageSize = 12): Page<T> {
   return { items: [], total: 0, page, pageSize, totalPages: 0 };
 }
 
+/**
+ * Runs a read and falls back instead of failing the page.
+ *
+ * A public page must never 500 because the database is mid-migration, briefly
+ * unreachable, or not seeded yet — the visitor sees the same honest empty state
+ * as when no data exists, and the cause is logged for the operator.
+ */
+async function safeRead<T>(label: string, read: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await read();
+  } catch (error) {
+    console.error(`[content:${label}]`, error);
+    return fallback;
+  }
+}
+
 export function db(locals: App.Locals): Database | null {
   return getDatabase(locals);
 }
 
 /* ---------------------------------------------------------------- ranks -- */
 
-export async function getRanks(locals: App.Locals): Promise<Rank[]> {
+async function queryGetRanks(locals: App.Locals): Promise<Rank[]> {
   const database = db(locals);
   if (!database) return defaultRanks;
   const rows = await database.select().from(schema.ranks).orderBy(asc(schema.ranks.sortOrder));
@@ -61,7 +77,7 @@ export interface MemberQuery {
   pageSize?: number;
 }
 
-export async function listMembers(locals: App.Locals, query: MemberQuery = {}): Promise<Page<Member>> {
+async function queryListMembers(locals: App.Locals, query: MemberQuery = {}): Promise<Page<Member>> {
   const database = db(locals);
   const page = Math.max(1, query.page ?? 1);
   const pageSize = Math.min(48, Math.max(1, query.pageSize ?? 12));
@@ -119,7 +135,7 @@ export async function listMembers(locals: App.Locals, query: MemberQuery = {}): 
   };
 }
 
-export async function getMemberBySlug(locals: App.Locals, slug: string): Promise<Member | null> {
+async function queryGetMemberBySlug(locals: App.Locals, slug: string): Promise<Member | null> {
   const database = db(locals);
   if (!database) return null;
 
@@ -153,7 +169,7 @@ export async function getMemberBySlug(locals: App.Locals, slug: string): Promise
 
 /* ---------------------------------------------------------------- games -- */
 
-export async function listGames(
+async function queryListGames(
   locals: App.Locals,
   query: { status?: string; platform?: string; search?: string } = {},
 ): Promise<Game[]> {
@@ -182,7 +198,7 @@ export async function listGames(
   return games;
 }
 
-export async function getGameBySlug(locals: App.Locals, slug: string) {
+async function queryGetGameBySlug(locals: App.Locals, slug: string) {
   const database = db(locals);
   if (!database) return null;
 
@@ -227,7 +243,7 @@ export interface EventQuery {
   limit?: number;
 }
 
-export async function listEvents(locals: App.Locals, query: EventQuery = {}): Promise<ClanEvent[]> {
+async function queryListEvents(locals: App.Locals, query: EventQuery = {}): Promise<ClanEvent[]> {
   const database = db(locals);
   if (!database) return [];
 
@@ -269,7 +285,7 @@ export async function listEvents(locals: App.Locals, query: EventQuery = {}): Pr
   );
 }
 
-export async function getEventBySlug(locals: App.Locals, slug: string) {
+async function queryGetEventBySlug(locals: App.Locals, slug: string) {
   const database = db(locals);
   if (!database) return null;
 
@@ -296,7 +312,7 @@ export async function getEventBySlug(locals: App.Locals, slug: string) {
   });
 }
 
-export async function isParticipant(
+async function queryIsParticipant(
   locals: App.Locals,
   eventId: string,
   userId: string,
@@ -318,7 +334,7 @@ export async function isParticipant(
 
 /* ----------------------------------------------------------------- news -- */
 
-export async function listNews(
+async function queryListNews(
   locals: App.Locals,
   query: { category?: string; search?: string; page?: number; pageSize?: number; includeDrafts?: boolean } = {},
 ): Promise<Page<NewsArticle>> {
@@ -363,7 +379,7 @@ export async function listNews(
   };
 }
 
-export async function getNewsBySlug(locals: App.Locals, slug: string): Promise<NewsArticle | null> {
+async function queryGetNewsBySlug(locals: App.Locals, slug: string): Promise<NewsArticle | null> {
   const database = db(locals);
   if (!database) return null;
   const rows = await database
@@ -376,7 +392,7 @@ export async function getNewsBySlug(locals: App.Locals, slug: string): Promise<N
   return row ? mapNews({ ...row.article, categoryLabel: row.categoryLabel }) : null;
 }
 
-export async function listNewsCategories(locals: App.Locals) {
+async function queryListNewsCategories(locals: App.Locals) {
   const database = db(locals);
   if (!database) return [];
   return database.select().from(schema.newsCategories).orderBy(asc(schema.newsCategories.sortOrder));
@@ -384,7 +400,7 @@ export async function listNewsCategories(locals: App.Locals) {
 
 /* ---------------------------------------------------------------- media -- */
 
-export async function listMedia(
+async function queryListMedia(
   locals: App.Locals,
   query: { category?: string; kind?: string; limit?: number } = {},
 ): Promise<MediaItem[]> {
@@ -404,7 +420,7 @@ export async function listMedia(
 
 /* --------------------------------------------------------- achievements -- */
 
-export async function listAchievements(locals: App.Locals): Promise<Achievement[]> {
+async function queryListAchievements(locals: App.Locals): Promise<Achievement[]> {
   const database = db(locals);
   if (!database) return [];
   const rows = await database
@@ -417,7 +433,7 @@ export async function listAchievements(locals: App.Locals): Promise<Achievement[
 
 /* ---------------------------------------------------------------- stats -- */
 
-export async function getClanStats(locals: App.Locals): Promise<ClanStats> {
+async function queryGetClanStats(locals: App.Locals): Promise<ClanStats> {
   const database = db(locals);
   if (!database) {
     return { totalMembers: null, onlineMembers: null, activeGames: null, nextEvent: null };
@@ -437,7 +453,7 @@ export async function getClanStats(locals: App.Locals): Promise<ClanStats> {
       .select({ value: sql<number>`count(*)` })
       .from(schema.games)
       .where(eq(schema.games.status, 'active')),
-    listEvents(locals, { when: 'upcoming', limit: 1 }),
+    queryListEvents(locals, { when: 'upcoming', limit: 1 }),
   ]);
 
   void nowSeconds;
@@ -458,7 +474,7 @@ export interface SearchResult {
   href: string;
 }
 
-export async function search(locals: App.Locals, term: string): Promise<SearchResult[]> {
+async function querySearch(locals: App.Locals, term: string): Promise<SearchResult[]> {
   const database = db(locals);
   const query = term.trim().toLowerCase();
   if (!database || query.length < 2) return [];
@@ -520,7 +536,7 @@ export async function search(locals: App.Locals, term: string): Promise<SearchRe
 
 /* ------------------------------------------------------------ dashboard -- */
 
-export async function getNotifications(locals: App.Locals, userId: string) {
+async function queryGetNotifications(locals: App.Locals, userId: string) {
   const database = db(locals);
   if (!database) return [];
   return database
@@ -530,5 +546,89 @@ export async function getNotifications(locals: App.Locals, userId: string) {
     .orderBy(desc(schema.notifications.createdAt))
     .limit(20);
 }
+
+
+/* ------------------------------------------------------- public read API -- */
+/**
+ * Every public read goes through `safeRead`. A database that is unreachable,
+ * mid-migration or not seeded yet therefore produces the same honest empty
+ * state as "no data exists" — a broken database never takes the site down.
+ */
+
+export const getRanks = (locals: App.Locals) =>
+  safeRead('getRanks', () => queryGetRanks(locals), defaultRanks);
+
+export const listMembers = (locals: App.Locals, query: MemberQuery = {}) =>
+  safeRead(
+    'listMembers',
+    () => queryListMembers(locals, query),
+    emptyPage<Member>(Math.max(1, query.page ?? 1), query.pageSize ?? 12),
+  );
+
+export const getMemberBySlug = (locals: App.Locals, slug: string) =>
+  safeRead('getMemberBySlug', () => queryGetMemberBySlug(locals, slug), null);
+
+export const listGames = (
+  locals: App.Locals,
+  query: { status?: string; platform?: string; search?: string } = {},
+) => safeRead('listGames', () => queryListGames(locals, query), [] as Game[]);
+
+export const getGameBySlug = (locals: App.Locals, slug: string) =>
+  safeRead('getGameBySlug', () => queryGetGameBySlug(locals, slug), null);
+
+export const listEvents = (locals: App.Locals, query: EventQuery = {}) =>
+  safeRead('listEvents', () => queryListEvents(locals, query), [] as ClanEvent[]);
+
+export const getEventBySlug = (locals: App.Locals, slug: string) =>
+  safeRead('getEventBySlug', () => queryGetEventBySlug(locals, slug), null);
+
+export const isParticipant = (locals: App.Locals, eventId: string, userId: string) =>
+  safeRead('isParticipant', () => queryIsParticipant(locals, eventId, userId), false);
+
+export const listNews = (
+  locals: App.Locals,
+  query: {
+    category?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+    includeDrafts?: boolean;
+  } = {},
+) =>
+  safeRead(
+    'listNews',
+    () => queryListNews(locals, query),
+    emptyPage<NewsArticle>(Math.max(1, query.page ?? 1), query.pageSize ?? 9),
+  );
+
+export const getNewsBySlug = (locals: App.Locals, slug: string) =>
+  safeRead('getNewsBySlug', () => queryGetNewsBySlug(locals, slug), null);
+
+export const listNewsCategories = (locals: App.Locals) =>
+  safeRead('listNewsCategories', () => queryListNewsCategories(locals), [] as
+    { id: string; label: string; sortOrder: number }[]);
+
+export const listMedia = (
+  locals: App.Locals,
+  query: { category?: string; kind?: string; limit?: number } = {},
+) => safeRead('listMedia', () => queryListMedia(locals, query), [] as MediaItem[]);
+
+export const listAchievements = (locals: App.Locals) =>
+  safeRead('listAchievements', () => queryListAchievements(locals), [] as Achievement[]);
+
+export const getClanStats = (locals: App.Locals) =>
+  safeRead('getClanStats', () => queryGetClanStats(locals), {
+    totalMembers: null,
+    onlineMembers: null,
+    activeGames: null,
+    nextEvent: null,
+  } as ClanStats);
+
+export const search = (locals: App.Locals, term: string) =>
+  safeRead('search', () => querySearch(locals, term), [] as SearchResult[]);
+
+export const getNotifications = (locals: App.Locals, userId: string) =>
+  safeRead('getNotifications', () => queryGetNotifications(locals, userId), [] as
+    Awaited<ReturnType<typeof queryGetNotifications>>);
 
 export { parseJsonArray };
