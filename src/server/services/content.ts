@@ -13,7 +13,7 @@ import {
  *
  * Every function degrades gracefully: with no database bound, it returns the
  * empty result rather than throwing or inventing content, so the site renders
- * honest empty states before the clan has entered any data.
+ * ehrliche Leerzustände, solange der Club noch keine Daten eingetragen hat.
  */
 
 export interface Page<T> {

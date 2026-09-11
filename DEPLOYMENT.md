@@ -3,6 +3,10 @@
 Complete walkthrough from an empty Cloudflare account to a live site. Everything below fits in
 Cloudflare's free tier.
 
+> Diese Anleitung ist bewusst auf Englisch geblieben: Sie beschreibt Schritt für Schritt das
+> Cloudflare-Dashboard, dessen Beschriftungen ("Workers & Pages", "Add custom domain", …) genau so
+> auf dem Bildschirm stehen. Die Website selbst ist vollständig deutsch.
+
 **Time needed:** about 15 minutes.
 
 ---
@@ -68,14 +72,14 @@ everything else in `dist/` is served from the CDN. `public/.assetsignore` keeps 
 server bundle out of the public asset directory — without it, everything under `src/server/`
 would be downloadable from the live site.
 
-## 3. Fill in the clan data
+## 3. Fill in the club data
 
 This needs the database (see [Adding the database](#adding-the-database)) — the admin area is
 where the content lives.
 
 Everything the site shows as `—` or "not published yet" is edited at **`/admin/settings`**:
-Discord invite, clan description, history, values, goals, rules, imprint, privacy notice, social
-links. Members, games, events, news, media and achievements have their own admin sections.
+Discord invite, club description, history, values, goals, rules, imprint, privacy notice, social
+links. Members, disciplines, events, news, media and achievements have their own admin sections.
 
 Nothing is invented: a field you leave empty stays an honest placeholder on the public site.
 
@@ -153,7 +157,7 @@ npx wrangler d1 execute tft-db --remote --command "INSERT INTO users (...) VALUE
 `email_normalized` must be the lowercased email — that is the column the login looks up.
 
 **5. Commit and push.** The next build deploys with the database attached; sign in at
-`/login` and fill in the clan data at `/admin/settings`.
+`/login` and fill in the club data at `/admin/settings`.
 
 ## Updating the site
 
@@ -200,4 +204,4 @@ npm run db:migrate:remote      # then apply to production
 | Workers requests | 100 000 requests/day | SSR for every page |
 | D1 | 5 GB, 5 M row reads/day | The whole database |
 
-A clan site sits far inside these limits. No paid service is required.
+A club site sits far inside these limits. No paid service is required.

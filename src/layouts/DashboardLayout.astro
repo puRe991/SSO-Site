@@ -16,11 +16,11 @@ const { title, heading, nav, icons } = Astro.props;
 
 const status = Astro.url.searchParams.get('status');
 const messages: Record<string, { text: string; tone: 'success' | 'danger' }> = {
-  saved: { text: 'Changes saved.', tone: 'success' },
-  created: { text: 'Entry created.', tone: 'success' },
-  deleted: { text: 'Entry deleted.', tone: 'success' },
-  error: { text: 'The action could not be completed.', tone: 'danger' },
-  forbidden: { text: 'You do not have permission for this action.', tone: 'danger' },
+  saved: { text: 'Änderungen gespeichert.', tone: 'success' },
+  created: { text: 'Eintrag angelegt.', tone: 'success' },
+  deleted: { text: 'Eintrag gelöscht.', tone: 'success' },
+  error: { text: 'Die Aktion konnte nicht ausgeführt werden.', tone: 'danger' },
+  forbidden: { text: 'Dir fehlt die Berechtigung für diese Aktion.', tone: 'danger' },
 };
 const toast = status ? messages[status] : undefined;
 ---

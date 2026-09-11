@@ -12,7 +12,7 @@ import { clientIdentifier, rateLimit } from '@/server/security/rate-limit';
 import { loginSchema, formToObject } from '@/server/validation/schemas';
 import { canAccessAdmin } from '@/data/permissions';
 
-/** Only same-origin paths are accepted as a redirect target (open-redirect guard). */
+/** Nur Pfade der eigenen Seite sind als Weiterleitungsziel erlaubt (Schutz vor Open Redirects). */
 function safeNext(value: string | null | undefined): string | null {
   if (!value || !value.startsWith('/') || value.startsWith('//')) return null;
   return value;
@@ -32,20 +32,20 @@ if (Astro.request.method === 'POST') {
   values = formToObject(form);
 
   if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
-    error = 'Your session expired. Please sign in again.';
+    error = 'Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.';
   } else {
     const database = getDatabase(Astro.locals);
     const identifier = clientIdentifier(Astro.request);
     const limit = await rateLimit(database, 'login', identifier, 8, 15 * 60);
 
     if (!limit.allowed) {
-      error = `Too many login attempts. Try again in ${Math.ceil(limit.retryAfterSeconds / 60)} minutes.`;
+      error = `Zu viele Anmeldeversuche. Versuch es in ${Math.ceil(limit.retryAfterSeconds / 60)} Minuten noch einmal.`;
     } else {
       const parsed = loginSchema.safeParse(values);
       if (!parsed.success) {
-        error = 'Please enter a valid email address and your password.';
+        error = 'Bitte gib eine gültige E-Mail-Adresse und dein Passwort ein.';
       } else if (!database) {
-        error = 'Login is unavailable because no database is configured.';
+        error = 'Die Anmeldung ist nicht verfügbar, weil keine Datenbank eingerichtet ist.';
       } else {
         const rows = await database
           .select()
@@ -54,13 +54,13 @@ if (Astro.request.method === 'POST') {
           .limit(1);
 
         const user = rows[0];
-        // Always run a verification so timing does not reveal whether the
-        // account exists.
+        // Es wird immer geprüft, damit die Antwortzeit nicht verrät, ob das
+        // Konto existiert.
         const dummyHash = 'pbkdf2$210000$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
         const valid = await verifyPassword(parsed.data.password, user?.passwordHash ?? dummyHash);
 
         if (!user || !valid || !user.isActive) {
-          error = 'Email address or password is incorrect.';
+          error = 'E-Mail-Adresse oder Passwort stimmt nicht.';
         } else {
           await purgeExpiredSessions(database);
           await createSession(
@@ -86,10 +86,10 @@ if (Astro.request.method === 'POST') {
 }
 ---
 
-<AuthLayout title="Login" description="Sign in to the Team Fairy Tight member area.">
+<AuthLayout title="Anmelden" description="Melde dich im Mitgliederbereich von Fairy Tight an.">
   <div>
-    <h1 class="title">Login</h1>
-    <p class="text-muted subtitle">Sign in to the member area.</p>
+    <h1 class="title">Anmelden</h1>
+    <p class="text-muted subtitle">Melde dich im Mitgliederbereich an.</p>
   </div>
 
   {error && <Alert tone="danger">{error}</Alert>}
@@ -99,7 +99,7 @@ if (Astro.request.method === 'POST') {
     {nextParam && <input type="hidden" name="next" value={nextParam} />}
 
     <Field
-      label="Email"
+      label="E-Mail"
       name="email"
       type="email"
       required
@@ -107,19 +107,19 @@ if (Astro.request.method === 'POST') {
       autocomplete="email"
     />
     <Field
-      label="Password"
+      label="Passwort"
       name="password"
       type="password"
       required
       autocomplete="current-password"
     />
 
-    <Button type="submit" variant="primary" size="lg" full>Sign in</Button>
+    <Button type="submit" variant="primary" size="lg" full>Anmelden</Button>
   </form>
 
   <p class="text-muted hint">
-    No account yet? <a href="/register">Register</a> — or apply to the clan at
-    <a href="/join"> Join Us</a>.
+    Noch kein Konto? <a href="/register">Registrieren</a> — oder bewirb dich beim Club unter
+    <a href="/join">Mitreiten</a>.
   </p>
 </AuthLayout>
 

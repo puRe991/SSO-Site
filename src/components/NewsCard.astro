@@ -26,7 +26,7 @@ const published = formatDate(article.publishedAt);
   <div class="news-card__body">
     <div class="cluster">
       <Badge tone="accent" size="sm">{article.category}</Badge>
-      {article.status === 'draft' && <Badge tone="warning" size="sm">Draft</Badge>}
+      {article.status === 'draft' && <Badge tone="warning" size="sm">Entwurf</Badge>}
       {article.isDemo && <Badge tone="warning" size="sm">Demo</Badge>}
     </div>
     <h3 class="news-card__title">{article.title}</h3>

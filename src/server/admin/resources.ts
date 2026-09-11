@@ -10,12 +10,12 @@ import { toDateTimeLocal } from '@/lib/format';
 import type { Permission } from '@/data/permissions';
 
 /**
- * Resource registry
- * =================
- * The admin area is data-driven: every managed entity is described once here
- * (columns, form fields, validation, mapping) and a single set of pages renders
- * list/create/edit/delete for all of them. Adding a new managed entity means
- * adding one entry — no new pages, no copy-pasted CRUD.
+ * Ressourcen-Register
+ * ===================
+ * Der Adminbereich ist datengetrieben: jede verwaltete Entität wird hier genau
+ * einmal beschrieben (Spalten, Formularfelder, Validierung, Mapping), und ein
+ * einziger Satz Seiten rendert Liste/Anlegen/Bearbeiten/Löschen für alle. Eine
+ * neue Entität heißt: ein Eintrag mehr — keine neuen Seiten, kein kopiertes CRUD.
  */
 
 export type FieldType =
@@ -28,7 +28,7 @@ export interface FieldDef {
   required?: boolean;
   hint?: string;
   options?: { value: string; label: string }[];
-  /** Options resolved at render time (e.g. the list of games). */
+  /** Optionen, die erst beim Rendern aufgelöst werden (z. B. die Disziplinenliste). */
   optionsFrom?: 'games' | 'ranks' | 'newsCategories';
   maxlength?: number;
 }
@@ -36,7 +36,7 @@ export interface FieldDef {
 export interface ColumnDef {
   key: string;
   label: string;
-  /** Rendered as a muted secondary line under the primary value. */
+  /** Wird als gedämpfte zweite Zeile unter dem Hauptwert gerendert. */
   secondary?: boolean;
 }
 
@@ -53,13 +53,13 @@ export interface ResourceDef {
   columns: ColumnDef[];
   canCreate: boolean;
   canDelete: boolean;
-  /** Loads rows for the list view. */
+  /** Lädt die Zeilen für die Listenansicht. */
   list: (db: Database) => Promise<Record<string, unknown>[]>;
-  /** Loads one row for the edit form. */
+  /** Lädt eine Zeile für das Bearbeitungsformular. */
   find: (db: Database, id: string) => Promise<Record<string, unknown> | null>;
-  /** Maps validated form input to database columns. */
+  /** Bildet geprüfte Formulareingaben auf Datenbankspalten ab. */
   toRow: (input: Record<string, string>) => Record<string, unknown>;
-  /** Maps a database row back to form values. */
+  /** Bildet eine Datenbankzeile zurück auf Formularwerte ab. */
   toForm: (row: Record<string, unknown>) => Record<string, string>;
 }
 
@@ -71,54 +71,54 @@ const checkbox = (value: string | undefined): boolean => value === 'true' || val
 const statusOptions = {
   presence: [
     { value: 'online', label: 'Online' },
-    { value: 'away', label: 'Away' },
-    { value: 'dnd', label: 'Do not disturb' },
+    { value: 'away', label: 'Abwesend' },
+    { value: 'dnd', label: 'Bitte nicht stören' },
     { value: 'offline', label: 'Offline' },
   ],
   game: [
-    { value: 'active', label: 'Active' },
-    { value: 'casual', label: 'Casual' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'planned', label: 'Planned' },
+    { value: 'active', label: 'Aktiv' },
+    { value: 'casual', label: 'Gelegentlich' },
+    { value: 'inactive', label: 'Pausiert' },
+    { value: 'planned', label: 'Geplant' },
   ],
   event: [
-    { value: 'upcoming', label: 'Upcoming' },
-    { value: 'live', label: 'Live' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'upcoming', label: 'Geplant' },
+    { value: 'live', label: 'Läuft gerade' },
+    { value: 'completed', label: 'Vorbei' },
+    { value: 'cancelled', label: 'Abgesagt' },
   ],
   news: [
-    { value: 'draft', label: 'Draft' },
-    { value: 'published', label: 'Published' },
+    { value: 'draft', label: 'Entwurf' },
+    { value: 'published', label: 'Veröffentlicht' },
   ],
   mediaCategory: [
     { value: 'screenshots', label: 'Screenshots' },
-    { value: 'clan', label: 'Clan' },
-    { value: 'events', label: 'Events' },
-    { value: 'games', label: 'Games' },
+    { value: 'clan', label: 'Clubleben' },
+    { value: 'events', label: 'Termine' },
+    { value: 'games', label: 'Disziplinen' },
     { value: 'videos', label: 'Videos' },
     { value: 'artwork', label: 'Artwork' },
   ],
   mediaKind: [
-    { value: 'image', label: 'Image' },
+    { value: 'image', label: 'Bild' },
     { value: 'video', label: 'Video' },
   ],
   provider: [
     { value: '', label: '—' },
     { value: 'youtube', label: 'YouTube' },
     { value: 'twitch', label: 'Twitch' },
-    { value: 'local', label: 'Local file' },
+    { value: 'local', label: 'Eigene Datei' },
   ],
   application: [
-    { value: 'submitted', label: 'Submitted' },
-    { value: 'under_review', label: 'Under review' },
-    { value: 'accepted', label: 'Accepted' },
-    { value: 'declined', label: 'Declined' },
+    { value: 'submitted', label: 'Eingegangen' },
+    { value: 'under_review', label: 'In Prüfung' },
+    { value: 'accepted', label: 'Angenommen' },
+    { value: 'declined', label: 'Abgelehnt' },
   ],
   tone: [
-    { value: 'primary', label: 'Primary' },
-    { value: 'secondary', label: 'Secondary' },
-    { value: 'accent', label: 'Accent' },
+    { value: 'primary', label: 'Gold' },
+    { value: 'secondary', label: 'Grün' },
+    { value: 'accent', label: 'Türkis' },
     { value: 'neutral', label: 'Neutral' },
   ],
 };
@@ -131,8 +131,8 @@ const applicationAdminSchema = z.object({
 export const resources: Record<string, ResourceDef> = {
   members: {
     key: 'members',
-    label: 'Members',
-    singular: 'Member',
+    label: 'Mitglieder',
+    singular: 'Mitglied',
     permission: 'manage_members',
     idPrefix: 'mbr',
     table: schema.members,
@@ -140,24 +140,24 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: true,
     canDelete: true,
     columns: [
-      { key: 'username', label: 'Username' },
-      { key: 'displayName', label: 'Display name', secondary: true },
-      { key: 'rank', label: 'Rank' },
+      { key: 'username', label: 'Benutzername' },
+      { key: 'displayName', label: 'Anzeigename', secondary: true },
+      { key: 'rank', label: 'Rang' },
       { key: 'status', label: 'Status' },
     ],
     fields: [
-      { name: 'username', label: 'Username', required: true, maxlength: 40 },
-      { name: 'slug', label: 'Slug', required: true, hint: 'URL segment, e.g. "florian".' },
-      { name: 'displayName', label: 'Display name', maxlength: 60 },
-      { name: 'rank', label: 'Rank', type: 'select', optionsFrom: 'ranks' },
+      { name: 'username', label: 'Benutzername', required: true, maxlength: 40 },
+      { name: 'slug', label: 'Slug', required: true, hint: 'URL-Teil, z. B. „florian“.' },
+      { name: 'displayName', label: 'Anzeigename', maxlength: 60 },
+      { name: 'rank', label: 'Rang', type: 'select', optionsFrom: 'ranks' },
       { name: 'status', label: 'Status', type: 'select', options: statusOptions.presence, required: true },
-      { name: 'role', label: 'Role', maxlength: 60, hint: 'Free text, e.g. "Content" — leave empty if unknown.' },
-      { name: 'mainGame', label: 'Main game', maxlength: 80 },
-      { name: 'avatarUrl', label: 'Avatar URL', type: 'url' },
-      { name: 'joinedAt', label: 'Joined', type: 'datetime-local' },
-      { name: 'bio', label: 'Bio', type: 'textarea', maxlength: 2000 },
-      { name: 'isVisible', label: 'Visible on the site', type: 'checkbox' },
-      { name: 'isDemo', label: 'Mark as demo content', type: 'checkbox' },
+      { name: 'role', label: 'Aufgabe', maxlength: 60, hint: 'Freitext, z. B. „Turnierplanung“ — leer lassen, wenn offen.' },
+      { name: 'mainGame', label: 'Hauptdisziplin', maxlength: 80 },
+      { name: 'avatarUrl', label: 'Avatar-URL', type: 'url' },
+      { name: 'joinedAt', label: 'Dabei seit', type: 'datetime-local' },
+      { name: 'bio', label: 'Über mich', type: 'textarea', maxlength: 2000 },
+      { name: 'isVisible', label: 'Auf der Seite sichtbar', type: 'checkbox' },
+      { name: 'isDemo', label: 'Als Demo-Inhalt markieren', type: 'checkbox' },
     ],
     list: (db) => db.select().from(schema.members).orderBy(asc(schema.members.sortOrder), asc(schema.members.username)),
     find: async (db, id) =>
@@ -195,8 +195,8 @@ export const resources: Record<string, ResourceDef> = {
 
   games: {
     key: 'games',
-    label: 'Games',
-    singular: 'Game',
+    label: 'Disziplinen',
+    singular: 'Disziplin',
     permission: 'manage_games',
     idPrefix: 'gam',
     table: schema.games,
@@ -205,18 +205,18 @@ export const resources: Record<string, ResourceDef> = {
     canDelete: true,
     columns: [
       { key: 'name', label: 'Name' },
-      { key: 'genre', label: 'Genre', secondary: true },
+      { key: 'genre', label: 'Art', secondary: true },
       { key: 'status', label: 'Status' },
     ],
     fields: [
       { name: 'name', label: 'Name', required: true, maxlength: 80 },
       { name: 'slug', label: 'Slug', required: true },
-      { name: 'genre', label: 'Genre', maxlength: 60 },
-      { name: 'platforms', label: 'Platforms', hint: 'Comma separated, e.g. "PC, PS5".' },
-      { name: 'coverUrl', label: 'Cover URL', type: 'url' },
+      { name: 'genre', label: 'Art', maxlength: 60, hint: 'z. B. „Dressur“, „Springen“, „Distanzritt“.' },
+      { name: 'platforms', label: 'Bereiche', hint: 'Mit Komma getrennt, z. B. „Turnier, Training“.' },
+      { name: 'coverUrl', label: 'Bild-URL', type: 'url' },
       { name: 'status', label: 'Status', type: 'select', options: statusOptions.game, required: true },
-      { name: 'description', label: 'Description', type: 'textarea', maxlength: 2000 },
-      { name: 'isDemo', label: 'Mark as demo content', type: 'checkbox' },
+      { name: 'description', label: 'Beschreibung', type: 'textarea', maxlength: 2000 },
+      { name: 'isDemo', label: 'Als Demo-Inhalt markieren', type: 'checkbox' },
     ],
     list: (db) => db.select().from(schema.games).orderBy(asc(schema.games.sortOrder), asc(schema.games.name)),
     find: async (db, id) =>
@@ -259,8 +259,8 @@ export const resources: Record<string, ResourceDef> = {
 
   events: {
     key: 'events',
-    label: 'Events',
-    singular: 'Event',
+    label: 'Termine',
+    singular: 'Termin',
     permission: 'manage_events',
     idPrefix: 'evt',
     table: schema.events,
@@ -268,21 +268,21 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: true,
     canDelete: true,
     columns: [
-      { key: 'title', label: 'Title' },
-      { key: 'startsAt', label: 'Start', secondary: true },
+      { key: 'title', label: 'Titel' },
+      { key: 'startsAt', label: 'Beginn', secondary: true },
       { key: 'status', label: 'Status' },
     ],
     fields: [
-      { name: 'title', label: 'Title', required: true, maxlength: 120 },
+      { name: 'title', label: 'Titel', required: true, maxlength: 120 },
       { name: 'slug', label: 'Slug', required: true },
-      { name: 'gameId', label: 'Game', type: 'select', optionsFrom: 'games' },
-      { name: 'startsAt', label: 'Start', type: 'datetime-local', required: true },
-      { name: 'endsAt', label: 'End', type: 'datetime-local' },
-      { name: 'hostName', label: 'Host', maxlength: 80 },
-      { name: 'participantLimit', label: 'Participant limit', type: 'number' },
+      { name: 'gameId', label: 'Disziplin', type: 'select', optionsFrom: 'games' },
+      { name: 'startsAt', label: 'Beginn', type: 'datetime-local', required: true },
+      { name: 'endsAt', label: 'Ende', type: 'datetime-local' },
+      { name: 'hostName', label: 'Leitung', maxlength: 80 },
+      { name: 'participantLimit', label: 'Maximale Teilnehmerzahl', type: 'number' },
       { name: 'status', label: 'Status', type: 'select', options: statusOptions.event, required: true },
-      { name: 'description', label: 'Description', type: 'textarea', maxlength: 4000 },
-      { name: 'isDemo', label: 'Mark as demo content', type: 'checkbox' },
+      { name: 'description', label: 'Beschreibung', type: 'textarea', maxlength: 4000 },
+      { name: 'isDemo', label: 'Als Demo-Inhalt markieren', type: 'checkbox' },
     ],
     list: (db) => db.select().from(schema.events).orderBy(desc(schema.events.startsAt)),
     find: async (db, id) =>
@@ -315,8 +315,8 @@ export const resources: Record<string, ResourceDef> = {
 
   news: {
     key: 'news',
-    label: 'News',
-    singular: 'Article',
+    label: 'Neuigkeiten',
+    singular: 'Beitrag',
     permission: 'manage_news',
     idPrefix: 'nws',
     table: schema.news,
@@ -324,20 +324,20 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: true,
     canDelete: true,
     columns: [
-      { key: 'title', label: 'Title' },
-      { key: 'categoryId', label: 'Category', secondary: true },
+      { key: 'title', label: 'Titel' },
+      { key: 'categoryId', label: 'Kategorie', secondary: true },
       { key: 'status', label: 'Status' },
     ],
     fields: [
-      { name: 'title', label: 'Title', required: true, maxlength: 160 },
+      { name: 'title', label: 'Titel', required: true, maxlength: 160 },
       { name: 'slug', label: 'Slug', required: true },
-      { name: 'categoryId', label: 'Category', type: 'select', optionsFrom: 'newsCategories' },
-      { name: 'teaser', label: 'Teaser', type: 'textarea', maxlength: 300 },
-      { name: 'content', label: 'Content', type: 'textarea', maxlength: 40000, hint: 'Plain text. **bold**, *italic*, ## headings and - lists are supported.' },
-      { name: 'imageUrl', label: 'Image URL', type: 'url' },
-      { name: 'tags', label: 'Tags', hint: 'Comma separated.' },
+      { name: 'categoryId', label: 'Kategorie', type: 'select', optionsFrom: 'newsCategories' },
+      { name: 'teaser', label: 'Anrisstext', type: 'textarea', maxlength: 300 },
+      { name: 'content', label: 'Inhalt', type: 'textarea', maxlength: 40000, hint: 'Einfacher Text. **fett**, *kursiv*, ## Überschriften und - Listen funktionieren.' },
+      { name: 'imageUrl', label: 'Bild-URL', type: 'url' },
+      { name: 'tags', label: 'Schlagwörter', hint: 'Mit Komma getrennt.' },
       { name: 'status', label: 'Status', type: 'select', options: statusOptions.news, required: true },
-      { name: 'isDemo', label: 'Mark as demo content', type: 'checkbox' },
+      { name: 'isDemo', label: 'Als Demo-Inhalt markieren', type: 'checkbox' },
     ],
     list: (db) => db.select().from(schema.news).orderBy(desc(schema.news.createdAt)),
     find: async (db, id) =>
@@ -356,7 +356,7 @@ export const resources: Record<string, ResourceDef> = {
           .filter(Boolean),
       ),
       status: input.status,
-      // Publishing stamps the date once; drafts keep it empty.
+      // Beim Veröffentlichen wird das Datum gesetzt; Entwürfe bleiben ohne.
       publishedAt: input.status === 'published' ? Math.floor(Date.now() / 1000) : null,
       isDemo: checkbox(input.isDemo),
       updatedAt: Math.floor(Date.now() / 1000),
@@ -385,8 +385,8 @@ export const resources: Record<string, ResourceDef> = {
 
   media: {
     key: 'media',
-    label: 'Media',
-    singular: 'Media item',
+    label: 'Galerie',
+    singular: 'Eintrag',
     permission: 'manage_media',
     idPrefix: 'med',
     table: schema.media,
@@ -394,18 +394,18 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: true,
     canDelete: true,
     columns: [
-      { key: 'title', label: 'Title' },
-      { key: 'category', label: 'Category', secondary: true },
-      { key: 'kind', label: 'Type' },
+      { key: 'title', label: 'Titel' },
+      { key: 'category', label: 'Kategorie', secondary: true },
+      { key: 'kind', label: 'Typ' },
     ],
     fields: [
-      { name: 'title', label: 'Title', required: true, maxlength: 120 },
-      { name: 'category', label: 'Category', type: 'select', options: statusOptions.mediaCategory, required: true },
-      { name: 'kind', label: 'Type', type: 'select', options: statusOptions.mediaKind, required: true },
+      { name: 'title', label: 'Titel', required: true, maxlength: 120 },
+      { name: 'category', label: 'Kategorie', type: 'select', options: statusOptions.mediaCategory, required: true },
+      { name: 'kind', label: 'Typ', type: 'select', options: statusOptions.mediaKind, required: true },
       { name: 'url', label: 'URL', type: 'url', required: true },
-      { name: 'thumbnailUrl', label: 'Thumbnail URL', type: 'url' },
-      { name: 'provider', label: 'Video provider', type: 'select', options: statusOptions.provider },
-      { name: 'isDemo', label: 'Mark as demo content', type: 'checkbox' },
+      { name: 'thumbnailUrl', label: 'Vorschaubild-URL', type: 'url' },
+      { name: 'provider', label: 'Videoanbieter', type: 'select', options: statusOptions.provider },
+      { name: 'isDemo', label: 'Als Demo-Inhalt markieren', type: 'checkbox' },
     ],
     list: (db) => db.select().from(schema.media).orderBy(desc(schema.media.createdAt)),
     find: async (db, id) =>
@@ -432,8 +432,8 @@ export const resources: Record<string, ResourceDef> = {
 
   achievements: {
     key: 'achievements',
-    label: 'Achievements',
-    singular: 'Achievement',
+    label: 'Erfolge',
+    singular: 'Erfolg',
     permission: 'manage_achievements',
     idPrefix: 'ach',
     table: schema.achievements,
@@ -441,17 +441,17 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: true,
     canDelete: true,
     columns: [
-      { key: 'title', label: 'Title' },
-      { key: 'achievedAt', label: 'Date', secondary: true },
+      { key: 'title', label: 'Titel' },
+      { key: 'achievedAt', label: 'Datum', secondary: true },
     ],
     fields: [
-      { name: 'title', label: 'Title', required: true, maxlength: 120 },
+      { name: 'title', label: 'Titel', required: true, maxlength: 120 },
       { name: 'slug', label: 'Slug', required: true },
-      { name: 'icon', label: 'Icon', maxlength: 20, hint: 'A single emoji, e.g. 🏆.' },
-      { name: 'gameId', label: 'Game', type: 'select', optionsFrom: 'games' },
-      { name: 'achievedAt', label: 'Achieved on', type: 'datetime-local' },
-      { name: 'description', label: 'Description', type: 'textarea', maxlength: 1000 },
-      { name: 'isDemo', label: 'Mark as placeholder', type: 'checkbox' },
+      { name: 'icon', label: 'Symbol', maxlength: 20, hint: 'Ein einzelnes Emoji, z. B. 🏆.' },
+      { name: 'gameId', label: 'Disziplin', type: 'select', optionsFrom: 'games' },
+      { name: 'achievedAt', label: 'Erreicht am', type: 'datetime-local' },
+      { name: 'description', label: 'Beschreibung', type: 'textarea', maxlength: 1000 },
+      { name: 'isDemo', label: 'Als Platzhalter markieren', type: 'checkbox' },
     ],
     list: (db) => db.select().from(schema.achievements).orderBy(desc(schema.achievements.achievedAt)),
     find: async (db, id) =>
@@ -480,8 +480,8 @@ export const resources: Record<string, ResourceDef> = {
 
   ranks: {
     key: 'ranks',
-    label: 'Ranks',
-    singular: 'Rank',
+    label: 'Ränge',
+    singular: 'Rang',
     permission: 'manage_roles',
     idPrefix: '',
     table: schema.ranks,
@@ -489,15 +489,15 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: true,
     canDelete: true,
     columns: [
-      { key: 'label', label: 'Label' },
-      { key: 'id', label: 'Key', secondary: true },
-      { key: 'sortOrder', label: 'Order' },
+      { key: 'label', label: 'Bezeichnung' },
+      { key: 'id', label: 'Schlüssel', secondary: true },
+      { key: 'sortOrder', label: 'Reihenfolge' },
     ],
     fields: [
-      { name: 'label', label: 'Label', required: true, maxlength: 40 },
-      { name: 'id', label: 'Key', required: true, hint: 'Lowercase, e.g. "co_leader". Cannot be changed later.' },
-      { name: 'sortOrder', label: 'Order', type: 'number', required: true, hint: 'Lower value = higher in the hierarchy.' },
-      { name: 'tone', label: 'Colour', type: 'select', options: statusOptions.tone, required: true },
+      { name: 'label', label: 'Bezeichnung', required: true, maxlength: 40 },
+      { name: 'id', label: 'Schlüssel', required: true, hint: 'Kleinbuchstaben, z. B. „co_leader“. Später nicht mehr änderbar.' },
+      { name: 'sortOrder', label: 'Reihenfolge', type: 'number', required: true, hint: 'Kleinerer Wert = weiter oben in der Rangordnung.' },
+      { name: 'tone', label: 'Farbe', type: 'select', options: statusOptions.tone, required: true },
     ],
     list: (db) => db.select().from(schema.ranks).orderBy(asc(schema.ranks.sortOrder)),
     find: async (db, id) =>
@@ -518,8 +518,8 @@ export const resources: Record<string, ResourceDef> = {
 
   applications: {
     key: 'applications',
-    label: 'Applications',
-    singular: 'Application',
+    label: 'Bewerbungen',
+    singular: 'Bewerbung',
     permission: 'manage_applications',
     idPrefix: 'app',
     table: schema.applications,
@@ -527,13 +527,13 @@ export const resources: Record<string, ResourceDef> = {
     canCreate: false,
     canDelete: true,
     columns: [
-      { key: 'username', label: 'Username' },
+      { key: 'username', label: 'Benutzername' },
       { key: 'discordUsername', label: 'Discord', secondary: true },
       { key: 'status', label: 'Status' },
     ],
     fields: [
       { name: 'status', label: 'Status', type: 'select', options: statusOptions.application, required: true },
-      { name: 'note', label: 'Internal note', type: 'textarea', maxlength: 2000 },
+      { name: 'note', label: 'Interne Notiz', type: 'textarea', maxlength: 2000 },
     ],
     list: (db) => db.select().from(schema.applications).orderBy(desc(schema.applications.createdAt)),
     find: async (db, id) =>
@@ -552,7 +552,7 @@ export function getResource(key: string | undefined): ResourceDef | null {
   return resources[key] ?? null;
 }
 
-/** Counts used on the admin overview. */
+/** Zählwerte für die Admin-Übersicht. */
 export async function adminCounts(db: Database) {
   const count = async (table: SQLiteTable) => {
     const rows = await db.select({ value: sql<number>`count(*)` }).from(table);

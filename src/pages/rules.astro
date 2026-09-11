@@ -9,24 +9,24 @@ import { renderRichText } from '@/lib/text';
 const settings = await getSettings(Astro.locals);
 const content = settings['rules.content'].trim();
 
-/** Section outline the clan can fill in; no rule text is invented here. */
+/** Gliederung, die der Club selbst füllt; hier wird kein Regeltext erfunden. */
 const sections = [
-  'General rules',
-  'Behaviour',
-  'Communication',
-  'Voice chat',
-  'Games',
-  'Applications',
+  'Allgemeines',
+  'Umgang miteinander',
+  'Kommunikation',
+  'Sprachchat',
+  'Ausritte und Turniere',
+  'Bewerbungen',
   'Moderation',
-  'Sanctions',
+  'Konsequenzen',
 ];
 ---
 
-<PageLayout title="Rules" description="The rules of Team Fairy Tight.">
+<PageLayout title="Clubregeln" description="Die Regeln des Reitclubs Fairy Tight.">
   <section class="section">
     <div class="container container-narrow">
-      <p class="eyebrow">Guidelines</p>
-      <h1>Clan rules</h1>
+      <p class="eyebrow">Leitlinien</p>
+      <h1>Clubregeln</h1>
 
       {
         content ? (
@@ -34,9 +34,9 @@ const sections = [
         ) : (
           <>
             <div class="notice">
-              <Alert tone="info" title="Rules not published yet">
-                The clan has not published its rules yet. The sections below are the planned
-                structure — no rule text is shown that the clan has not written.
+              <Alert tone="info" title="Regeln noch nicht veröffentlicht">
+                Der Club hat seine Regeln noch nicht veröffentlicht. Die Abschnitte unten sind die
+                geplante Gliederung — es steht kein Regeltext hier, den der Club nicht geschrieben hat.
               </Alert>
             </div>
 
@@ -45,7 +45,7 @@ const sections = [
                 {sections.map((section) => (
                   <li>
                     <span>{section}</span>
-                    <span class="outline__tbd">TBD</span>
+                    <span class="outline__tbd">offen</span>
                   </li>
                 ))}
               </ol>
@@ -53,8 +53,8 @@ const sections = [
 
             <div class="notice">
               <EmptyState
-                title="No rules available."
-                description="Rules are written in the admin area under Settings and appear here immediately."
+                title="Noch keine Regeln hinterlegt."
+                description="Die Regeln werden im Adminbereich unter Einstellungen geschrieben und erscheinen sofort hier."
                 icon="shield"
               />
             </div>
@@ -98,8 +98,8 @@ const sections = [
     content: counter(rule) '.';
     margin-inline-end: var(--space-3);
     color: var(--text-subtle);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
   }
 
   .outline li span:first-of-type {
@@ -109,8 +109,11 @@ const sections = [
   }
 
   .outline__tbd {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
     color: var(--text-subtle);
   }
 </style>

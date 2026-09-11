@@ -1,22 +1,23 @@
 import type { Rank } from '@/types';
 
 /**
- * Rank hierarchy — technical default only.
+ * Rangordnung — nur ein technischer Standard.
  *
- * These ranks are a configurable proposal, NOT a statement about ranks the clan
- * actually uses. Ranks stored in the `ranks` table override this list at runtime,
- * so the clan can rename, reorder, add or remove ranks without a code change.
+ * Diese Ränge sind ein änderbarer Vorschlag, KEINE Aussage darüber, welche
+ * Ränge der Club wirklich benutzt. Ränge aus der Tabelle `ranks` überschreiben
+ * diese Liste zur Laufzeit — umbenennen, umsortieren, ergänzen und löschen geht
+ * also ohne Codeänderung.
  */
 export const defaultRanks: Rank[] = [
-  { id: 'owner', label: 'Owner', order: 10, tone: 'primary' },
-  { id: 'co_owner', label: 'Co-Owner', order: 20, tone: 'primary' },
-  { id: 'leader', label: 'Leader', order: 30, tone: 'secondary' },
-  { id: 'co_leader', label: 'Co-Leader', order: 40, tone: 'secondary' },
-  { id: 'admin', label: 'Admin', order: 50, tone: 'accent' },
-  { id: 'moderator', label: 'Moderator', order: 60, tone: 'accent' },
-  { id: 'officer', label: 'Officer', order: 70, tone: 'accent' },
-  { id: 'member', label: 'Member', order: 80, tone: 'neutral' },
-  { id: 'trial', label: 'Trial', order: 90, tone: 'neutral' },
+  { id: 'owner', label: 'Clubleitung', order: 10, tone: 'primary' },
+  { id: 'co_owner', label: 'Stellvertretende Leitung', order: 20, tone: 'primary' },
+  { id: 'leader', label: 'Stallleitung', order: 30, tone: 'secondary' },
+  { id: 'co_leader', label: 'Trainingsleitung', order: 40, tone: 'secondary' },
+  { id: 'admin', label: 'Administration', order: 50, tone: 'accent' },
+  { id: 'moderator', label: 'Moderation', order: 60, tone: 'accent' },
+  { id: 'officer', label: 'Turnierleitung', order: 70, tone: 'accent' },
+  { id: 'member', label: 'Mitglied', order: 80, tone: 'neutral' },
+  { id: 'trial', label: 'Probemitglied', order: 90, tone: 'neutral' },
 ];
 
 export function rankById(ranks: Rank[], id: string | null | undefined): Rank | undefined {
@@ -29,14 +30,14 @@ export function rankLabel(ranks: Rank[], id: string | null | undefined): string 
 }
 
 /**
- * Clan XP levels — placeholder names, prepared for the optional XP system.
- * No XP is displayed anywhere until a real data source exists.
+ * Club-Stufen — Platzhalternamen für das optionale XP-System.
+ * Solange es keine echte Datenquelle gibt, werden nirgends XP angezeigt.
  */
 export const xpLevels = [
-  { level: 1, name: 'Recruit', minXp: 0 },
-  { level: 2, name: 'Rising Team', minXp: 1000 },
-  { level: 3, name: 'Veteran', minXp: 5000 },
-  { level: 4, name: 'Elite', minXp: 15000 },
+  { level: 1, name: 'Neuling', minXp: 0 },
+  { level: 2, name: 'Stallhilfe', minXp: 1000 },
+  { level: 3, name: 'Erfahrenes Mitglied', minXp: 5000 },
+  { level: 4, name: 'Champion', minXp: 15000 },
 ] as const;
 
 export function levelForXp(xp: number) {

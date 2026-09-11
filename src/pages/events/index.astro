@@ -6,6 +6,8 @@ import EmptyState from '@/components/EmptyState.astro';
 import SectionHeader from '@/components/SectionHeader.astro';
 import { listEvents, listGames } from '@/server/services/content';
 import { formatDate } from '@/lib/format';
+import { eventStatusLabel } from '@/lib/labels';
+import { siteConfig } from '@/data/site.config.mjs';
 
 const params = Astro.url.searchParams;
 const gameFilter = params.get('game') ?? undefined;
@@ -17,28 +19,31 @@ const [games, upcoming, past] = await Promise.all([
   listEvents(Astro.locals, { when: 'past', game: gameFilter, status: statusFilter, limit: 12 }),
 ]);
 
-/** Groups upcoming events by month for the calendar overview. */
+/** Gruppiert die nächsten Termine nach Monat für die Kalenderübersicht. */
 const byMonth = new Map<string, typeof upcoming>();
 for (const event of upcoming) {
-  const key = new Date(event.startsAt).toLocaleDateString('en', { month: 'long', year: 'numeric' });
+  const key = new Date(event.startsAt).toLocaleDateString(siteConfig.locale, {
+    month: 'long',
+    year: 'numeric',
+  });
   byMonth.set(key, [...(byMonth.get(key) ?? []), event]);
 }
 ---
 
-<PageLayout title="Events" description="Clan evenings, tournaments and community events.">
+<PageLayout title="Termine" description="Ausritte, Turniere und Clubabende von Fairy Tight.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Calendar</p>
-      <h1>Events</h1>
+      <p class="eyebrow">Kalender</p>
+      <h1>Termine</h1>
 
       <div class="controls">
         <FilterBar
           searchName="q"
-          searchPlaceholder="Search events…"
+          searchPlaceholder="Termine durchsuchen…"
           groups={[
             {
               name: 'game',
-              label: 'Game',
+              label: 'Disziplin',
               value: gameFilter,
               options: games.map((game) => ({ value: game.slug, label: game.name })),
             },
@@ -47,17 +52,17 @@ for (const event of upcoming) {
               label: 'Status',
               value: statusFilter,
               options: [
-                { value: 'upcoming', label: 'Upcoming' },
-                { value: 'live', label: 'Live' },
-                { value: 'completed', label: 'Completed' },
-                { value: 'cancelled', label: 'Cancelled' },
+                { value: 'upcoming', label: 'Geplant' },
+                { value: 'live', label: 'Läuft gerade' },
+                { value: 'completed', label: 'Vorbei' },
+                { value: 'cancelled', label: 'Abgesagt' },
               ],
             },
           ]}
         />
       </div>
 
-      <SectionHeader eyebrow="Coming up" title="Upcoming events" />
+      <SectionHeader eyebrow="Demnächst" title="Nächste Termine" />
       {
         upcoming.length > 0 ? (
           [...byMonth.entries()].map(([month, monthEvents]) => (
@@ -72,8 +77,8 @@ for (const event of upcoming) {
           ))
         ) : (
           <EmptyState
-            title="No upcoming events."
-            description="New events appear here as soon as the team schedules them."
+            title="Keine anstehenden Termine."
+            description="Neue Termine erscheinen hier, sobald der Club sie einträgt."
             icon="calendar"
           />
         )
@@ -83,7 +88,7 @@ for (const event of upcoming) {
 
   <section class="section">
     <div class="container">
-      <SectionHeader eyebrow="Archive" title="Past events" />
+      <SectionHeader eyebrow="Archiv" title="Vergangene Termine" />
       {
         past.length > 0 ? (
           <ul class="past" role="list">
@@ -92,13 +97,13 @@ for (const event of upcoming) {
                 <a href={`/events/${event.slug}`}>
                   <span class="past__date">{formatDate(event.startsAt) ?? '—'}</span>
                   <span class="past__title">{event.title}</span>
-                  <span class="past__status">{event.status}</span>
+                  <span class="past__status">{eventStatusLabel(event.status)}</span>
                 </a>
               </li>
             ))}
           </ul>
         ) : (
-          <EmptyState title="No past events recorded." icon="clock" />
+          <EmptyState title="Noch keine vergangenen Termine erfasst." icon="clock" />
         )
       }
     </div>

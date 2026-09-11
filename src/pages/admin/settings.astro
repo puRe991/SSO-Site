@@ -23,40 +23,40 @@ let error: string | null = null;
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
-    error = 'Your session expired. Please save again.';
+    error = 'Deine Sitzung ist abgelaufen. Bitte speichere noch einmal.';
   } else if (!hasDatabase(Astro.locals)) {
-    error = 'No database is configured.';
+    error = 'Es ist keine Datenbank eingerichtet.';
   } else {
     for (const [key, value] of form.entries()) {
       if (typeof value !== 'string' || !isSettingKey(key)) continue;
       await setSetting(Astro.locals, key, value.slice(0, 40000));
     }
-    notice = 'Settings saved.';
+    notice = 'Einstellungen gespeichert.';
   }
 }
 
 const settings = await getSettings(Astro.locals);
 
-/** Only real values are shown in the inputs — TBD tokens render as empty. */
+/** In den Feldern stehen nur echte Werte — TBD-Platzhalter bleiben leer. */
 const valueOf = (key: (typeof SETTING_KEYS)[number]) => (isTBD(settings[key]) ? '' : settings[key]);
 
 const groups = [
   {
-    title: 'Clan',
-    description: 'Texts shown on the home and clan pages.',
+    title: 'Club',
+    description: 'Texte für die Start- und die Clubseite.',
     fields: [
-      { key: 'clan.description' as const, label: 'Clan description', type: 'textarea' as const },
-      { key: 'clan.history' as const, label: 'History', type: 'textarea' as const },
-      { key: 'clan.values' as const, label: 'Values', type: 'textarea' as const },
-      { key: 'clan.goals' as const, label: 'Goals', type: 'textarea' as const },
-      { key: 'clan.founded' as const, label: 'Founded', type: 'text' as const },
+      { key: 'clan.description' as const, label: 'Clubbeschreibung', type: 'textarea' as const },
+      { key: 'clan.history' as const, label: 'Geschichte', type: 'textarea' as const },
+      { key: 'clan.values' as const, label: 'Werte', type: 'textarea' as const },
+      { key: 'clan.goals' as const, label: 'Ziele', type: 'textarea' as const },
+      { key: 'clan.founded' as const, label: 'Gegründet', type: 'text' as const },
     ],
   },
   {
-    title: 'Social media',
-    description: 'Only platforms with a real URL are shown on the site.',
+    title: 'Social Media',
+    description: 'Auf der Seite erscheinen nur Plattformen mit einer echten URL.',
     fields: [
-      { key: 'social.discord' as const, label: 'Discord invite URL', type: 'url' as const },
+      { key: 'social.discord' as const, label: 'Discord-Einladungslink', type: 'url' as const },
       { key: 'social.youtube' as const, label: 'YouTube', type: 'url' as const },
       { key: 'social.twitch' as const, label: 'Twitch', type: 'url' as const },
       { key: 'social.instagram' as const, label: 'Instagram', type: 'url' as const },
@@ -64,30 +64,30 @@ const groups = [
       { key: 'social.x' as const, label: 'X', type: 'url' as const },
       { key: 'social.facebook' as const, label: 'Facebook', type: 'url' as const },
       { key: 'social.steam' as const, label: 'Steam', type: 'url' as const },
-      { key: 'contact.email' as const, label: 'Contact email', type: 'email' as const },
+      { key: 'contact.email' as const, label: 'Kontakt-E-Mail', type: 'email' as const },
     ],
   },
   {
-    title: 'Legal & rules',
-    description: 'Rules, imprint and privacy notice. Nothing here is generated automatically.',
+    title: 'Rechtliches & Regeln',
+    description: 'Regeln, Impressum und Datenschutz. Hier wird nichts automatisch erzeugt.',
     fields: [
-      { key: 'rules.content' as const, label: 'Clan rules', type: 'textarea' as const },
-      { key: 'imprint.content' as const, label: 'Imprint', type: 'textarea' as const },
-      { key: 'privacy.content' as const, label: 'Privacy notice', type: 'textarea' as const },
+      { key: 'rules.content' as const, label: 'Clubregeln', type: 'textarea' as const },
+      { key: 'imprint.content' as const, label: 'Impressum', type: 'textarea' as const },
+      { key: 'privacy.content' as const, label: 'Datenschutzerklärung', type: 'textarea' as const },
     ],
   },
 ];
 ---
 
 <DashboardLayout
-  title="Admin — Settings"
+  title="Admin — Einstellungen"
   heading="Administration"
   nav={visibleAdminNav(user.role)}
   icons={adminIcons}
 >
   <AdminHeader
-    title="Settings"
-    description="Editable site content. Empty fields stay empty and appear as placeholders on the site."
+    title="Einstellungen"
+    description="Bearbeitbare Inhalte der Seite. Leere Felder bleiben leer und erscheinen auf der Seite als Platzhalter."
   />
 
   {notice && <div class="block"><Alert tone="success">{notice}</Alert></div>}
@@ -117,7 +117,7 @@ const groups = [
     }
 
     <div class="actions">
-      <Button type="submit" variant="primary">Save settings</Button>
+      <Button type="submit" variant="primary">Einstellungen speichern</Button>
     </div>
   </form>
 </DashboardLayout>

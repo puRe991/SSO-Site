@@ -6,7 +6,7 @@ export interface FilterGroup {
   label: string;
   options: { value: string; label: string }[];
   value?: string;
-  /** Label of the neutral first option (default: "<label>: all"). */
+  /** Beschriftung der neutralen ersten Option (Standard: „<label>: alle“). */
   allLabel?: string;
 }
 
@@ -22,7 +22,7 @@ const {
   groups,
   searchName = 'q',
   searchValue = '',
-  searchPlaceholder = 'Search…',
+  searchPlaceholder = 'Suchen…',
   action = Astro.url.pathname,
 } = Astro.props;
 ---
@@ -35,7 +35,7 @@ const {
       name={searchName}
       value={searchValue}
       placeholder={searchPlaceholder}
-      aria-label="Search"
+      aria-label="Suche"
     />
   </div>
 
@@ -44,7 +44,7 @@ const {
       <label class="filters__group">
         <span class="visually-hidden">{group.label}</span>
         <select name={group.name}>
-          <option value="">{group.allLabel ?? `${group.label}: all`}</option>
+          <option value="">{group.allLabel ?? `${group.label}: alle`}</option>
           {group.options.map((option) => (
             <option value={option.value} selected={group.value === option.value}>
               {option.label}
@@ -57,9 +57,9 @@ const {
 
   <button class="filters__submit" type="submit">
     <Icon name="filter" size={16} />
-    Apply
+    Filtern
   </button>
-  <a class="filters__reset" href={action}>Reset</a>
+  <a class="filters__reset" href={action}>Zurücksetzen</a>
 </form>
 
 <style>

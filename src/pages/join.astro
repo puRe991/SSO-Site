@@ -23,7 +23,7 @@ if (Astro.request.method === 'POST') {
   values = formToObject(form);
 
   if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
-    errors._form = 'Your session expired. Please submit the form again.';
+    errors._form = 'Deine Sitzung ist abgelaufen. Bitte schick das Formular noch einmal ab.';
   } else {
     const database = getDatabase(Astro.locals);
     const limit = await rateLimit(
@@ -35,17 +35,17 @@ if (Astro.request.method === 'POST') {
     );
 
     if (!limit.allowed) {
-      errors._form = 'Too many applications from this connection. Please try again later.';
+      errors._form = 'Zu viele Bewerbungen von diesem Anschluss. Bitte versuch es später noch einmal.';
     } else {
       const parsed = applicationSchema.safeParse(values);
       if (!parsed.success) {
         errors = fieldErrors(parsed.error);
       } else if (parsed.data.website) {
-        // Honeypot filled → silently accept without storing.
+        // Honeypot ausgefüllt → still annehmen, aber nichts speichern.
         submitted = true;
       } else if (!database) {
         errors._form =
-          'Applications cannot be accepted right now because no database is configured.';
+          'Bewerbungen können gerade nicht angenommen werden, weil keine Datenbank eingerichtet ist.';
       } else {
         await database.insert(schema.applications).values({
           id: newId('app'),
@@ -71,22 +71,22 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 ---
 
 <PageLayout
-  title="Join Us"
-  description="Apply to Team Fairy Tight — requirements, process and application form."
+  title="Mitreiten"
+  description="Bewirb dich bei Fairy Tight — Voraussetzungen, Ablauf und Bewerbungsformular."
 >
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Recruiting</p>
-      <h1>Join Team Fairy Tight</h1>
+      <p class="eyebrow">Aufnahme</p>
+      <h1>Reite bei Fairy Tight mit</h1>
       <p class="text-muted intro">
-        We are looking for players who enjoy playing as a team. Read the requirements, then send us
-        your application.
+        Wir suchen Reiterinnen und Reiter, die gern gemeinsam unterwegs sind. Lies dir die
+        Voraussetzungen durch und schick uns danach deine Bewerbung.
       </p>
 
       <div class="layout">
         <div class="layout__info">
           <Card>
-            <h2 class="h3">Requirements</h2>
+            <h2 class="h3">Voraussetzungen</h2>
             <ul class="list" role="list">
               {
                 joinRequirements.map((requirement) => (
@@ -100,7 +100,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </Card>
 
           <Card>
-            <h2 class="h3">How it works</h2>
+            <h2 class="h3">So läuft es ab</h2>
             <ol class="steps">
               {
                 joinSteps.map((step, index) => (
@@ -119,15 +119,15 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </Card>
 
           <Card>
-            <h2 class="h3">Expectations</h2>
+            <h2 class="h3">Was wir erwarten</h2>
             <p class="text-muted small">
-              The clan rules apply to all members. Please read them before applying:
-              <a href="/rules"> clan rules</a>.
+              Für alle Mitglieder gelten die Clubregeln. Bitte lies sie vor deiner Bewerbung:
+              <a href="/rules">Clubregeln</a>.
             </p>
             {
               discord && (
                 <Button href={discord} variant="ghost" size="sm" full>
-                  <Icon name="discord" size={16} /> Ask a question on Discord
+                  <Icon name="discord" size={16} /> Frag auf Discord nach
                 </Button>
               )
             }
@@ -136,13 +136,13 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 
         <div class="layout__form">
           <Card>
-            <h2 class="h3">Application</h2>
+            <h2 class="h3">Bewerbung</h2>
 
             {
               submitted ? (
-                <Alert tone="success" title="Application received">
-                  Thank you — your application has the status <strong>submitted</strong>. The team
-                  will review it and get back to you on Discord.
+                <Alert tone="success" title="Bewerbung eingegangen">
+                  Danke — deine Bewerbung hat den Status <strong>eingegangen</strong>. Der Club
+                  schaut sie sich an und meldet sich bei dir auf Discord.
                 </Alert>
               ) : (
                 <form method="post" novalidate>
@@ -152,31 +152,31 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 
                   <div class="grid">
                     <Field
-                      label="Username"
+                      label="Benutzername"
                       name="username"
                       required
                       value={values.username}
                       error={errors.username}
                       maxlength={40}
-                      hint="Your in-game name."
+                      hint="Dein Name im Spiel."
                     />
                     <Field
-                      label="Display name"
+                      label="Anzeigename"
                       name="displayName"
                       value={values.displayName}
                       error={errors.displayName}
                       maxlength={60}
                     />
                     <Field
-                      label="Country"
+                      label="Land"
                       name="country"
                       value={values.country}
                       error={errors.country}
                       maxlength={60}
-                      hint="Optional — helps with scheduling time zones."
+                      hint="Optional — hilft bei der Zeitplanung über Zeitzonen hinweg."
                     />
                     <Field
-                      label="Discord username"
+                      label="Discord-Name"
                       name="discordUsername"
                       required
                       value={values.discordUsername}
@@ -184,15 +184,15 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                       maxlength={60}
                     />
                     <Field
-                      label="Games you play"
+                      label="Disziplinen, die du reitest"
                       name="games"
                       value={values.games}
                       error={errors.games}
                       maxlength={300}
-                      hint="Comma separated."
+                      hint="Mit Komma getrennt."
                     />
                     <Field
-                      label="Main game"
+                      label="Hauptdisziplin"
                       name="mainGame"
                       value={values.mainGame}
                       error={errors.mainGame}
@@ -201,18 +201,18 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                   </div>
 
                   <Field
-                    label="Why do you want to join?"
+                    label="Warum möchtest du in den Club?"
                     name="motivation"
                     type="textarea"
                     required
                     value={values.motivation}
                     error={errors.motivation}
                     maxlength={2000}
-                    hint="At least 20 characters."
+                    hint="Mindestens 20 Zeichen."
                   />
 
                   <Field
-                    label="How did you find us?"
+                    label="Wie hast du uns gefunden?"
                     name="referral"
                     value={values.referral}
                     error={errors.referral}
@@ -227,11 +227,11 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                   </div>
 
                   <p class="privacy-note">
-                    Your data is used only to process this application. See the
-                    <a href="/privacy"> privacy notice</a>.
+                    Deine Daten werden nur für diese Bewerbung verwendet. Mehr dazu in der
+                    <a href="/privacy">Datenschutzerklärung</a>.
                   </p>
 
-                  <Button type="submit" variant="primary" size="lg" full>Send application</Button>
+                  <Button type="submit" variant="primary" size="lg" full>Bewerbung absenden</Button>
                 </form>
               )
             }
@@ -298,7 +298,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
     height: 1.6rem;
     border-radius: var(--radius-full);
     background: color-mix(in oklab, var(--primary) 20%, transparent);
-    color: var(--violet-300);
+    color: var(--gold-300);
     font-size: var(--text-xs);
     font-weight: 700;
   }
@@ -315,6 +315,9 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
   .grid {
     display: grid;
     gap: var(--space-4);
+    /* Jedes Feld behält seine eigene Höhe, sonst zieht ein Hinweistext in der
+       einen Spalte das Eingabefeld in der anderen mit in die Länge. */
+    align-items: start;
   }
 
   .honeypot {

@@ -23,7 +23,7 @@ if (Astro.request.method === 'POST') {
   values = formToObject(form);
 
   if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
-    errors._form = 'Your session expired. Please submit the form again.';
+    errors._form = 'Deine Sitzung ist abgelaufen. Bitte schick das Formular noch einmal ab.';
   } else {
     const database = getDatabase(Astro.locals);
     const limit = await rateLimit(
@@ -35,13 +35,13 @@ if (Astro.request.method === 'POST') {
     );
 
     if (!limit.allowed) {
-      errors._form = 'Too many registrations from this connection. Please try again later.';
+      errors._form = 'Zu viele Registrierungen von diesem Anschluss. Bitte versuch es später noch einmal.';
     } else {
       const parsed = registerSchema.safeParse(values);
       if (!parsed.success) {
         errors = fieldErrors(parsed.error);
       } else if (!database) {
-        errors._form = 'Registration is unavailable because no database is configured.';
+        errors._form = 'Die Registrierung ist nicht verfügbar, weil keine Datenbank eingerichtet ist.';
       } else {
         const email = parsed.data.email;
         const normalized = email.toLowerCase();
@@ -52,8 +52,8 @@ if (Astro.request.method === 'POST') {
           .limit(1);
 
         if (existing.length > 0) {
-          // Do not confirm which addresses are registered.
-          errors._form = 'This email address cannot be used for registration.';
+          // Nicht verraten, welche Adressen registriert sind.
+          errors._form = 'Mit dieser E-Mail-Adresse ist keine Registrierung möglich.';
         } else {
           const id = newId('usr');
           await database.insert(schema.users).values({
@@ -78,12 +78,12 @@ if (Astro.request.method === 'POST') {
 }
 ---
 
-<AuthLayout title="Register" description="Create an account for the Team Fairy Tight site.">
+<AuthLayout title="Registrieren" description="Leg dir ein Konto für die Seite des Reitclubs Fairy Tight an.">
   <div>
-    <h1 class="title">Create account</h1>
+    <h1 class="title">Konto anlegen</h1>
     <p class="text-muted subtitle">
-      An account lets you sign up for events and manage your profile. Clan membership is applied for
-      separately at <a href="/join">Join Us</a>.
+      Mit einem Konto meldest du dich für Termine an und pflegst dein Profil. Um die Mitgliedschaft
+      im Club bewirbst du dich getrennt davon unter <a href="/join">Mitreiten</a>.
     </p>
   </div>
 
@@ -93,7 +93,7 @@ if (Astro.request.method === 'POST') {
     <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
 
     <Field
-      label="Email"
+      label="E-Mail"
       name="email"
       type="email"
       required
@@ -102,16 +102,16 @@ if (Astro.request.method === 'POST') {
       autocomplete="email"
     />
     <Field
-      label="Password"
+      label="Passwort"
       name="password"
       type="password"
       required
       error={errors.password}
       autocomplete="new-password"
-      hint="At least 12 characters, with letters and numbers."
+      hint="Mindestens 12 Zeichen, mit Buchstaben und Zahlen."
     />
     <Field
-      label="Repeat password"
+      label="Passwort wiederholen"
       name="passwordConfirm"
       type="password"
       required
@@ -119,10 +119,10 @@ if (Astro.request.method === 'POST') {
       autocomplete="new-password"
     />
 
-    <Button type="submit" variant="primary" size="lg" full>Register</Button>
+    <Button type="submit" variant="primary" size="lg" full>Registrieren</Button>
   </form>
 
-  <p class="text-muted hint">Already have an account? <a href="/login">Sign in</a>.</p>
+  <p class="text-muted hint">Du hast schon ein Konto? <a href="/login">Anmelden</a>.</p>
 </AuthLayout>
 
 <style>

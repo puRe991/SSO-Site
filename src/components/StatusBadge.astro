@@ -3,7 +3,7 @@ import type { PresenceStatus } from '@/types';
 
 interface Props {
   status: PresenceStatus;
-  /** Dot only, e.g. as an overlay on an avatar. */
+  /** Nur der Punkt, z. B. als Overlay auf einem Avatar. */
   compact?: boolean;
 }
 
@@ -11,8 +11,8 @@ const { status, compact = false } = Astro.props;
 
 const labels: Record<PresenceStatus, string> = {
   online: 'Online',
-  away: 'Away',
-  dnd: 'Do not disturb',
+  away: 'Abwesend',
+  dnd: 'Bitte nicht stören',
   offline: 'Offline',
 };
 ---

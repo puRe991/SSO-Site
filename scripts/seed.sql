@@ -1,62 +1,64 @@
--- Seed data for Team Fairy Tight
--- ==============================
--- Contains three kinds of rows:
---   1. System defaults (ranks, news categories) — safe to keep.
---   2. Confirmed clan data: the one member the clan has named so far.
---      Unknown attributes stay NULL; nothing is guessed.
---   3. Demo rows, all flagged is_demo = 1 and named "Demo …" so they are
---      recognisable as placeholders. Delete them in /admin once real data
---      exists: DELETE FROM members WHERE is_demo = 1; (same for other tables)
+-- Startdaten für den Reitclub Fairy Tight
+-- =======================================
+-- Enthält drei Arten von Zeilen:
+--   1. Systemvorgaben (Ränge, Beitragskategorien) — können so bleiben.
+--   2. Bestätigte Clubdaten: das eine Mitglied, das der Club bisher genannt hat.
+--      Unbekannte Angaben bleiben NULL; nichts wird geraten.
+--   3. Demo-Zeilen, alle mit is_demo = 1 und „Demo …“ im Namen, damit sie als
+--      Platzhalter erkennbar sind. Sobald echte Daten da sind, im /admin
+--      löschen: DELETE FROM members WHERE is_demo = 1; (ebenso in den anderen
+--      Tabellen)
 
--- 1. Ranks (default hierarchy — rename or replace freely) ---------------------
+-- 1. Ränge (Standard-Rangordnung — frei umbenennbar oder ersetzbar) -----------
 INSERT OR REPLACE INTO ranks (id, label, sort_order, tone) VALUES
-  ('owner',      'Owner',      10, 'primary'),
-  ('co_owner',   'Co-Owner',   20, 'primary'),
-  ('leader',     'Leader',     30, 'secondary'),
-  ('co_leader',  'Co-Leader',  40, 'secondary'),
-  ('admin',      'Admin',      50, 'accent'),
-  ('moderator',  'Moderator',  60, 'accent'),
-  ('officer',    'Officer',    70, 'accent'),
-  ('member',     'Member',     80, 'neutral'),
-  ('trial',      'Trial',      90, 'neutral');
+  ('owner',      'Clubleitung',              10, 'primary'),
+  ('co_owner',   'Stellvertretende Leitung', 20, 'primary'),
+  ('leader',     'Stallleitung',             30, 'secondary'),
+  ('co_leader',  'Trainingsleitung',         40, 'secondary'),
+  ('admin',      'Administration',           50, 'accent'),
+  ('moderator',  'Moderation',               60, 'accent'),
+  ('officer',    'Turnierleitung',           70, 'accent'),
+  ('member',     'Mitglied',                 80, 'neutral'),
+  ('trial',      'Probemitglied',            90, 'neutral');
 
--- 2. News categories ---------------------------------------------------------
+-- 2. Beitragskategorien ------------------------------------------------------
 INSERT OR REPLACE INTO news_categories (id, label, sort_order) VALUES
-  ('clan',          'Clan News',     10),
-  ('community',     'Community',     20),
-  ('games',         'Games',         30),
-  ('events',        'Events',        40),
-  ('updates',       'Updates',       50),
-  ('announcements', 'Announcements', 60);
+  ('clan',          'Aus dem Club',   10),
+  ('community',     'Community',      20),
+  ('games',         'Disziplinen',    30),
+  ('events',        'Termine',        40),
+  ('updates',       'Updates',        50),
+  ('announcements', 'Ankündigungen',  60);
 
--- 3. Confirmed member --------------------------------------------------------
--- Rank and role are not confirmed yet, so they stay NULL and render as TBD.
+-- 3. Bestätigtes Mitglied ----------------------------------------------------
+-- Rang und Aufgabe sind noch nicht bestätigt, bleiben also NULL und werden als
+-- Platzhalter dargestellt.
 INSERT OR IGNORE INTO members (id, slug, username, display_name, rank, status, role, main_game, sort_order, is_visible, is_demo)
 VALUES ('mbr_florian', 'florian', 'Florian', 'Florian Clever', NULL, 'offline', NULL, NULL, 10, 1, 0);
 
--- Three further members are known to exist but were not named. Add them here
--- as they are confirmed — do not invent names.
+-- Es gibt weitere Mitglieder, deren Namen aber nicht vorliegen. Sie kommen
+-- hier dazu, sobald sie bestätigt sind — keine Namen erfinden.
 
--- 4. Demo content (clearly marked, delete once real data exists) --------------
+-- 4. Demo-Inhalte (deutlich markiert, bei echten Daten löschen) ---------------
 INSERT OR IGNORE INTO members (id, slug, username, display_name, rank, status, role, main_game, sort_order, is_visible, is_demo)
-VALUES ('mbr_demo1', 'demo-member', 'Demo Member', 'Demo Member', 'member', 'online', 'Demo role', 'Demo Game', 900, 1, 1);
+VALUES ('mbr_demo1', 'demo-mitglied', 'Demo-Mitglied', 'Demo-Mitglied', 'member', 'online', 'Demo-Aufgabe', 'Demo-Disziplin', 900, 1, 1);
 
 INSERT OR IGNORE INTO games (id, slug, name, genre, platforms, status, description, sort_order, is_demo)
-VALUES ('gam_demo1', 'demo-game', 'Demo Game', 'Demo genre', '["PC"]', 'planned',
-        'Placeholder entry so the layout can be reviewed. Replace with the games the clan actually plays.', 900, 1);
+VALUES ('gam_demo1', 'demo-disziplin', 'Demo-Disziplin', 'Demo-Art', '["Training"]', 'planned',
+        'Platzhalter, damit sich das Layout ansehen lässt. Durch die Disziplinen ersetzen, die der Club wirklich reitet.', 900, 1);
 
 INSERT OR IGNORE INTO events (id, slug, title, description, game_id, starts_at, host_name, participant_limit, status, is_demo)
-VALUES ('evt_demo1', 'demo-event', 'Demo Event',
-        'Placeholder event. Real clan evenings and tournaments are created in the admin area.',
-        'gam_demo1', unixepoch() + 604800, 'Demo Member', 10, 'upcoming', 1);
+VALUES ('evt_demo1', 'demo-termin', 'Demo-Termin',
+        'Platzhalter-Termin. Echte Ausritte und Turniere werden im Adminbereich angelegt.',
+        'gam_demo1', unixepoch() + 604800, 'Demo-Mitglied', 10, 'upcoming', 1);
 
 INSERT OR IGNORE INTO news (id, slug, title, teaser, content, category_id, author_name, tags, status, published_at, is_demo)
-VALUES ('nws_demo1', 'demo-article', 'Demo Article',
-        'Placeholder article showing how news items are displayed.',
-        'This is placeholder content.' || char(10) || char(10) ||
-        'It demonstrates the article layout and is not a real Team Fairy Tight announcement. Delete it in the admin area once the first real article exists.',
-        'clan', 'Demo Member', '["demo"]', 'published', unixepoch(), 1);
+VALUES ('nws_demo1', 'demo-beitrag', 'Demo-Beitrag',
+        'Platzhalter-Beitrag, der zeigt, wie Neuigkeiten dargestellt werden.',
+        'Das hier ist Platzhaltertext.' || char(10) || char(10) ||
+        'Er zeigt das Layout eines Beitrags und ist keine echte Ankündigung von Fairy Tight. Sobald der erste richtige Beitrag steht, im Adminbereich löschen.',
+        'clan', 'Demo-Mitglied', '["demo"]', 'published', unixepoch(), 1);
 
 INSERT OR IGNORE INTO achievements (id, slug, title, description, icon, game_id, achieved_at, is_demo)
-VALUES ('ach_demo1', 'demo-achievement', 'Demo Achievement',
-        'Placeholder entry. No real result is claimed here.', '🏆', 'gam_demo1', NULL, 1);
+VALUES ('ach_demo1', 'demo-erfolg', 'Demo-Erfolg',
+        'Platzhalter-Eintrag. Hier wird kein echtes Ergebnis behauptet.', '🏆', 'gam_demo1', NULL, 1);

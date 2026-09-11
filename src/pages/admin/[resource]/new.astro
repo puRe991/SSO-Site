@@ -31,21 +31,21 @@ const lookups = await loadLookups(getDatabase(Astro.locals));
 ---
 
 <DashboardLayout
-  title={`Admin — New ${resource.singular}`}
+  title={`Admin — ${resource.singular} anlegen`}
   heading="Administration"
   nav={visibleAdminNav(user.role)}
   icons={adminIcons}
 >
   <AdminHeader
     eyebrow={resource.label}
-    title={`New ${resource.singular.toLowerCase()}`}
-    description="Fields you leave empty stay empty — nothing is filled in automatically."
+    title={`${resource.singular} anlegen`}
+    description="Felder, die du leer lässt, bleiben leer — es wird nichts automatisch ergänzt."
   />
   <ResourceForm
     resource={resource}
     values={values}
     errors={errors}
     lookups={lookups}
-    submitLabel="Create"
+    submitLabel="Anlegen"
   />
 </DashboardLayout>

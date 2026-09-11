@@ -20,7 +20,7 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
   <div class="container header__inner">
     <Logo />
 
-    <nav class="nav" aria-label="Main navigation">
+    <nav class="nav" aria-label="Hauptnavigation">
       <ul class="nav__list" role="list">
         {
           mainNav.map((item) => (
@@ -39,7 +39,7 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
     </nav>
 
     <div class="header__actions">
-      <a class="header__icon-link" href="/search" aria-label="Search">
+      <a class="header__icon-link" href="/search" aria-label="Suche">
         <Icon name="search" size={18} />
       </a>
 
@@ -56,11 +56,11 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
         user ? (
           <Button href={canAccessAdmin(user.role) ? '/admin' : '/dashboard'} variant="secondary" size="sm">
             <Icon name="user" size={16} />
-            Account
+            Konto
           </Button>
         ) : (
           <Button href="/login" variant="secondary" size="sm">
-            Login
+            Anmelden
           </Button>
         )
       }
@@ -68,7 +68,7 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
       <button
         class="header__burger"
         type="button"
-        aria-label="Open menu"
+        aria-label="Menü öffnen"
         aria-expanded="false"
         aria-controls="mobile-menu"
         data-menu-toggle
@@ -79,17 +79,17 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
   </div>
 </header>
 
-<!-- Mobile menu: a plain <dialog>-free drawer so it works without JS frameworks. -->
+<!-- Mobiles Menü: bewusst ohne <dialog> und ohne Framework gebaut. -->
 <div class="drawer" id="mobile-menu" hidden data-menu-panel>
   <div class="drawer__backdrop" data-menu-close></div>
-  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menü">
     <div class="drawer__head">
       <Logo variant="compact" />
-      <button class="drawer__close" type="button" aria-label="Close menu" data-menu-close>
+      <button class="drawer__close" type="button" aria-label="Menü schließen" data-menu-close>
         <Icon name="close" size={22} />
       </button>
     </div>
-    <nav aria-label="Mobile navigation">
+    <nav aria-label="Mobile Navigation">
       <ul class="drawer__list" role="list">
         {
           mainNav.map((item) => (
@@ -108,24 +108,24 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
     </nav>
     <div class="drawer__foot">
       <Button href="/search" variant="ghost" size="sm" full>
-        <Icon name="search" size={16} /> Search
+        <Icon name="search" size={16} /> Suche
       </Button>
       {
         discord && (
           <Button href={discord} variant="primary" size="sm" full>
-            <Icon name="discord" size={16} /> Join Discord
+            <Icon name="discord" size={16} /> Discord beitreten
           </Button>
         )
       }
       <Button href={user ? '/dashboard' : '/login'} variant="secondary" size="sm" full>
-        {user ? 'Dashboard' : 'Login'}
+        {user ? 'Mein Bereich' : 'Anmelden'}
       </Button>
     </div>
   </div>
 </div>
 
 <script>
-  // Sticky header compaction + mobile drawer. ~30 lines of vanilla JS, no deps.
+  // Kompakter Sticky-Header + mobile Schublade. ~30 Zeilen Vanilla-JS, keine Abhängigkeiten.
   const header = document.querySelector<HTMLElement>('[data-header]');
   const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');

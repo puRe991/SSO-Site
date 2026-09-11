@@ -4,39 +4,39 @@ import EmptyState from '@/components/EmptyState.astro';
 import Alert from '@/components/Alert.astro';
 
 /**
- * Leaderboard.
+ * Rangliste.
  *
- * The ranking architecture is in place (see `members.xp` and the XP level model
- * in `data/ranks.ts`), but there is no activity data source yet. Rather than
- * showing invented numbers, the page states that plainly.
+ * Der Unterbau steht (siehe `members.xp` und das XP-Stufenmodell in
+ * `data/ranks.ts`), es gibt aber noch keine Datenquelle für Aktivität. Statt
+ * erfundener Zahlen sagt die Seite das offen.
  */
 const categories = [
-  { id: 'clan-xp', label: 'Clan XP' },
-  { id: 'activity', label: 'Activity' },
-  { id: 'events', label: 'Events attended' },
-  { id: 'wins', label: 'Wins' },
-  { id: 'contributions', label: 'Community contributions' },
+  { id: 'clan-xp', label: 'Club-XP' },
+  { id: 'activity', label: 'Aktivität' },
+  { id: 'events', label: 'Teilnahmen' },
+  { id: 'wins', label: 'Siege' },
+  { id: 'contributions', label: 'Einsatz für die Community' },
 ];
 
 const active = Astro.url.searchParams.get('category') ?? 'clan-xp';
 const entries: { username: string; slug: string; value: number }[] = [];
 ---
 
-<PageLayout title="Leaderboard" description="Clan rankings of Team Fairy Tight.">
+<PageLayout title="Rangliste" description="Ranglisten des Reitclubs Fairy Tight.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Rankings</p>
-      <h1>Leaderboard</h1>
+      <p class="eyebrow">Platzierungen</p>
+      <h1>Rangliste</h1>
 
       <div class="notice">
-        <Alert tone="info" title="No data source connected">
-          The ranking system is prepared but no activity data is being collected yet. As soon as a
-          source (clan XP, event attendance, match results) is connected, the tables fill
-          automatically.
+        <Alert tone="info" title="Noch keine Datenquelle angebunden">
+          Das Ranglistensystem steht bereit, es werden aber noch keine Aktivitätsdaten erfasst.
+          Sobald eine Quelle angebunden ist (Club-XP, Teilnahmen, Ergebnisse), füllen sich die
+          Tabellen von selbst.
         </Alert>
       </div>
 
-      <nav class="chips" aria-label="Leaderboard categories">
+      <nav class="chips" aria-label="Ranglisten-Kategorien">
         {
           categories.map((category) => (
             <a
@@ -56,8 +56,8 @@ const entries: { username: string; slug: string; value: number }[] = [];
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Member</th>
-                <th scope="col">Value</th>
+                <th scope="col">Mitglied</th>
+                <th scope="col">Wert</th>
               </tr>
             </thead>
             <tbody>
@@ -73,7 +73,7 @@ const entries: { username: string; slug: string; value: number }[] = [];
             </tbody>
           </table>
         ) : (
-          <EmptyState title="No statistics available yet." icon="star" />
+          <EmptyState title="Noch keine Auswertung vorhanden." icon="star" />
         )
       }
     </div>

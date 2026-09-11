@@ -31,22 +31,22 @@ export const POST: APIRoute = ({ request, locals }) =>
     const database = getDatabase(locals);
     const limit = await rateLimit(database, 'application', clientIdentifier(request), 3, 60 * 60);
     if (!limit.allowed) {
-      return fail('rate_limited', 'Too many requests. Please try again later.', 429);
+      return fail('rate_limited', 'Zu viele Anfragen. Bitte versuch es später noch einmal.', 429);
     }
 
     let payload: unknown;
     try {
       payload = await request.json();
     } catch {
-      return fail('invalid_json', 'Request body must be valid JSON.');
+      return fail('invalid_json', 'Der Request-Body muss gültiges JSON sein.');
     }
 
     const parsed = applicationSchema.safeParse(payload);
     if (!parsed.success) {
-      return fail('validation_failed', 'Validation failed.', 422, fieldErrors(parsed.error));
+      return fail('validation_failed', 'Die Prüfung der Eingaben ist fehlgeschlagen.', 422, fieldErrors(parsed.error));
     }
     if (parsed.data.website) return ok({ status: 'submitted' });
-    if (!database) return fail('unavailable', 'No database is configured.', 503);
+    if (!database) return fail('unavailable', 'Es ist keine Datenbank eingerichtet.', 503);
 
     const id = newId('app');
     await database.insert(schema.applications).values({

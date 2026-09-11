@@ -28,7 +28,7 @@ const name = member.displayName ?? member.username;
 
 <PageLayout
   title={member.username}
-  description={`${name} — member of Team Fairy Tight.`}
+  description={`${name} — Mitglied im Reitclub Fairy Tight.`}
   structuredData={[
     {
       '@context': 'https://schema.org',
@@ -39,7 +39,7 @@ const name = member.displayName ?? member.username;
 >
   <section class="section">
     <div class="container">
-      <a class="back" href="/members">← All members</a>
+      <a class="back" href="/members">← Alle Mitglieder</a>
 
       <header class="profile">
         <Avatar name={member.username} src={member.avatarUrl} status={member.status} size={112} />
@@ -49,7 +49,7 @@ const name = member.displayName ?? member.username;
           <div class="cluster">
             <RankBadge rankId={member.rank} ranks={ranks} />
             <StatusBadge status={member.status} />
-            {member.isDemo && <Badge tone="warning">Demo profile</Badge>}
+            {member.isDemo && <Badge tone="warning">Demo-Profil</Badge>}
           </div>
           {member.socials && <SocialLinks links={member.socials} />}
         </div>
@@ -58,18 +58,18 @@ const name = member.displayName ?? member.username;
       <div class="layout">
         <div class="layout__main">
           <Card>
-            <h2 class="h3">Bio</h2>
+            <h2 class="h3">Über mich</h2>
             {
               member.bio ? (
                 <div class="prose" set:html={renderRichText(member.bio)} />
               ) : (
-                <p class="text-muted">No bio written yet.</p>
+                <p class="text-muted">Noch kein Text hinterlegt.</p>
               )
             }
           </Card>
 
           <section aria-labelledby="member-games">
-            <h2 class="h3" id="member-games">Games</h2>
+            <h2 class="h3" id="member-games">Disziplinen</h2>
             {
               member.games && member.games.length > 0 ? (
                 <div class="grid-auto" style="--min-col:240px">
@@ -78,16 +78,16 @@ const name = member.displayName ?? member.username;
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No games assigned yet." icon="gamepad" />
+                <EmptyState title="Noch keine Disziplinen zugeordnet." icon="horseshoe" />
               )
             }
           </section>
 
           <section aria-labelledby="member-achievements">
-            <h2 class="h3" id="member-achievements">Achievements</h2>
+            <h2 class="h3" id="member-achievements">Erfolge</h2>
             <EmptyState
-              title="No achievements recorded for this member."
-              description="Achievements are linked to members in the admin area."
+              title="Für dieses Mitglied sind noch keine Erfolge eingetragen."
+              description="Erfolge werden im Adminbereich mit Mitgliedern verknüpft."
               icon="trophy"
             />
           </section>
@@ -95,32 +95,32 @@ const name = member.displayName ?? member.username;
 
         <aside class="layout__side">
           <Card>
-            <h2 class="h3">Clan info</h2>
+            <h2 class="h3">Clubdaten</h2>
             <dl class="meta">
               <div>
-                <dt>Role</dt>
+                <dt>Aufgabe</dt>
                 <dd>{orTBD(member.role)}</dd>
               </div>
               <div>
-                <dt>Main game</dt>
+                <dt>Hauptdisziplin</dt>
                 <dd>{orTBD(member.mainGame)}</dd>
               </div>
               <div>
-                <dt>Joined</dt>
+                <dt>Dabei seit</dt>
                 <dd>{joined ?? '—'}</dd>
               </div>
             </dl>
           </Card>
 
           <Card>
-            <h2 class="h3">Clan stats</h2>
+            <h2 class="h3">Statistik</h2>
             <p class="text-muted small">
-              No statistics available yet. Activity, events and XP appear here once a data source is
-              connected.
+              Noch keine Statistik vorhanden. Aktivität, Termine und XP erscheinen hier, sobald eine
+              Datenquelle angebunden ist.
             </p>
           </Card>
 
-          <Button href="/members" variant="ghost" full>Back to roster</Button>
+          <Button href="/members" variant="ghost" full>Zurück zur Mitgliederliste</Button>
         </aside>
       </div>
     </div>

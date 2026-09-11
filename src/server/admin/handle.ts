@@ -26,7 +26,7 @@ export async function handleResourceSubmit(
   const values = formToObject(form);
 
   if (!verifyCsrf(context.request, context.cookies, csrfFromForm(form))) {
-    return { errors: { _form: 'Your session expired. Please submit the form again.' }, values };
+    return { errors: { _form: 'Deine Sitzung ist abgelaufen. Bitte schick das Formular noch einmal ab.' }, values };
   }
 
   const database = getDatabase(context.locals);
@@ -68,6 +68,6 @@ export async function handleResourceSubmit(
         values,
       };
     }
-    return { errors: { _form: 'The entry could not be saved.' }, values };
+    return { errors: { _form: 'Der Eintrag konnte nicht gespeichert werden.' }, values };
   }
 }

@@ -1,4 +1,5 @@
 @import './tokens.css';
+@import './fonts.css';
 
 /* ---------------------------------------------------------------- reset -- */
 *,
@@ -75,9 +76,11 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: 'SOFT' 40, 'WONK' 1;
   line-height: var(--leading-tight);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 h1 {
@@ -91,14 +94,14 @@ h3 {
 }
 
 a {
-  color: var(--primary-hover);
+  color: var(--link);
   text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
   text-underline-offset: 0.2em;
   transition: color var(--duration-fast) var(--ease-out);
 }
 
 a:hover {
-  color: var(--text);
+  color: var(--link-hover);
 }
 
 code,
@@ -217,7 +220,7 @@ pre {
 }
 
 .text-gradient {
-  background: linear-gradient(100deg, var(--violet-300), var(--magenta-400) 55%, var(--cyan-400));
+  background: linear-gradient(100deg, var(--gold-300), var(--gold-500) 45%, var(--pine-300));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -238,28 +241,32 @@ pre {
   background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
 }
 
-/* Subtle animated page backdrop: grid + two slow glows. GPU-cheap. */
+/* Page backdrop: warm low sun over a forest horizon. GPU-cheap, no images. */
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(60rem 40rem at 15% -10%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%),
-    radial-gradient(50rem 34rem at 85% 8%, color-mix(in oklab, var(--secondary) 12%, transparent), transparent 62%),
+    radial-gradient(70rem 36rem at 50% -14%, color-mix(in oklab, var(--primary) 20%, transparent), transparent 62%),
+    radial-gradient(56rem 40rem at 8% 12%, color-mix(in oklab, var(--pine-500) 26%, transparent), transparent 64%),
+    radial-gradient(48rem 36rem at 96% 22%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%),
     var(--background);
 }
 
+/* A faint field texture instead of the old technical grid. */
 .backdrop::after {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 75%);
-  opacity: 0.5;
+    repeating-linear-gradient(
+      115deg,
+      color-mix(in oklab, var(--text) 4%, transparent) 0 1px,
+      transparent 1px 7px
+    );
+  mask-image: radial-gradient(90% 70% at 50% 0%, #000 0%, transparent 78%);
+  opacity: 0.45;
 }
 
 /* ------------------------------------------------------- reduced motion -- */

@@ -2,8 +2,8 @@
 import Alert from './Alert.astro';
 
 /**
- * Shown wherever placeholder content is visible, so demo rows are never
- * mistaken for real clan data.
+ * Wird überall dort gezeigt, wo Platzhalterinhalte sichtbar sind, damit
+ * Demo-Einträge nie für echte Clubdaten gehalten werden.
  */
 interface Props {
   what: string;
@@ -12,7 +12,7 @@ interface Props {
 const { what } = Astro.props;
 ---
 
-<Alert tone="warning" title="Demo content">
-  Some {what} on this page are marked <strong>Demo</strong>. Those entries are placeholders for
-  layout purposes, not real Team Fairy Tight data, and can be deleted in the admin area.
+<Alert tone="warning" title="Demo-Inhalte">
+  Einige {what} auf dieser Seite sind mit <strong>Demo</strong> markiert. Das sind Platzhalter für
+  das Layout, keine echten Clubdaten — sie lassen sich im Adminbereich löschen.
 </Alert>

@@ -8,7 +8,7 @@ interface Props {
   align?: 'start' | 'center';
 }
 
-const { eyebrow, title, description, href, linkLabel = 'View all', align = 'start' } = Astro.props;
+const { eyebrow, title, description, href, linkLabel = 'Alle ansehen', align = 'start' } = Astro.props;
 ---
 
 <div class:list={['section-header', `section-header--${align}`]}>

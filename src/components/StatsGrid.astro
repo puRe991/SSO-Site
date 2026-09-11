@@ -4,8 +4,9 @@ import { formatDate } from '@/lib/format';
 import type { ClanStats } from '@/types';
 
 /**
- * Live clan status. Values come from the database; when no data source is
- * connected every tile shows the neutral placeholder instead of a made-up number.
+ * Live-Status des Clubs. Die Werte kommen aus der Datenbank; ohne angebundene
+ * Datenquelle zeigt jede Kachel den neutralen Platzhalter statt einer
+ * erfundenen Zahl.
  */
 interface Props {
   stats: ClanStats;
@@ -14,9 +15,9 @@ interface Props {
 const { stats } = Astro.props;
 
 const tiles = [
-  { label: 'Total members', value: stats.totalMembers },
-  { label: 'Online members', value: stats.onlineMembers },
-  { label: 'Active games', value: stats.activeGames },
+  { label: 'Mitglieder', value: stats.totalMembers },
+  { label: 'Gerade online', value: stats.onlineMembers },
+  { label: 'Aktive Disziplinen', value: stats.activeGames },
 ];
 
 const nextEventLabel = stats.nextEvent
@@ -26,7 +27,7 @@ const nextEventLabel = stats.nextEvent
 
 <section class="section" aria-labelledby="team-status">
   <div class="container">
-    <p class="eyebrow" id="team-status">Team status</p>
+    <p class="eyebrow" id="team-status">Clubstatus</p>
     <dl class="stats">
       {
         tiles.map((tile) => (
@@ -37,7 +38,7 @@ const nextEventLabel = stats.nextEvent
         ))
       }
       <div class="stat">
-        <dt>Next event</dt>
+        <dt>Nächster Termin</dt>
         <dd class="stat__value--sm">
           {
             stats.nextEvent ? (

@@ -10,6 +10,7 @@ import { getEventBySlug, isParticipant } from '@/server/services/content';
 import { formatDate, formatTime, isoAttr } from '@/lib/format';
 import { renderRichText } from '@/lib/text';
 import { CSRF_FIELD } from '@/server/security/csrf';
+import { eventStatusLabel } from '@/lib/labels';
 
 const { slug } = Astro.params;
 const event = slug ? await getEventBySlug(Astro.locals, slug) : null;
@@ -25,15 +26,15 @@ const full =
 
 const status = Astro.url.searchParams.get('status');
 const toastMessages: Record<string, string> = {
-  joined: 'You are registered for this event.',
-  left: 'You have been removed from this event.',
-  full: 'This event is already full.',
+  joined: 'Du bist für diesen Termin angemeldet.',
+  left: 'Deine Anmeldung für diesen Termin wurde zurückgenommen.',
+  full: 'Dieser Termin ist schon ausgebucht.',
 };
 ---
 
 <PageLayout
   title={event.title}
-  description={event.description ?? `Event of Team Fairy Tight: ${event.title}`}
+  description={event.description ?? `Termin des Reitclubs Fairy Tight: ${event.title}`}
   structuredData={[
     {
       '@context': 'https://schema.org',
@@ -54,24 +55,24 @@ const toastMessages: Record<string, string> = {
 
   <section class="section">
     <div class="container">
-      <a class="back" href="/events">← All events</a>
+      <a class="back" href="/events">← Alle Termine</a>
 
       <div class="layout">
         <div class="layout__main">
           <div class="cluster">
-            <Badge tone={event.status === 'live' ? 'danger' : 'primary'}>{event.status}</Badge>
+            <Badge tone={event.status === 'live' ? 'danger' : 'primary'}>{eventStatusLabel(event.status)}</Badge>
             {event.gameName && <Badge>{event.gameName}</Badge>}
-            {event.isDemo && <Badge tone="warning">Demo event</Badge>}
+            {event.isDemo && <Badge tone="warning">Demo-Termin</Badge>}
           </div>
           <h1>{event.title}</h1>
 
           <Card>
-            <h2 class="h3">Description</h2>
+            <h2 class="h3">Beschreibung</h2>
             {
               event.description ? (
                 <div class="prose" set:html={renderRichText(event.description)} />
               ) : (
-                <p class="text-muted">No description provided for this event.</p>
+                <p class="text-muted">Für diesen Termin wurde keine Beschreibung hinterlegt.</p>
               )
             }
           </Card>
@@ -81,15 +82,15 @@ const toastMessages: Record<string, string> = {
           <Card>
             <dl class="meta">
               <div>
-                <dt><Icon name="calendar" size={15} /> Date</dt>
+                <dt><Icon name="calendar" size={15} /> Datum</dt>
                 <dd><time datetime={isoAttr(event.startsAt)}>{formatDate(event.startsAt) ?? '—'}</time></dd>
               </div>
               <div>
-                <dt><Icon name="clock" size={15} /> Time</dt>
+                <dt><Icon name="clock" size={15} /> Uhrzeit</dt>
                 <dd>{formatTime(event.startsAt) ?? '—'}</dd>
               </div>
               <div>
-                <dt><Icon name="gamepad" size={15} /> Game</dt>
+                <dt><Icon name="horseshoe" size={15} /> Disziplin</dt>
                 <dd>
                   {
                     event.gameSlug ? <a href={`/games/${event.gameSlug}`}>{event.gameName}</a> : '—'
@@ -97,11 +98,11 @@ const toastMessages: Record<string, string> = {
                 </dd>
               </div>
               <div>
-                <dt><Icon name="user" size={15} /> Host</dt>
+                <dt><Icon name="user" size={15} /> Leitung</dt>
                 <dd>{event.hostName ?? '—'}</dd>
               </div>
               <div>
-                <dt><Icon name="users" size={15} /> Participants</dt>
+                <dt><Icon name="users" size={15} /> Teilnehmende</dt>
                 <dd>
                   {event.participantCount}
                   {event.participantLimit ? ` / ${event.participantLimit}` : ''}
@@ -111,15 +112,15 @@ const toastMessages: Record<string, string> = {
           </Card>
 
           <Card>
-            <h2 class="h3">Take part</h2>
+            <h2 class="h3">Mitmachen</h2>
             {
               event.status === 'cancelled' ? (
-                <Alert tone="warning">This event has been cancelled.</Alert>
+                <Alert tone="warning">Dieser Termin wurde abgesagt.</Alert>
               ) : !user ? (
                 <>
-                  <p class="text-muted small">Sign in to register for this event.</p>
+                  <p class="text-muted small">Melde dich an, um dich für diesen Termin einzutragen.</p>
                   <Button href={`/login?next=/events/${event.slug}`} variant="primary" full>
-                    Login
+                    Anmelden
                   </Button>
                 </>
               ) : (
@@ -133,7 +134,7 @@ const toastMessages: Record<string, string> = {
                     disabled={full}
                     aria-disabled={full}
                   >
-                    {joined ? 'Cancel registration' : full ? 'Event is full' : 'Take part'}
+                    {joined ? 'Anmeldung zurücknehmen' : full ? 'Termin ist voll' : 'Teilnehmen'}
                   </Button>
                 </form>
               )

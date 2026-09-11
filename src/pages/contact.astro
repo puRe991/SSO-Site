@@ -24,13 +24,13 @@ if (Astro.request.method === 'POST') {
   values = formToObject(form);
 
   if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
-    errors._form = 'Your session expired. Please send the message again.';
+    errors._form = 'Deine Sitzung ist abgelaufen. Bitte schick die Nachricht noch einmal ab.';
   } else {
     const database = getDatabase(Astro.locals);
     const limit = await rateLimit(database, 'contact', clientIdentifier(Astro.request), 5, 60 * 60);
 
     if (!limit.allowed) {
-      errors._form = 'Too many messages from this connection. Please try again later.';
+      errors._form = 'Zu viele Nachrichten von diesem Anschluss. Bitte versuch es später noch einmal.';
     } else {
       const parsed = contactSchema.safeParse(values);
       if (!parsed.success) {
@@ -38,7 +38,7 @@ if (Astro.request.method === 'POST') {
       } else if (parsed.data.website) {
         sent = true;
       } else if (!database) {
-        errors._form = 'Messages cannot be received right now because no database is configured.';
+        errors._form = 'Nachrichten können gerade nicht empfangen werden, weil keine Datenbank eingerichtet ist.';
       } else {
         await database.insert(schema.contactMessages).values({
           id: newId('msg'),
@@ -70,19 +70,19 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
 ];
 ---
 
-<PageLayout title="Contact" description="Get in touch with Team Fairy Tight.">
+<PageLayout title="Kontakt" description="Nimm Kontakt zum Reitclub Fairy Tight auf.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Get in touch</p>
-      <h1>Contact</h1>
+      <p class="eyebrow">Schreib uns</p>
+      <h1>Kontakt</h1>
 
       <div class="layout">
         <Card>
-          <h2 class="h3">Send a message</h2>
+          <h2 class="h3">Nachricht schreiben</h2>
           {
             sent ? (
-              <Alert tone="success" title="Message sent">
-                Thank you — we will get back to you.
+              <Alert tone="success" title="Nachricht verschickt">
+                Danke — wir melden uns bei dir.
               </Alert>
             ) : (
               <form method="post" novalidate>
@@ -91,7 +91,7 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
 
                 <Field label="Name" name="name" required value={values.name} error={errors.name} maxlength={80} />
                 <Field
-                  label="Email"
+                  label="E-Mail"
                   name="email"
                   type="email"
                   required
@@ -100,7 +100,7 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
                   autocomplete="email"
                 />
                 <Field
-                  label="Subject"
+                  label="Betreff"
                   name="subject"
                   required
                   value={values.subject}
@@ -108,7 +108,7 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
                   maxlength={120}
                 />
                 <Field
-                  label="Message"
+                  label="Nachricht"
                   name="message"
                   type="textarea"
                   required
@@ -124,7 +124,7 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
                   </label>
                 </div>
 
-                <Button type="submit" variant="primary" full>Send message</Button>
+                <Button type="submit" variant="primary" full>Nachricht senden</Button>
               </form>
             )
           }
@@ -132,17 +132,17 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
 
         <div class="channels">
           <Card>
-            <h2 class="h3">Other channels</h2>
+            <h2 class="h3">Andere Wege</h2>
             <ul class="channel-list" role="list">
               <li>
                 <Icon name="discord" size={17} />
                 {
                   discord ? (
                     <a href={discord} rel="noopener noreferrer" target="_blank">
-                      Discord server
+                      Discord-Server
                     </a>
                   ) : (
-                    <span class="text-muted">Discord link not published yet.</span>
+                    <span class="text-muted">Der Discord-Link ist noch nicht veröffentlicht.</span>
                   )
                 }
               </li>
@@ -152,7 +152,7 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
                   email ? (
                     <a href={`mailto:${email}`}>{email}</a>
                   ) : (
-                    <span class="text-muted">No email address published yet.</span>
+                    <span class="text-muted">Es ist noch keine E-Mail-Adresse veröffentlicht.</span>
                   )
                 }
               </li>
@@ -160,10 +160,10 @@ const socials: { platform: SocialPlatform; label: string; url: string }[] = [
           </Card>
 
           <Card>
-            <h2 class="h3">Social media</h2>
+            <h2 class="h3">Social Media</h2>
             <SocialLinks links={socials} />
             <p class="text-muted small">
-              Only channels the clan has actually set up are listed here.
+              Hier stehen nur Kanäle, die der Club wirklich eingerichtet hat.
             </p>
           </Card>
         </div>

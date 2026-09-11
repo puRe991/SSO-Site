@@ -26,6 +26,12 @@ export const iconPaths = {
   link: '<path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/>',
   users:
     '<path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20"/><circle cx="9.5" cy="8" r="3.5"/><path d="M21 20v-1.5a4 4 0 0 0-3-3.9"/><path d="M16 4.1a3.5 3.5 0 0 1 0 6.8"/>',
+  horseshoe:
+    '<path d="M8.5 20.6C6 19 4.5 16.2 4.5 13a7.5 7.5 0 0 1 15 0c0 3.2-1.5 6-4 7.6"/><path d="M6 20.6h3.5M14.5 20.6h3.5"/><circle cx="6.4" cy="8" r=".7"/><circle cx="17.6" cy="8" r=".7"/><circle cx="4.5" cy="13.7" r=".7"/><circle cx="19.5" cy="13.7" r=".7"/>',
+  horse:
+    '<path d="M5 20c0-4 1.8-6.6 4.6-8.2L8 8.4l2.2.6L12 6.2c2.6.2 4.6 1.4 5.7 3.4l1.8.6-.9 2c.6 2.6.1 5.3-1.6 7.8"/><path d="M9.6 11.8 5.5 9.5"/><circle cx="14.4" cy="9.4" r=".8"/>',
+  rosette:
+    '<circle cx="12" cy="9" r="4.5"/><path d="m9 13.2-2 7.3 5-2.4 5 2.4-2-7.3"/>',
   gamepad:
     '<rect x="2.5" y="7.5" width="19" height="10" rx="4"/><path d="M7 11v3M5.5 12.5h3M15.5 11.5h.01M18 13.5h.01"/>',
   calendar:

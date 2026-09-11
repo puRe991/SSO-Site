@@ -10,17 +10,18 @@ const content = settings['imprint.content'];
 const hasContent = !isTBD(content);
 ---
 
-<PageLayout title="Imprint" description="Imprint — Team Fairy Tight." noindex={!hasContent}>
+<PageLayout title="Impressum" description="Impressum — Reitclub Fairy Tight." noindex={!hasContent}>
   <section class="section">
     <div class="container container-narrow">
-      <h1>Imprint</h1>
+      <h1>Impressum</h1>
       {
         hasContent ? (
           <div class="prose body" set:html={renderRichText(content)} />
         ) : (
           <div class="notice">
-            <Alert tone="warning" title="Placeholder">
-              No imprint details have been supplied yet. Legal information is never invented — the operator enters it in the admin area.
+            <Alert tone="warning" title="Platzhalter">
+              Es wurden noch keine Impressumsangaben hinterlegt. Rechtliche Angaben werden nie
+              erfunden — der Betreiber trägt sie im Adminbereich ein.
             </Alert>
           </div>
         )

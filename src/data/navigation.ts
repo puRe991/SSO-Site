@@ -1,65 +1,65 @@
 export interface NavItem {
   label: string;
   href: string;
-  /** Sub-paths also mark this item active (e.g. /members/florian). */
+  /** Unterseiten markieren diesen Eintrag ebenfalls als aktiv (z. B. /members/florian). */
   match?: string;
 }
 
 export const mainNav: NavItem[] = [
-  { label: 'Home', href: '/', match: '^/$' },
-  { label: 'Clan', href: '/clan' },
-  { label: 'Members', href: '/members' },
-  { label: 'Games', href: '/games' },
-  { label: 'Events', href: '/events' },
-  { label: 'News', href: '/news' },
-  { label: 'Media', href: '/media' },
-  { label: 'Achievements', href: '/achievements' },
-  { label: 'Join Us', href: '/join' },
+  { label: 'Start', href: '/', match: '^/$' },
+  { label: 'Club', href: '/clan' },
+  { label: 'Mitglieder', href: '/members' },
+  { label: 'Disziplinen', href: '/games' },
+  { label: 'Termine', href: '/events' },
+  { label: 'Neuigkeiten', href: '/news' },
+  { label: 'Galerie', href: '/media' },
+  { label: 'Erfolge', href: '/achievements' },
+  { label: 'Mitreiten', href: '/join' },
 ];
 
 export const footerNav: { title: string; items: NavItem[] }[] = [
   {
-    title: 'Clan',
+    title: 'Club',
     items: [
-      { label: 'About the clan', href: '/clan' },
-      { label: 'Members', href: '/members' },
-      { label: 'Games', href: '/games' },
-      { label: 'Achievements', href: '/achievements' },
-      { label: 'Leaderboard', href: '/leaderboard' },
+      { label: 'Über den Club', href: '/clan' },
+      { label: 'Mitglieder', href: '/members' },
+      { label: 'Disziplinen', href: '/games' },
+      { label: 'Erfolge', href: '/achievements' },
+      { label: 'Rangliste', href: '/leaderboard' },
     ],
   },
   {
     title: 'Community',
     items: [
-      { label: 'Events', href: '/events' },
-      { label: 'News', href: '/news' },
-      { label: 'Media', href: '/media' },
-      { label: 'Rules', href: '/rules' },
-      { label: 'Join Us', href: '/join' },
+      { label: 'Termine', href: '/events' },
+      { label: 'Neuigkeiten', href: '/news' },
+      { label: 'Galerie', href: '/media' },
+      { label: 'Clubregeln', href: '/rules' },
+      { label: 'Mitreiten', href: '/join' },
     ],
   },
   {
-    title: 'Contact',
+    title: 'Kontakt',
     items: [
-      { label: 'Contact', href: '/contact' },
-      { label: 'Login', href: '/login' },
-      { label: 'Imprint', href: '/imprint' },
-      { label: 'Privacy', href: '/privacy' },
+      { label: 'Kontakt', href: '/contact' },
+      { label: 'Anmelden', href: '/login' },
+      { label: 'Impressum', href: '/imprint' },
+      { label: 'Datenschutz', href: '/privacy' },
     ],
   },
 ];
 
 export const adminNav: NavItem[] = [
-  { label: 'Dashboard', href: '/admin' },
-  { label: 'Members', href: '/admin/members' },
-  { label: 'Games', href: '/admin/games' },
-  { label: 'Events', href: '/admin/events' },
-  { label: 'News', href: '/admin/news' },
-  { label: 'Media', href: '/admin/media' },
-  { label: 'Achievements', href: '/admin/achievements' },
-  { label: 'Applications', href: '/admin/applications' },
-  { label: 'Ranks', href: '/admin/ranks' },
-  { label: 'Settings', href: '/admin/settings' },
+  { label: 'Übersicht', href: '/admin' },
+  { label: 'Mitglieder', href: '/admin/members' },
+  { label: 'Disziplinen', href: '/admin/games' },
+  { label: 'Termine', href: '/admin/events' },
+  { label: 'Neuigkeiten', href: '/admin/news' },
+  { label: 'Galerie', href: '/admin/media' },
+  { label: 'Erfolge', href: '/admin/achievements' },
+  { label: 'Bewerbungen', href: '/admin/applications' },
+  { label: 'Ränge', href: '/admin/ranks' },
+  { label: 'Einstellungen', href: '/admin/settings' },
 ];
 
 export function isActive(pathname: string, item: NavItem): boolean {

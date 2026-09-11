@@ -41,26 +41,26 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 
   <StatsGrid stats={stats} />
 
-  <!-- What is Team Fairy Tight -->
+  <!-- Was ist Fairy Tight -->
   <section class="section" aria-labelledby="about-title">
     <div class="container">
       <SectionHeader
-        eyebrow="About"
-        title="What is Team Fairy Tight?"
+        eyebrow="Über uns"
+        title="Was ist Fairy Tight?"
         href="/clan"
-        linkLabel="More about the clan"
+        linkLabel="Mehr über den Club"
       />
       {
         hasDescription ? (
           <div class="prose" set:html={renderRichText(description)} />
         ) : (
           <EmptyState
-            title="The clan description has not been written yet."
-            description="Once the team supplies its description, it appears here. Nothing is invented in the meantime."
+            title="Die Clubbeschreibung ist noch nicht geschrieben."
+            description="Sobald der Club seinen Text liefert, steht er hier. Bis dahin wird nichts erfunden."
             icon="info"
           >
             <Button href="/clan" variant="ghost" size="sm">
-              Go to the clan page
+              Zur Clubseite
             </Button>
           </EmptyState>
         )
@@ -68,10 +68,10 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
     </div>
   </section>
 
-  <!-- Games -->
+  <!-- Disziplinen -->
   <section class="section" aria-labelledby="games-title">
     <div class="container">
-      <SectionHeader eyebrow="Games" title="Our games" href="/games" />
+      <SectionHeader eyebrow="Reiten" title="Unsere Disziplinen" href="/games" />
       {
         games.length > 0 ? (
           <div class="grid-auto" style="--min-col:260px">
@@ -81,9 +81,9 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </div>
         ) : (
           <EmptyState
-            title="No games listed yet."
-            description="The games the clan plays will be listed here."
-            icon="gamepad"
+            title="Noch keine Disziplinen eingetragen."
+            description="Hier stehen später die Disziplinen, in denen der Club unterwegs ist."
+            icon="horseshoe"
           />
         )
       }
@@ -93,7 +93,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
   <!-- Events -->
   <section class="section" aria-labelledby="events-title">
     <div class="container">
-      <SectionHeader eyebrow="Calendar" title="Upcoming events" href="/events" />
+      <SectionHeader eyebrow="Kalender" title="Nächste Termine" href="/events" />
       {
         events.length > 0 ? (
           <div class="grid-auto" style="--min-col:300px">
@@ -103,8 +103,8 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </div>
         ) : (
           <EmptyState
-            title="No upcoming events."
-            description="New clan evenings and tournaments show up here as soon as they are scheduled."
+            title="Keine anstehenden Termine."
+            description="Neue Ausritte und Turniere tauchen hier auf, sobald sie geplant sind."
             icon="calendar"
           />
         )
@@ -115,7 +115,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
   <!-- Members -->
   <section class="section" aria-labelledby="members-title">
     <div class="container">
-      <SectionHeader eyebrow="Roster" title="Our members" href="/members" />
+      <SectionHeader eyebrow="Stall" title="Unsere Mitglieder" href="/members" />
       {
         members.items.length > 0 ? (
           <div class="grid-auto" style="--min-col:300px">
@@ -125,8 +125,8 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </div>
         ) : (
           <EmptyState
-            title="No members found."
-            description="The roster is filled from the admin area."
+            title="Keine Mitglieder gefunden."
+            description="Die Mitgliederliste wird im Adminbereich gepflegt."
             icon="users"
           />
         )
@@ -137,7 +137,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
   <!-- News -->
   <section class="section" aria-labelledby="news-title">
     <div class="container">
-      <SectionHeader eyebrow="Updates" title="Latest news" href="/news" />
+      <SectionHeader eyebrow="Aktuelles" title="Neuigkeiten" href="/news" />
       {
         news.items.length > 0 ? (
           <div class="grid-auto" style="--min-col:280px">
@@ -146,7 +146,11 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
             ))}
           </div>
         ) : (
-          <EmptyState title="No news yet." description="Clan announcements appear here." icon="news" />
+          <EmptyState
+            title="Noch keine Neuigkeiten."
+            description="Ankündigungen aus dem Club erscheinen hier."
+            icon="news"
+          />
         )
       }
     </div>
@@ -155,7 +159,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
   <!-- Achievements -->
   <section class="section" aria-labelledby="achievements-title">
     <div class="container">
-      <SectionHeader eyebrow="Milestones" title="Achievements" href="/achievements" />
+      <SectionHeader eyebrow="Meilensteine" title="Erfolge" href="/achievements" />
       {
         achievements.length > 0 ? (
           <div class="grid-auto" style="--min-col:320px">
@@ -165,8 +169,8 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </div>
         ) : (
           <EmptyState
-            title="No achievements recorded yet."
-            description="Results and milestones are entered by the team — nothing is listed here that did not happen."
+            title="Noch keine Erfolge eingetragen."
+            description="Platzierungen und Meilensteine trägt der Club selbst ein — hier steht nichts, was nicht passiert ist."
             icon="trophy"
           />
         )
@@ -180,10 +184,10 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
       <Card class="community">
         <div class="community__text">
           <p class="eyebrow">Community</p>
-          <h2 id="community-title">Join the community</h2>
+          <h2 id="community-title">Komm in die Community</h2>
           <p class="text-muted">
-            Voice evenings, clan nights, tournaments and everyday gaming — the team coordinates on
-            Discord.
+            Gemeinsame Ausritte, Clubabende, Turniere und der ganz normale Stallalltag — abgestimmt
+            wird das alles auf Discord.
           </p>
         </div>
         <div class="community__actions">
@@ -191,15 +195,15 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
             discord ? (
               <Button href={discord} variant="primary" size="lg">
                 <Icon name="discord" size={18} />
-                Join our Discord
+                Unserem Discord beitreten
               </Button>
             ) : (
               <p class="community__pending">
-                The Discord invite link has not been published yet.
+                Der Discord-Einladungslink ist noch nicht veröffentlicht.
               </p>
             )
           }
-          <Button href="/join" variant="secondary" size="lg">Apply to the clan</Button>
+          <Button href="/join" variant="secondary" size="lg">Beim Club bewerben</Button>
         </div>
       </Card>
     </div>
