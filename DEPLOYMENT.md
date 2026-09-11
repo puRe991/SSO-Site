@@ -20,62 +20,22 @@ npx wrangler login      # opens a browser, authorises the CLI
 
 ---
 
-## 1. Create the database
+## 1. The database is optional to start with
 
-D1 is Cloudflare's SQLite. The free tier covers 5 GB storage and 5 million row reads per day.
+The D1 binding is **commented out** in `wrangler.toml`, so the first deploy needs no database at
+all. The site comes up and every page renders its empty state.
 
-```bash
-npx wrangler d1 create tft-db
-```
+What works without a database: all public pages, navigation, search (empty), the sitemap, the RSS
+feed, the legal pages. What does not: login, the member dashboard, the admin area, applications
+and the contact form — each says so plainly instead of pretending to work.
 
-The command prints something like:
+Verified on the Workers runtime with no binding present: 23 of 23 routes return 200.
 
-```
-[[d1_databases]]
-binding = "DB"
-database_name = "tft-db"
-database_id = "8f2c1e40-....-............"
-```
+Skip ahead to step 2 if you just want the site live. To switch the database on, see
+[Adding the database](#adding-the-database) below — it takes about two minutes and can be done at
+any time.
 
-**Copy the `database_id` into `wrangler.toml`**, replacing `PASTE_YOUR_D1_DATABASE_ID_HERE`:
-
-```toml
-[[d1_databases]]
-binding = "DB"
-database_name = "tft-db"
-database_id = "8f2c1e40-....-............"   # ← your id
-migrations_dir = "migrations"
-```
-
-> **Why this matters:** Cloudflare reads the Worker's bindings from `wrangler.toml`, so an
-> unreplaced placeholder means the deployment has no database. The site stays up in that case,
-> but every section renders empty.
-
-Commit the change:
-
-```bash
-git add wrangler.toml && git commit -m "Add D1 database id" && git push
-```
-
----
-
-## 2. Create the schema and seed it
-
-```bash
-npx wrangler d1 migrations apply tft-db --remote
-npx wrangler d1 execute tft-db --remote --file=./scripts/seed.sql
-```
-
-`--remote` targets the real Cloudflare database; without it you are working on the local copy used
-by `npm run dev`.
-
-The seed adds the rank hierarchy, news categories, the one confirmed member, and a handful of rows
-flagged `is_demo` so the layout has something to show. Delete the demo rows once real content
-exists (see README → Content model).
-
----
-
-## 3. Create the Workers project
+## 2. Create the Workers project
 
 In the Cloudflare dashboard: **Workers & Pages → Create → Workers → Import a repository**, pick
 the repository, then set:
@@ -108,32 +68,12 @@ everything else in `dist/` is served from the CDN. `public/.assetsignore` keeps 
 server bundle out of the public asset directory — without it, everything under `src/server/`
 would be downloadable from the live site.
 
-## 4. Create the first admin account
+## 3. Fill in the clan data
 
-There is no default account. Generate a hash:
+This needs the database (see [Adding the database](#adding-the-database)) — the admin area is
+where the content lives.
 
-```bash
-npm run admin:hash -- "a-long-password-you-choose"
-```
-
-It prints a ready-made `INSERT`. Put your own email address in and run it against the remote
-database:
-
-```bash
-npx wrangler d1 execute tft-db --remote --command \
-  "INSERT INTO users (id, email, email_normalized, password_hash, role) \
-   VALUES ('usr_xxxxx', 'you@example.com', 'you@example.com', 'pbkdf2\$210000\$...', 'owner');"
-```
-
-`email_normalized` must be the lowercased email — that is the column the login looks up.
-
-Then sign in at `https://<your-worker>.workers.dev/login`.
-
----
-
-## 5. Fill in the clan data
-
-Everything the site still shows as `—` or "not published yet" is edited at **`/admin/settings`**:
+Everything the site shows as `—` or "not published yet" is edited at **`/admin/settings`**:
 Discord invite, clan description, history, values, goals, rules, imprint, privacy notice, social
 links. Members, games, events, news, media and achievements have their own admin sections.
 
@@ -141,7 +81,7 @@ Nothing is invented: a field you leave empty stays an honest placeholder on the 
 
 ---
 
-## 6. Custom domain (optional)
+## 4. Custom domain (optional)
 
 **Worker → Settings → Domains & Routes → Add custom domain.** Cloudflare issues the TLS
 certificate automatically.
@@ -158,6 +98,62 @@ PUBLIC_SITE_URL = https://teamfairytight.com
 It must be a *build* variable, not a runtime `[vars]` entry — it is read while the site is built.
 
 ---
+
+## Adding the database
+
+Everything above works without D1. This section turns on logins, the admin area, applications and
+all managed content.
+
+**1. Create the database.** Either in the dashboard (Storage & Databases → D1 → Create) or:
+
+```bash
+npx wrangler login
+npx wrangler d1 create tft-db
+```
+
+It prints a `database_id`.
+
+**2. Enable the binding.** In `wrangler.toml`, uncomment the four `[[d1_databases]]` lines and
+paste the id:
+
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "tft-db"
+database_id = "8f2c1e40-....-............"   # ← your id
+migrations_dir = "migrations"
+```
+
+A binding with the placeholder id fails the whole deployment with
+`binding DB of type d1 must have a valid database_id specified [10021]`, which is why it ships
+commented out.
+
+**3. Create the schema and seed it.**
+
+```bash
+npx wrangler d1 migrations apply tft-db --remote
+npx wrangler d1 execute tft-db --remote --file=./scripts/seed.sql
+```
+
+`--remote` targets the real Cloudflare database; without it you are working on the local copy used
+by `npm run dev`.
+
+**4. Create the first admin account.** There is no default account.
+
+```bash
+npm run admin:hash -- "a-long-password-you-choose"
+```
+
+It prints a ready-made `INSERT`. Put your own email address in and run it:
+
+```bash
+npx wrangler d1 execute tft-db --remote --command "INSERT INTO users (...) VALUES (...);"
+```
+
+`email_normalized` must be the lowercased email — that is the column the login looks up.
+
+**5. Commit and push.** The next build deploys with the database attached; sign in at
+`/login` and fill in the clan data at `/admin/settings`.
 
 ## Updating the site
 
