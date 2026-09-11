@@ -14,7 +14,7 @@
     "db:migrate:remote": "wrangler d1 migrations apply tft-db --remote",
     "db:seed:local": "wrangler d1 execute tft-db --local --file=./scripts/seed.sql",
     "admin:hash": "node scripts/hash-password.mjs",
-    "deploy": "npm run build:ci && wrangler deploy"
+    "deploy": "npm run build:ci && wrangler deploy --config wrangler.toml"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.10",

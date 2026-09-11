@@ -1,11 +1,18 @@
 # Cloudflare Workers configuration
 # ================================
-# The site deploys as a Worker with static assets (`npx wrangler deploy`), which
-# is what Cloudflare's Workers Builds runs. `dist/_worker.js/index.js` is the SSR
-# entry produced by the Astro Cloudflare adapter; everything else in `dist/` is
-# served straight from the CDN.
+# The site deploys as a Worker with static assets. `dist/_worker.js/index.js` is
+# the SSR entry produced by the Astro Cloudflare adapter; everything else in
+# `dist/` is served straight from the CDN.
 #
-# Build it before deploying — `npm run deploy` does both in one step.
+# Always deploy with an explicit config path:
+#
+#   wrangler deploy --config wrangler.toml     (or: npm run deploy)
+#
+# A bare `wrangler deploy` runs wrangler's framework autodetection, which
+# identifies an Astro + @astrojs/cloudflare project as a *Pages* project, warns
+# "you have run wrangler deploy on a Pages project" and then fails with
+# "Missing entry-point to Worker script" — even though this file defines one.
+# Passing --config skips that detection (see maybeRunAutoConfig in wrangler).
 
 name = "team-fairy-tight"
 main = "./dist/_worker.js/index.js"
