@@ -92,11 +92,11 @@ the repository, then set:
 > and `wrangler deploy` then fails with *"Missing entry-point to Worker script"* because `dist/`
 > was never produced.
 >
-> *The `--config` flag:* a bare `wrangler deploy` runs wrangler's framework autodetection, which
-> identifies this Astro + `@astrojs/cloudflare` project as a **Pages** project. It then warns
-> *"you have run `wrangler deploy` on a Pages project"* and fails with the same missing
-> entry-point error — even though `wrangler.toml` defines one. Passing `--config` skips the
-> detection entirely.
+> *The `--config` flag:* optional, but it turns a confusing failure into a clear one. Without it,
+> a `wrangler.toml` that still declares `pages_build_output_dir` only produces a warning, the
+> confirmation prompt is auto-answered in CI, and the deploy then fails with the unrelated-looking
+> *"Missing entry-point to Worker script"*. With `--config`, the same situation fails immediately
+> with *"It looks like you've run a Workers-specific command in a Pages project."*
 >
 > If you would rather configure only one field, leave the build command empty and set the
 > **deploy command to `npm run deploy`**, which does both with the flag already in place.
@@ -183,8 +183,10 @@ npm run db:migrate:remote      # then apply to production
 
 | Symptom | Cause and fix |
 | --- | --- |
-| `Missing entry-point to Worker script or to assets directory` | Either `dist/` does not exist (the build command did not run — set it to `npm run build:ci`), or wrangler ignored the config because autodetection took over (deploy with `--config wrangler.toml`). |
-| `It seems that you have run wrangler deploy on a Pages project` | Wrangler's framework autodetection mis-reads this Astro project as Pages. Deploy with `npx wrangler deploy --config wrangler.toml`, which skips detection. It is not a sign that `wrangler.toml` is wrong. |
+| `binding DB of type d1 must have a valid database_id specified [code: 10021]` | The `database_id` in `wrangler.toml` is still the placeholder. Run `npx wrangler d1 create tft-db` (step 1 of this guide) and commit the real id. Everything else in the deploy already works at this point. |
+| `Failed to match Worker name … expected "sso-site"` | The `name` in `wrangler.toml` differs from the Worker in Cloudflare. Workers Builds overrides it and opens a PR to correct it; set `name` to match instead. |
+| `Missing entry-point to Worker script or to assets directory` | Either `dist/` does not exist (the build command did not run — set it to `npm run build:ci`), or the build checked out a commit whose `wrangler.toml` still has `pages_build_output_dir` and no `main`. |
+| `It seems that you have run wrangler deploy on a Pages project` | The **loaded** `wrangler.toml` contains `pages_build_output_dir`. It is not about Astro or the adapter: with the Workers config in this repo the message does not appear. If you see it, the build is using an older commit — check which commit the build cloned. |
 | `Uploading a Pages _worker.js directory as an asset` | `public/.assetsignore` is missing. It must contain `_worker.js`, otherwise the server bundle is published. |
 | Build fails with `Invalid binding` or an unknown database | `database_id` in `wrangler.toml` is still the placeholder, or the id does not belong to this account. |
 | Site loads, but everything is empty and `/admin` warns "No database bound" | The D1 binding is missing. Check the `[[d1_databases]]` block is committed and redeploy. |
