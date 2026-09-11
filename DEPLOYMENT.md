@@ -84,13 +84,22 @@ the repository, then set:
 | --- | --- |
 | Production branch | `main` (or the branch you deploy from) |
 | **Build command** | `npm run build:ci` |
-| **Deploy command** | `npx wrangler deploy` |
+| **Deploy command** | `npx wrangler deploy --config wrangler.toml` |
 
-> **Both commands matter.** Workers Builds runs the deploy command even when no build command is
-> set — and `wrangler deploy` then fails with *"Missing entry-point to Worker script"*, because
-> `dist/` was never produced. If you would rather configure only one field, leave the build
-> command empty and set the **deploy command to `npm run deploy`**, which builds and deploys in
-> one step.
+> **Both details matter.**
+>
+> *The build command:* Workers Builds runs the deploy command even when no build command is set,
+> and `wrangler deploy` then fails with *"Missing entry-point to Worker script"* because `dist/`
+> was never produced.
+>
+> *The `--config` flag:* a bare `wrangler deploy` runs wrangler's framework autodetection, which
+> identifies this Astro + `@astrojs/cloudflare` project as a **Pages** project. It then warns
+> *"you have run `wrangler deploy` on a Pages project"* and fails with the same missing
+> entry-point error — even though `wrangler.toml` defines one. Passing `--config` skips the
+> detection entirely.
+>
+> If you would rather configure only one field, leave the build command empty and set the
+> **deploy command to `npm run deploy`**, which does both with the flag already in place.
 
 Click **Deploy**. The first build takes 1–2 minutes.
 
@@ -157,7 +166,7 @@ Push to the production branch; Workers Builds rebuilds automatically.
 To deploy by hand from your machine:
 
 ```bash
-npm run deploy        # builds, then runs wrangler deploy
+npm run deploy        # builds, then deploys with an explicit --config
 ```
 
 After changing the database schema:
@@ -174,8 +183,8 @@ npm run db:migrate:remote      # then apply to production
 
 | Symptom | Cause and fix |
 | --- | --- |
-| `Missing entry-point to Worker script or to assets directory` | The build command did not run, so `dist/` does not exist. Set the build command to `npm run build:ci`, or the deploy command to `npm run deploy`. |
-| `It seems that you have run wrangler deploy on a Pages project` | Left over from a Pages-style config. This repo deploys as a Worker; make sure `wrangler.toml` has `main` and `[assets]` and no `pages_build_output_dir`. |
+| `Missing entry-point to Worker script or to assets directory` | Either `dist/` does not exist (the build command did not run — set it to `npm run build:ci`), or wrangler ignored the config because autodetection took over (deploy with `--config wrangler.toml`). |
+| `It seems that you have run wrangler deploy on a Pages project` | Wrangler's framework autodetection mis-reads this Astro project as Pages. Deploy with `npx wrangler deploy --config wrangler.toml`, which skips detection. It is not a sign that `wrangler.toml` is wrong. |
 | `Uploading a Pages _worker.js directory as an asset` | `public/.assetsignore` is missing. It must contain `_worker.js`, otherwise the server bundle is published. |
 | Build fails with `Invalid binding` or an unknown database | `database_id` in `wrangler.toml` is still the placeholder, or the id does not belong to this account. |
 | Site loads, but everything is empty and `/admin` warns "No database bound" | The D1 binding is missing. Check the `[[d1_databases]]` block is committed and redeploy. |

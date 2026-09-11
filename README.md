@@ -194,11 +194,13 @@ npm run deploy                          # builds, then deploys
 For continuous deployment, import the repository under Workers & Pages and set:
 
 - Build command: `npm run build:ci`
-- Deploy command: `npx wrangler deploy`
+- Deploy command: `npx wrangler deploy --config wrangler.toml`
 
-(Or leave the build command empty and use `npm run deploy` as the deploy command — Workers Builds
-runs the deploy command even without a build step, and `wrangler deploy` fails if `dist/` was
-never produced.)
+(Or leave the build command empty and use `npm run deploy` as the deploy command, which does both.)
+
+The `--config` flag is not optional: a bare `wrangler deploy` runs wrangler's framework
+autodetection, which mis-identifies this Astro project as a Pages project and then fails with
+*"Missing entry-point to Worker script"*.
 
 The site ships as a Worker with static assets: `dist/_worker.js/index.js` serves SSR, the rest of
 `dist/` comes from the CDN, and `public/.assetsignore` keeps the server bundle from being served
