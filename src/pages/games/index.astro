@@ -18,34 +18,35 @@ const platforms = [...new Set(games.flatMap((game) => game.platforms))].sort();
 const hasDemo = games.some((game) => game.isDemo);
 ---
 
-<PageLayout title="Games" description="The games Team Fairy Tight plays.">
+<PageLayout title="Disziplinen" description="Die Disziplinen, in denen Fairy Tight unterwegs ist.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Line-up</p>
-      <h1>Games</h1>
+      <p class="eyebrow">Programm</p>
+      <h1>Disziplinen</h1>
       <p class="text-muted intro">
-        Only games the clan actually plays are listed here — nothing is added automatically.
+        Hier stehen nur Disziplinen, die der Club wirklich reitet — nichts wird automatisch
+        ergänzt.
       </p>
 
       <div class="controls">
         <FilterBar
           searchValue={query.search ?? ''}
-          searchPlaceholder="Search games…"
+          searchPlaceholder="Disziplinen durchsuchen…"
           groups={[
             {
               name: 'status',
-              label: 'Activity',
+              label: 'Aktivität',
               value: query.status,
               options: [
-                { value: 'active', label: 'Active' },
-                { value: 'casual', label: 'Casual' },
-                { value: 'inactive', label: 'Inactive' },
-                { value: 'planned', label: 'Planned' },
+                { value: 'active', label: 'Aktiv' },
+                { value: 'casual', label: 'Gelegentlich' },
+                { value: 'inactive', label: 'Pausiert' },
+                { value: 'planned', label: 'Geplant' },
               ],
             },
             {
               name: 'platform',
-              label: 'Platform',
+              label: 'Bereich',
               value: query.platform,
               options: platforms.map((platform) => ({ value: platform, label: platform })),
             },
@@ -53,7 +54,7 @@ const hasDemo = games.some((game) => game.isDemo);
         />
       </div>
 
-      {hasDemo && <div class="controls"><DemoNotice what="games" /></div>}
+      {hasDemo && <div class="controls"><DemoNotice what="Disziplinen" /></div>}
 
       {
         games.length > 0 ? (
@@ -64,9 +65,9 @@ const hasDemo = games.some((game) => game.isDemo);
           </div>
         ) : (
           <EmptyState
-            title="No games found."
-            description="Add the clan's games in the admin area, or reset the filters."
-            icon="gamepad"
+            title="Keine Disziplinen gefunden."
+            description="Leg die Disziplinen des Clubs im Adminbereich an oder setz die Filter zurück."
+            icon="horseshoe"
           />
         )
       }

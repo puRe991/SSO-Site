@@ -7,12 +7,14 @@ import DemoNotice from '@/components/DemoNotice.astro';
 import { listMedia } from '@/server/services/content';
 import { withParams } from '@/lib/format';
 
+/** Die Werte bleiben englisch (so stehen sie in der Datenbank), nur die
+ *  Beschriftung ist deutsch. */
 const categories = [
-  { value: '', label: 'All' },
+  { value: '', label: 'Alle' },
   { value: 'screenshots', label: 'Screenshots' },
-  { value: 'clan', label: 'Clan' },
-  { value: 'events', label: 'Events' },
-  { value: 'games', label: 'Games' },
+  { value: 'clan', label: 'Clubleben' },
+  { value: 'events', label: 'Termine' },
+  { value: 'games', label: 'Disziplinen' },
   { value: 'videos', label: 'Videos' },
   { value: 'artwork', label: 'Artwork' },
 ];
@@ -23,7 +25,7 @@ const images = items.filter((item) => item.kind === 'image');
 const videos = items.filter((item) => item.kind === 'video');
 const hasDemo = items.some((item) => item.isDemo);
 
-/** Builds a privacy-friendly embed URL; unknown providers are not embedded. */
+/** Baut eine datensparsame Embed-URL; unbekannte Anbieter werden nicht eingebettet. */
 function embedUrl(url: string, provider: string | null): string | null {
   try {
     const parsed = new URL(url);
@@ -42,17 +44,17 @@ function embedUrl(url: string, provider: string | null): string | null {
 }
 ---
 
-<PageLayout title="Media" description="Screenshots, clips and artwork from Team Fairy Tight.">
+<PageLayout title="Galerie" description="Screenshots, Clips und Artwork aus dem Reitclub Fairy Tight.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Gallery</p>
-      <h1>Media</h1>
+      <p class="eyebrow">Galerie</p>
+      <h1>Bilder und Videos</h1>
       <p class="text-muted intro">
-        Only material the clan has uploaded itself is shown here — no stock images stand in for real
-        clan content.
+        Hier ist nur Material zu sehen, das der Club selbst hochgeladen hat — keine Stockfotos
+        anstelle echter Clubinhalte.
       </p>
 
-      <nav class="chips" aria-label="Media categories">
+      <nav class="chips" aria-label="Kategorien">
         {
           categories.map((category) => (
             <a
@@ -66,13 +68,13 @@ function embedUrl(url: string, provider: string | null): string | null {
         }
       </nav>
 
-      {hasDemo && <div class="notice"><DemoNotice what="media items" /></div>}
+      {hasDemo && <div class="notice"><DemoNotice what="Einträge" /></div>}
 
       {
         items.length === 0 && (
           <EmptyState
-            title="No media yet."
-            description="Screenshots, clips and artwork are uploaded in the admin area."
+            title="Noch keine Bilder oder Videos."
+            description="Screenshots, Clips und Artwork werden im Adminbereich hochgeladen."
             icon="image"
           />
         )
@@ -88,7 +90,7 @@ function embedUrl(url: string, provider: string | null): string | null {
                 data-lightbox
                 data-src={item.url}
                 data-title={item.title}
-                aria-label={`Open ${item.title} full screen`}
+                aria-label={`${item.title} groß anzeigen`}
               >
                 <img
                   src={item.thumbnailUrl ?? item.url}
@@ -111,7 +113,7 @@ function embedUrl(url: string, provider: string | null): string | null {
       {
         videos.length > 0 && (
           <section class="videos" aria-labelledby="videos-title">
-            <h2 id="videos-title">Latest videos</h2>
+            <h2 id="videos-title">Neueste Videos</h2>
             <div class="grid-auto" style="--min-col:320px">
               {videos.map((item) => {
                 const embed = embedUrl(item.url, item.provider);
@@ -128,7 +130,7 @@ function embedUrl(url: string, provider: string | null): string | null {
                     ) : (
                       <a class="video__fallback" href={item.url} rel="noopener noreferrer" target="_blank">
                         <Icon name="play" size={22} />
-                        Watch video
+                        Video ansehen
                       </a>
                     )}
                     <figcaption>{item.title}</figcaption>
@@ -142,12 +144,12 @@ function embedUrl(url: string, provider: string | null): string | null {
     </div>
   </section>
 
-  <!-- Lightbox: native <dialog>, no library. -->
-  <dialog class="lightbox" data-lightbox-dialog aria-label="Image view">
-    <button class="lightbox__close" type="button" data-lightbox-close aria-label="Close">
+  <!-- Lightbox: natives <dialog>, ohne Bibliothek. -->
+  <dialog class="lightbox" data-lightbox-dialog aria-label="Bildansicht">
+    <button class="lightbox__close" type="button" data-lightbox-close aria-label="Schließen">
       <Icon name="close" size={22} />
     </button>
-    <!-- Starts as a 1x1 transparent pixel so the closed dialog holds no broken image. -->
+    <!-- Startet als transparentes 1x1-Pixel, damit im geschlossenen Dialog kein kaputtes Bild steht. -->
     <img
       data-lightbox-image
       src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"

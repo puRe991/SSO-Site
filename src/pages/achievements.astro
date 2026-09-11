@@ -9,17 +9,17 @@ const achievements = await listAchievements(Astro.locals);
 const hasDemo = achievements.some((achievement) => achievement.isDemo);
 ---
 
-<PageLayout title="Achievements" description="Milestones and results of Team Fairy Tight.">
+<PageLayout title="Erfolge" description="Meilensteine und Platzierungen des Reitclubs Fairy Tight.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Milestones</p>
-      <h1>Achievements</h1>
+      <p class="eyebrow">Meilensteine</p>
+      <h1>Erfolge</h1>
       <p class="text-muted intro">
-        Only results the clan has actually recorded appear here. Nothing on this page is generated
-        or estimated.
+        Hier stehen nur Ergebnisse, die der Club selbst eingetragen hat. Auf dieser Seite wird
+        nichts erzeugt oder geschätzt.
       </p>
 
-      {hasDemo && <div class="notice"><DemoNotice what="achievements" /></div>}
+      {hasDemo && <div class="notice"><DemoNotice what="Erfolge" /></div>}
 
       {
         achievements.length > 0 ? (
@@ -30,8 +30,8 @@ const hasDemo = achievements.some((achievement) => achievement.isDemo);
           </div>
         ) : (
           <EmptyState
-            title="No achievements recorded yet."
-            description="Tournament results, milestones and clan goals are entered in the admin area."
+            title="Noch keine Erfolge eingetragen."
+            description="Turnierergebnisse, Meilensteine und Clubziele werden im Adminbereich gepflegt."
             icon="trophy"
           />
         )

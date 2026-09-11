@@ -18,6 +18,7 @@ import { hashPassword, verifyPassword } from '@/server/security/crypto';
 import { canAccessAdmin } from '@/data/permissions';
 import type { NavItem } from '@/data/navigation';
 import type { IconName } from '@/lib/icons';
+import { siteConfig } from '@/data/site.config.mjs';
 
 const user = Astro.locals.user!;
 const database = getDatabase(Astro.locals);
@@ -30,7 +31,7 @@ if (Astro.request.method === 'POST' && database) {
   const values = formToObject(form);
 
   if (!verifyCsrf(Astro.request, Astro.cookies, csrfFromForm(form))) {
-    errors._form = 'Your session expired. Please try again.';
+    errors._form = 'Deine Sitzung ist abgelaufen. Bitte versuch es noch einmal.';
   } else if (values.intent === 'profile' && user.memberId) {
     const parsed = profileSchema.safeParse(values);
     if (!parsed.success) {
@@ -46,7 +47,7 @@ if (Astro.request.method === 'POST' && database) {
           updatedAt: Math.floor(Date.now() / 1000),
         })
         .where(eq(schema.members.id, user.memberId));
-      notice = 'Profile updated.';
+      notice = 'Profil gespeichert.';
     }
   } else if (values.intent === 'password') {
     const parsed = passwordChangeSchema.safeParse(values);
@@ -60,7 +61,7 @@ if (Astro.request.method === 'POST' && database) {
         .limit(1);
       const current = rows[0];
       if (!current || !(await verifyPassword(parsed.data.currentPassword, current.passwordHash))) {
-        errors.currentPassword = 'Current password is incorrect.';
+        errors.currentPassword = 'Das aktuelle Passwort stimmt nicht.';
       } else {
         await database
           .update(schema.users)
@@ -69,7 +70,7 @@ if (Astro.request.method === 'POST' && database) {
             updatedAt: Math.floor(Date.now() / 1000),
           })
           .where(eq(schema.users.id, user.id));
-        notice = 'Password changed.';
+        notice = 'Passwort geändert.';
       }
     }
   }
@@ -97,10 +98,10 @@ const events =
     : [];
 
 const nav: NavItem[] = [
-  { label: 'Overview', href: '/dashboard', match: '^/dashboard/?$' },
-  { label: 'Members', href: '/members' },
-  { label: 'Events', href: '/events' },
-  { label: 'Join Us', href: '/join' },
+  { label: 'Übersicht', href: '/dashboard', match: '^/dashboard/?$' },
+  { label: 'Mitglieder', href: '/members' },
+  { label: 'Termine', href: '/events' },
+  { label: 'Mitreiten', href: '/join' },
 ];
 const icons: Record<string, IconName> = {
   '/dashboard': 'dashboard',
@@ -110,16 +111,16 @@ const icons: Record<string, IconName> = {
 };
 ---
 
-<DashboardLayout title="Dashboard" heading="Member area" nav={nav} icons={icons}>
+<DashboardLayout title="Mein Bereich" heading="Mitgliederbereich" nav={nav} icons={icons}>
   <header class="head">
     <div>
-      <p class="eyebrow">Dashboard</p>
-      <h1>Welcome back</h1>
+      <p class="eyebrow">Mein Bereich</p>
+      <h1>Willkommen zurück</h1>
       <p class="text-muted">{user.email}</p>
     </div>
     <div class="cluster">
       <Badge tone="accent">{user.role}</Badge>
-      {canAccessAdmin(user.role) && <Button href="/admin" variant="secondary" size="sm">Admin area</Button>}
+      {canAccessAdmin(user.role) && <Button href="/admin" variant="secondary" size="sm">Adminbereich</Button>}
     </div>
   </header>
 
@@ -128,7 +129,7 @@ const icons: Record<string, IconName> = {
 
   <div class="grid">
     <Card>
-      <h2 class="h3">Clan profile</h2>
+      <h2 class="h3">Clubprofil</h2>
       {
         member ? (
           <>
@@ -143,8 +144,8 @@ const icons: Record<string, IconName> = {
             <form method="post" novalidate>
               <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
               <input type="hidden" name="intent" value="profile" />
-              <Field label="Display name" name="displayName" value={member.displayName ?? ''} error={errors.displayName} maxlength={60} />
-              <Field label="Avatar URL" name="avatarUrl" type="url" value={member.avatarUrl ?? ''} error={errors.avatarUrl} />
+              <Field label="Anzeigename" name="displayName" value={member.displayName ?? ''} error={errors.displayName} maxlength={60} />
+              <Field label="Avatar-URL" name="avatarUrl" type="url" value={member.avatarUrl ?? ''} error={errors.avatarUrl} />
               <Field
                 label="Status"
                 name="status"
@@ -152,19 +153,19 @@ const icons: Record<string, IconName> = {
                 value={member.status}
                 options={[
                   { value: 'online', label: 'Online' },
-                  { value: 'away', label: 'Away' },
-                  { value: 'dnd', label: 'Do not disturb' },
+                  { value: 'away', label: 'Abwesend' },
+                  { value: 'dnd', label: 'Bitte nicht stören' },
                   { value: 'offline', label: 'Offline' },
                 ]}
               />
-              <Field label="Bio" name="bio" type="textarea" value={member.bio ?? ''} error={errors.bio} maxlength={2000} />
-              <Button type="submit" variant="primary" full>Save profile</Button>
+              <Field label="Über mich" name="bio" type="textarea" value={member.bio ?? ''} error={errors.bio} maxlength={2000} />
+              <Button type="submit" variant="primary" full>Profil speichern</Button>
             </form>
           </>
         ) : (
           <EmptyState
-            title="No clan profile linked."
-            description="Your account is not linked to a clan member yet. An admin can connect the two."
+            title="Kein Clubprofil verknüpft."
+            description="Dein Konto ist noch mit keinem Clubmitglied verknüpft. Die Clubleitung kann beides verbinden."
             icon="user"
           />
         )
@@ -173,25 +174,27 @@ const icons: Record<string, IconName> = {
 
     <div class="column">
       <Card>
-        <h2 class="h3">My events</h2>
+        <h2 class="h3">Meine Termine</h2>
         {
           events.length > 0 ? (
             <ul class="list" role="list">
               {events.map(({ event }) => (
                 <li>
                   <a href={`/events/${event.slug}`}>{event.title}</a>
-                  <span class="text-muted">{new Date(event.startsAt * 1000).toLocaleDateString('en')}</span>
+                  <span class="text-muted">
+                    {new Date(event.startsAt * 1000).toLocaleDateString(siteConfig.locale)}
+                  </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p class="text-muted small">You are not signed up for any events.</p>
+            <p class="text-muted small">Du bist für keinen Termin angemeldet.</p>
           )
         }
       </Card>
 
       <Card>
-        <h2 class="h3">Notifications</h2>
+        <h2 class="h3">Benachrichtigungen</h2>
         {
           notifications.length > 0 ? (
             <ul class="list" role="list">
@@ -202,18 +205,18 @@ const icons: Record<string, IconName> = {
               ))}
             </ul>
           ) : (
-            <p class="text-muted small">No notifications.</p>
+            <p class="text-muted small">Keine Benachrichtigungen.</p>
           )
         }
       </Card>
 
       <Card>
-        <h2 class="h3">Change password</h2>
+        <h2 class="h3">Passwort ändern</h2>
         <form method="post" novalidate>
           <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
           <input type="hidden" name="intent" value="password" />
           <Field
-            label="Current password"
+            label="Aktuelles Passwort"
             name="currentPassword"
             type="password"
             required
@@ -221,23 +224,23 @@ const icons: Record<string, IconName> = {
             autocomplete="current-password"
           />
           <Field
-            label="New password"
+            label="Neues Passwort"
             name="password"
             type="password"
             required
             error={errors.password}
             autocomplete="new-password"
-            hint="At least 12 characters."
+            hint="Mindestens 12 Zeichen."
           />
           <Field
-            label="Repeat new password"
+            label="Neues Passwort wiederholen"
             name="passwordConfirm"
             type="password"
             required
             error={errors.passwordConfirm}
             autocomplete="new-password"
           />
-          <Button type="submit" variant="secondary" full>Change password</Button>
+          <Button type="submit" variant="secondary" full>Passwort ändern</Button>
         </form>
       </Card>
     </div>

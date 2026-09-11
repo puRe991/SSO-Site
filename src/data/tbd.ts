@@ -1,12 +1,14 @@
 /**
  * TBD system
  * =========
- * Every piece of clan information that is not confirmed yet lives here as a
- * placeholder token. Nothing in the UI invents facts: a `TBD` value is either
- * hidden or rendered as an explicit placeholder (see `isTBD` / `orTBD`).
+ * Jede Angabe über den Club, die noch nicht bestätigt ist, steht hier als
+ * Platzhalter-Token. Die Oberfläche erfindet nichts: ein `TBD`-Wert wird
+ * entweder versteckt oder als deutlicher Platzhalter ausgegeben (siehe `isTBD`
+ * / `orTBD`).
  *
- * To go live with real data, replace the value here (or in the database, which
- * always wins over these defaults) — no component has to be touched.
+ * Für echte Daten einfach den Wert hier ersetzen (oder in der Datenbank, die
+ * immer Vorrang vor diesen Vorgaben hat) — keine Komponente muss angefasst
+ * werden.
  */
 export const TBD = {
   CLAN_DESCRIPTION: 'CLAN_DESCRIPTION_TBD',
@@ -26,12 +28,12 @@ export const TBD = {
   ROLE: 'ROLE_TBD',
 } as const;
 
-/** Placeholder shown wherever a value is unknown. */
+/** Platzhalter überall dort, wo ein Wert unbekannt ist. */
 export const TBD_DISPLAY = '—';
 
 const TBD_VALUES: ReadonlySet<string> = new Set(Object.values(TBD));
 
-/** True for empty values and for any `*_TBD` placeholder token. */
+/** Wahr für leere Werte und für jedes `*_TBD`-Platzhalter-Token. */
 export function isTBD(value: unknown): boolean {
   if (value === null || value === undefined) return true;
   if (typeof value !== 'string') return false;
@@ -40,12 +42,12 @@ export function isTBD(value: unknown): boolean {
   return TBD_VALUES.has(trimmed) || /_TBD$/.test(trimmed);
 }
 
-/** Returns the value, or the neutral placeholder when it is not known yet. */
+/** Gibt den Wert zurück oder den neutralen Platzhalter, solange er unbekannt ist. */
 export function orTBD(value: unknown, fallback: string = TBD_DISPLAY): string {
   return isTBD(value) ? fallback : String(value);
 }
 
-/** Returns the value only when it is real — otherwise `undefined`. */
+/** Gibt den Wert nur zurück, wenn er echt ist — sonst `undefined`. */
 export function real<T>(value: T): T | undefined {
   return isTBD(value) ? undefined : value;
 }

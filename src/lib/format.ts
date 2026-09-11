@@ -37,14 +37,14 @@ export function formatTime(value: string | null | undefined): string | null {
   return Number.isNaN(date.getTime()) ? null : timeFormatter.format(date);
 }
 
-/** Value for `<time datetime="...">`. */
+/** Wert für `<time datetime="...">`. */
 export function isoAttr(value: string | null | undefined): string | undefined {
   if (!value) return undefined;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 }
 
-/** `2026-09-11T18:00` for `<input type="datetime-local">`. */
+/** `2026-09-11T18:00` für `<input type="datetime-local">`. */
 export function toDateTimeLocal(value: string | null | undefined): string {
   if (!value) return '';
   const date = new Date(value);
@@ -53,9 +53,19 @@ export function toDateTimeLocal(value: string | null | undefined): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+/** Deutsche Umlaute werden ausgeschrieben, damit „Ausritte für Anfänger“ zu
+ *  `ausritte-fuer-anfaenger` wird statt zu `ausritte-fr-anfnger`. */
+const germanTransliterations: Record<string, string> = {
+  ä: 'ae',
+  ö: 'oe',
+  ü: 'ue',
+  ß: 'ss',
+};
+
 export function slugify(value: string): string {
   return value
     .toLowerCase()
+    .replace(/[äöüß]/g, (char) => germanTransliterations[char] ?? char)
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
@@ -74,7 +84,7 @@ export function truncate(value: string, max = 160): string {
   return value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
 }
 
-/** Builds a URL keeping existing params; a null value removes the param. */
+/** Baut eine URL und behält bestehende Parameter; `null` entfernt einen Parameter. */
 export function withParams(base: URL, changes: Record<string, string | number | null>): string {
   const url = new URL(base.toString());
   for (const [key, value] of Object.entries(changes)) {

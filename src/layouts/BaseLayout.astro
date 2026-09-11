@@ -6,7 +6,7 @@ import { absoluteUrl, resolveOrigin } from '@/lib/origin';
 interface Props {
   title?: string;
   description?: string;
-  /** Absolute or root-relative OG image. Defaults to the generated social card. */
+  /** Absolutes oder root-relatives OG-Bild. Standard ist die Social Card. */
   image?: string;
   noindex?: boolean;
   /** Extra JSON-LD blocks for this page. */
@@ -23,7 +23,7 @@ const {
   bodyClass,
 } = Astro.props;
 
-const pageTitle = title ? `${title} — ${siteConfig.name}` : `${siteConfig.name} — Gaming Community`;
+const pageTitle = title ? `${title} — ${siteConfig.name}` : `${siteConfig.name} — Reitclub`;
 const origin = resolveOrigin(Astro.url);
 const canonical = absoluteUrl(Astro.url.pathname, Astro.url);
 const ogImage = absoluteUrl(image, Astro.url);
@@ -50,9 +50,12 @@ const baseStructuredData = {
     <meta name="generator" content={Astro.generator} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
+    <link rel="preload" href="/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap.xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} News`} href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} Neuigkeiten`} href="/rss.xml" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteConfig.name} />
@@ -60,7 +63,7 @@ const baseStructuredData = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content="en" />
+    <meta property="og:locale" content="de_DE" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title ?? siteConfig.name} />
     <meta name="twitter:description" content={description} />
@@ -73,11 +76,11 @@ const baseStructuredData = {
   </head>
   <body class={bodyClass}>
     <div class="backdrop" aria-hidden="true"></div>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <slot />
 
     <p class="offline-banner" role="status" hidden data-offline>
-      You are offline. Some content may be out of date.
+      Du bist offline. Manche Inhalte sind vielleicht nicht aktuell.
     </p>
 
     <style>
@@ -95,7 +98,7 @@ const baseStructuredData = {
     </style>
 
     <script is:inline>
-      // Connection state. Inline and tiny so it works before hydration.
+      // Verbindungsstatus. Inline und winzig, damit es vor jeder Hydration greift.
       (function () {
         var banner = document.querySelector('[data-offline]');
         if (!banner) return;

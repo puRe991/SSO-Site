@@ -2,23 +2,23 @@ import { TBD } from './tbd';
 import type { SocialPlatform } from '@/types';
 
 /**
- * Clan configuration.
+ * Club configuration.
  *
- * Anything not confirmed by the clan is a TBD token — the UI hides or neutrally
+ * Anything the club has not confirmed is a TBD token — the UI hides or neutrally
  * marks those values instead of inventing content. Values stored in the
  * `settings` table override this file at runtime (see `server/services/settings`).
  */
 export const clanConfig = {
-  name: 'Team Fairy Tight',
-  shortName: 'TFT',
-  type: 'Clan • Team • Guild • Gaming Community',
+  name: 'Fairy Tight',
+  shortName: 'FT',
+  type: 'Reitclub • Team • Community in Star Stable Online',
 
-  /** Long form clan text. Editable from /admin → Settings. */
+  /** Long form club text. Editable from /admin → Einstellungen. */
   description: TBD.CLAN_DESCRIPTION,
   history: TBD.CLAN_HISTORY,
   foundedAt: TBD.CLAN_FOUNDED,
 
-  /** Values / goals: empty until the clan supplies them. Never invented here. */
+  /** Werte / Ziele: leer, bis der Club sie liefert. Wird hier nie erfunden. */
   values: [] as { title: string; text: string }[],
   goals: [] as { title: string; text: string }[],
 
@@ -41,12 +41,12 @@ export const socialLinks: { platform: SocialPlatform; label: string; url: string
 ];
 
 /**
- * Confirmed roster.
+ * Bestätigte Mitglieder.
  *
- * Only people the clan has actually named belong here. Three further members
- * are known to exist but their names were not provided — add them below as
- * they are confirmed. Everything else visible on /members comes from the
- * database and is flagged `is_demo` where it is placeholder content.
+ * Hier stehen nur Personen, die der Club wirklich genannt hat. Weitere
+ * Mitglieder existieren, ihre Namen liegen aber noch nicht vor — sie kommen
+ * hier dazu, sobald sie bestätigt sind. Alles andere auf /members kommt aus
+ * der Datenbank und ist dort als `is_demo` markiert, wo es Platzhalter ist.
  */
 export const knownMembers = [
   {
@@ -54,20 +54,21 @@ export const knownMembers = [
     username: 'Florian',
     displayName: 'Florian Clever',
     role: TBD.ROLE,
-    rank: null as string | null, // rank not confirmed yet
+    rank: null as string | null, // Rang noch nicht bestätigt
   },
 ];
 
-/** Requirements shown on /join. Editable, deliberately generic and factual. */
+/** Voraussetzungen auf /join. Bewusst allgemein und sachlich, jederzeit änderbar. */
 export const joinRequirements: string[] = [
-  'A Discord account — the clan coordinates through Discord.',
-  'Working microphone for voice sessions.',
-  'Respectful behaviour towards members and opponents.',
+  'Ein Discord-Account — der Club stimmt sich über Discord ab.',
+  'Ein eigener Charakter in Star Stable Online.',
+  'Regelmäßig Zeit für gemeinsame Ausritte und Clubtermine.',
+  'Respektvoller Umgang mit Mitgliedern und anderen Reiterinnen und Reitern.',
 ];
 
 export const joinSteps: { title: string; text: string }[] = [
-  { title: 'Application', text: 'Fill in the form below with your gaming profile.' },
-  { title: 'Review', text: 'A team member reviews your application.' },
-  { title: 'Conversation', text: 'You are invited for a short talk on Discord.' },
-  { title: 'Trial', text: 'You join the team and play with us.' },
+  { title: 'Bewerbung', text: 'Füll das Formular unten mit deinem Reiterprofil aus.' },
+  { title: 'Prüfung', text: 'Jemand aus der Clubleitung sieht sich deine Bewerbung an.' },
+  { title: 'Gespräch', text: 'Wir laden dich zu einem kurzen Kennenlernen auf Discord ein.' },
+  { title: 'Proberitt', text: 'Du reitest eine Weile mit uns mit und wirst Teil des Clubs.' },
 ];

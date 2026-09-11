@@ -38,11 +38,11 @@ const year = new Date().getFullYear();
   </div>
 
   <div class="container footer__bottom">
-    <p>© {year} {siteConfig.name}. All rights reserved.</p>
+    <p>© {year} {siteConfig.name}. Alle Rechte vorbehalten.</p>
     <p class="footer__meta">
-      <a href="/imprint">Imprint</a>
+      <a href="/imprint">Impressum</a>
       <span aria-hidden="true">·</span>
-      <a href="/privacy">Privacy</a>
+      <a href="/privacy">Datenschutz</a>
     </p>
   </div>
 </footer>
@@ -69,8 +69,9 @@ const year = new Date().getFullYear();
 
   .footer__tagline {
     color: var(--text-subtle);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-xs);
+    font-weight: 700;
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
   }

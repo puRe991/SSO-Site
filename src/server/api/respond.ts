@@ -28,11 +28,11 @@ export function fail(
   });
 }
 
-export const notFound = () => fail('not_found', 'Resource not found.', 404);
-export const methodNotAllowed = () => fail('method_not_allowed', 'Method not allowed.', 405);
-export const unauthorized = () => fail('unauthorized', 'Authentication required.', 401);
-export const forbidden = () => fail('forbidden', 'Insufficient permissions.', 403);
-export const serverError = () => fail('server_error', 'Unexpected error.', 500);
+export const notFound = () => fail('not_found', 'Ressource nicht gefunden.', 404);
+export const methodNotAllowed = () => fail('method_not_allowed', 'Methode nicht erlaubt.', 405);
+export const unauthorized = () => fail('unauthorized', 'Anmeldung erforderlich.', 401);
+export const forbidden = () => fail('forbidden', 'Fehlende Berechtigung.', 403);
+export const serverError = () => fail('server_error', 'Unerwarteter Fehler.', 500);
 
 /** Wraps a handler so an unexpected throw never leaks a stack trace. */
 export async function guard(handler: () => Promise<Response>): Promise<Response> {

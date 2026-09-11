@@ -81,7 +81,7 @@ export const socialLinks = sqliteTable(
   'social_links',
   {
     id: text('id').primaryKey(),
-    /** Either a member link or, when member_id is null, a clan-wide link. */
+    /** Entweder ein Mitgliederlink oder, wenn member_id null ist, ein Link des Clubs. */
     memberId: text('member_id').references(() => members.id, { onDelete: 'cascade' }),
     platform: text('platform').notNull(),
     url: text('url').notNull(),
@@ -296,7 +296,7 @@ export const notifications = sqliteTable(
   (t) => [index('notifications_user_idx').on(t.userId, t.readAt)],
 );
 
-/** Key/value store for editable site content (clan text, rules, imprint, …). */
+/** Schlüssel/Wert-Speicher für bearbeitbare Seiteninhalte (Clubtext, Regeln, Impressum, …). */
 export const settings = sqliteTable('settings', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),

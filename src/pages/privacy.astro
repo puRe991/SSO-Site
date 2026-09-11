@@ -10,17 +10,18 @@ const content = settings['privacy.content'];
 const hasContent = !isTBD(content);
 ---
 
-<PageLayout title="Privacy" description="Privacy — Team Fairy Tight." noindex={!hasContent}>
+<PageLayout title="Datenschutz" description="Datenschutzerklärung — Reitclub Fairy Tight." noindex={!hasContent}>
   <section class="section">
     <div class="container container-narrow">
-      <h1>Privacy</h1>
+      <h1>Datenschutz</h1>
       {
         hasContent ? (
           <div class="prose body" set:html={renderRichText(content)} />
         ) : (
           <div class="notice">
-            <Alert tone="warning" title="Placeholder">
-              No privacy notice has been supplied yet. It must be written by the site operator and is not generated automatically.
+            <Alert tone="warning" title="Platzhalter">
+              Es wurde noch keine Datenschutzerklärung hinterlegt. Sie muss vom Betreiber der Seite
+              geschrieben werden und wird nicht automatisch erzeugt.
             </Alert>
           </div>
         )

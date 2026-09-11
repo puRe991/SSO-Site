@@ -3,15 +3,17 @@ import PageLayout from '@/layouts/PageLayout.astro';
 import Button from '@/components/Button.astro';
 ---
 
-<PageLayout title="Something went wrong" noindex>
+<PageLayout title="Da ist etwas schiefgegangen" noindex>
   <section class="section">
     <div class="container error">
       <p class="code" aria-hidden="true">500</p>
-      <h1>Something went wrong</h1>
-      <p class="text-muted">Please try again. If the problem persists, contact the team.</p>
+      <h1>Da ist etwas schiefgegangen</h1>
+      <p class="text-muted">
+        Bitte versuch es noch einmal. Wenn es weiter klemmt, meld dich beim Club.
+      </p>
       <div class="cluster">
-        <Button href="/" variant="primary">Back to home</Button>
-        <Button href="/contact" variant="ghost">Contact</Button>
+        <Button href="/" variant="primary">Zur Startseite</Button>
+        <Button href="/contact" variant="ghost">Kontakt</Button>
       </div>
     </div>
   </section>

@@ -86,7 +86,9 @@ const external = href?.startsWith('http');
   }
 
   .btn--primary {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    /* Durchgehend Gold statt Gold→Grün: dunkle Schrift bleibt über die ganze
+       Fläche lesbar. */
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary));
     color: var(--primary-contrast);
     box-shadow: 0 8px 26px -14px var(--glow);
   }

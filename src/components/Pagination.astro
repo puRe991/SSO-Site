@@ -4,7 +4,7 @@ import { withParams } from '@/lib/format';
 interface Props {
   page: number;
   totalPages: number;
-  /** Query parameter carrying the page number. */
+  /** Query-Parameter, der die Seitenzahl trägt. */
   param?: string;
 }
 
@@ -28,14 +28,14 @@ function pageList(current: number, total: number): (number | '…')[] {
 
 {
   totalPages > 1 && (
-    <nav class="pagination" aria-label="Pagination">
+    <nav class="pagination" aria-label="Seitennavigation">
       <a
         class="pagination__step"
         href={withParams(url, { [param]: page > 1 ? page - 1 : null })}
         aria-disabled={page <= 1}
         rel="prev"
       >
-        ← Prev
+        ← Zurück
       </a>
 
       <ul role="list">
@@ -64,7 +64,7 @@ function pageList(current: number, total: number): (number | '…')[] {
         aria-disabled={page >= totalPages}
         rel="next"
       >
-        Next →
+        Weiter →
       </a>
     </nav>
   )

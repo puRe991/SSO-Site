@@ -10,6 +10,7 @@ import { getClanStats, getRanks, listGames } from '@/server/services/content';
 import { clanConfig } from '@/data/clan.config';
 import { isTBD, orTBD } from '@/data/tbd';
 import { renderRichText } from '@/lib/text';
+import { gameStatusLabel } from '@/lib/labels';
 
 const [settings, stats, games, ranks] = await Promise.all([
   getSettings(Astro.locals),
@@ -25,30 +26,30 @@ const goals = settings['clan.goals'];
 ---
 
 <PageLayout
-  title="The Clan"
-  description={`About ${clanConfig.name} — the clan, its values and its activities.`}
+  title="Der Club"
+  description={`Über ${clanConfig.name} — der Reitclub, seine Werte und seine Aktivitäten.`}
 >
   <section class="section">
     <div class="container">
-      <p class="eyebrow">About</p>
-      <h1>About {clanConfig.name}</h1>
+      <p class="eyebrow">Über uns</p>
+      <h1>Über {clanConfig.name}</h1>
       <p class="lead text-muted">{clanConfig.type}</p>
 
       <dl class="facts">
         <div>
-          <dt>Short name</dt>
+          <dt>Kurzname</dt>
           <dd>{clanConfig.shortName}</dd>
         </div>
         <div>
-          <dt>Founded</dt>
+          <dt>Gegründet</dt>
           <dd>{orTBD(settings['clan.founded'])}</dd>
         </div>
         <div>
-          <dt>Members</dt>
+          <dt>Mitglieder</dt>
           <dd>{stats.totalMembers ?? '—'}</dd>
         </div>
         <div>
-          <dt>Active games</dt>
+          <dt>Aktive Disziplinen</dt>
           <dd>{stats.activeGames ?? '—'}</dd>
         </div>
       </dl>
@@ -57,12 +58,12 @@ const goals = settings['clan.goals'];
 
   <section class="section">
     <div class="container">
-      <SectionHeader eyebrow="Who we are" title="The clan" />
+      <SectionHeader eyebrow="Wer wir sind" title="Der Club" />
       {
         isTBD(description) ? (
           <EmptyState
-            title="No clan description yet."
-            description="This text is written by the team in the admin area. Until then nothing is filled in here — the history of Team Fairy Tight is not invented."
+            title="Noch keine Clubbeschreibung."
+            description="Diesen Text schreibt der Club selbst im Adminbereich. Bis dahin bleibt hier nichts stehen — die Geschichte von Fairy Tight wird nicht erfunden."
             icon="info"
           />
         ) : (
@@ -74,12 +75,12 @@ const goals = settings['clan.goals'];
 
   <section class="section">
     <div class="container">
-      <SectionHeader eyebrow="History" title="How it started" />
+      <SectionHeader eyebrow="Geschichte" title="Wie alles anfing" />
       {
         isTBD(history) ? (
           <EmptyState
-            title="The clan history has not been documented yet."
-            description="Founding date, milestones and the story of the team are added by the clan itself."
+            title="Die Clubgeschichte ist noch nicht festgehalten."
+            description="Gründungsdatum, Meilensteine und die Geschichte des Clubs trägt der Club selbst nach."
             icon="clock"
           />
         ) : (
@@ -92,35 +93,35 @@ const goals = settings['clan.goals'];
   <section class="section">
     <div class="container two-col">
       <div>
-        <SectionHeader eyebrow="What we stand for" title="Values" />
+        <SectionHeader eyebrow="Wofür wir stehen" title="Werte" />
         {
           values.trim() ? (
             <div class="prose" set:html={renderRichText(values)} />
           ) : (
-            <EmptyState title="No values recorded yet." icon="shield" />
+            <EmptyState title="Noch keine Werte hinterlegt." icon="shield" />
           )
         }
       </div>
       <div>
-        <SectionHeader eyebrow="Where we are heading" title="Goals" />
+        <SectionHeader eyebrow="Wohin wir wollen" title="Ziele" />
         {
           goals.trim() ? (
             <div class="prose" set:html={renderRichText(goals)} />
           ) : (
-            <EmptyState title="No goals recorded yet." icon="star" />
+            <EmptyState title="Noch keine Ziele hinterlegt." icon="star" />
           )
         }
       </div>
     </div>
   </section>
 
-  <!-- Rank hierarchy -->
+  <!-- Rangordnung -->
   <section class="section">
     <div class="container">
       <SectionHeader
-        eyebrow="Structure"
-        title="Rank hierarchy"
-        description="A configurable rank model. These ranks are the system default and can be renamed, reordered or removed by the clan at any time."
+        eyebrow="Struktur"
+        title="Rangordnung"
+        description="Ein änderbares Rangmodell. Diese Ränge sind die Systemvorgabe und lassen sich jederzeit umbenennen, umsortieren oder löschen."
       />
       <ol class="hierarchy" role="list">
         {
@@ -141,7 +142,7 @@ const goals = settings['clan.goals'];
 
   <section class="section">
     <div class="container">
-      <SectionHeader eyebrow="Activities" title="Games and community" href="/games" />
+      <SectionHeader eyebrow="Aktivitäten" title="Disziplinen und Community" href="/games" />
       {
         games.length > 0 ? (
           <ul class="games" role="list">
@@ -149,23 +150,23 @@ const goals = settings['clan.goals'];
               <li>
                 <Card href={`/games/${game.slug}`} class="games__item">
                   <span>{game.name}</span>
-                  <Badge size="sm">{game.status}</Badge>
+                  <Badge size="sm">{gameStatusLabel(game.status)}</Badge>
                 </Card>
               </li>
             ))}
           </ul>
         ) : (
           <EmptyState
-            title="No games listed yet."
-            description="The games the clan plays are maintained in the admin area."
-            icon="gamepad"
+            title="Noch keine Disziplinen eingetragen."
+            description="Die Disziplinen des Clubs werden im Adminbereich gepflegt."
+            icon="horseshoe"
           />
         )
       }
 
       <div class="cta">
-        <Button href="/members" variant="secondary">Meet the members</Button>
-        <Button href="/join" variant="primary">Join the team</Button>
+        <Button href="/members" variant="secondary">Mitglieder kennenlernen</Button>
+        <Button href="/join" variant="primary">Mitreiten</Button>
       </div>
     </div>
   </section>
@@ -174,10 +175,10 @@ const goals = settings['clan.goals'];
 <style>
   .lead {
     margin-top: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   .facts {

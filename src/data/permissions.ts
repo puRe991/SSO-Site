@@ -1,4 +1,4 @@
-/** Role-based access control. Roles are site roles, separate from clan ranks. */
+/** Rollenbasierte Rechte. Diese Rollen gehören zur Website und sind von den Clubrängen getrennt. */
 
 export const PERMISSIONS = [
   'manage_members',

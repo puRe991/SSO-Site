@@ -26,24 +26,24 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
   </div>
 
   <div class="container hero__inner">
-    <p class="hero__eyebrow">Clan · Team · Guild</p>
+    <p class="hero__eyebrow">Reitclub · Team · Community</p>
     <h1 class="hero__title" id="hero-title">
-      <span class="text-gradient">Team Fairy Tight</span>
+      <span class="text-gradient">{siteConfig.name}</span>
     </h1>
     <p class="hero__tagline">{siteConfig.tagline}</p>
     <p class="hero__lead">
-      The home base of the {siteConfig.shortName} community — members, games, events and everything
-      the team is working on, in one place.
+      Der Stall von {siteConfig.name} — Mitglieder, Disziplinen, Termine und alles, woran der Club
+      gerade arbeitet, an einem Ort.
     </p>
 
     <div class="hero__actions">
-      <Button href="/clan" variant="primary" size="lg">Discover the clan</Button>
-      <Button href="/join" variant="secondary" size="lg">Join the team</Button>
+      <Button href="/clan" variant="primary" size="lg">Club entdecken</Button>
+      <Button href="/join" variant="secondary" size="lg">Mitreiten</Button>
       {
         discord && (
           <Button href={discord} variant="ghost" size="lg">
             <Icon name="discord" size={18} />
-            Join Discord
+            Discord beitreten
           </Button>
         )
       }
@@ -98,7 +98,7 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
     width: var(--size);
     height: var(--size);
     border-radius: var(--radius-full);
-    background: color-mix(in oklab, var(--violet-300) 70%, transparent);
+    background: color-mix(in oklab, var(--gold-300) 70%, transparent);
     box-shadow: 0 0 8px var(--glow);
     opacity: 0;
     animation: float var(--duration) linear var(--delay) infinite;
@@ -129,25 +129,26 @@ const discord = isTBD(discordUrl) ? null : discordUrl;
   }
 
   .hero__eyebrow {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-xs);
+    font-weight: 700;
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
-    color: var(--text-subtle);
+    color: var(--gold-400);
   }
 
   .hero__title {
     font-size: var(--text-hero);
-    line-height: 0.95;
-    letter-spacing: -0.035em;
-    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'SOFT' 60, 'WONK' 1;
   }
 
   .hero__tagline {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-size: var(--text-lg);
+    font-weight: 600;
     letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
     color: var(--text-muted);
   }
 

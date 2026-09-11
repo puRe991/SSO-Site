@@ -38,19 +38,19 @@ if (!row) return Astro.rewrite('/404');
 const values = submitted ?? resource.toForm(row);
 const lookups = await loadLookups(database);
 
-/** Read-only context for resources that also carry submitted data (applications). */
+/** Nur-Lese-Kontext für Ressourcen mit eingereichten Daten (Bewerbungen). */
 const readonlyEntries =
   resource.key === 'applications'
     ? ([
-        ['Username', row.username],
-        ['Display name', row.displayName],
-        ['Country', row.country],
+        ['Benutzername', row.username],
+        ['Anzeigename', row.displayName],
+        ['Land', row.country],
         ['Discord', row.discordUsername],
-        ['Games', row.games],
-        ['Main game', row.mainGame],
+        ['Disziplinen', row.games],
+        ['Hauptdisziplin', row.mainGame],
         ['Motivation', row.motivation],
-        ['Found us via', row.referral],
-        ['Submitted', row.createdAt ? formatDateTime(new Date(Number(row.createdAt) * 1000).toISOString()) : null],
+        ['Gefunden über', row.referral],
+        ['Eingegangen', row.createdAt ? formatDateTime(new Date(Number(row.createdAt) * 1000).toISOString()) : null],
       ] as [string, unknown][])
     : [];
 ---
@@ -61,13 +61,13 @@ const readonlyEntries =
   nav={visibleAdminNav(user.role)}
   icons={adminIcons}
 >
-  <AdminHeader eyebrow={resource.label} title={`Edit ${resource.singular.toLowerCase()}`} />
+  <AdminHeader eyebrow={resource.label} title={`${resource.singular} bearbeiten`} />
 
   {
     readonlyEntries.length > 0 && (
       <div class="context">
         <Card>
-          <h2 class="h3">Submitted data</h2>
+          <h2 class="h3">Eingereichte Angaben</h2>
           <dl class="details">
             {readonlyEntries.map(([label, value]) => (
               <div>
@@ -86,7 +86,7 @@ const readonlyEntries =
     values={values}
     errors={errors}
     lookups={lookups}
-    submitLabel="Save"
+    submitLabel="Speichern"
   />
 </DashboardLayout>
 

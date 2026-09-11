@@ -1,7 +1,8 @@
 ---
 /**
- * Inline icon. Icons are inlined SVG (no icon font, no network request) and
- * inherit `currentColor`, so they follow the design tokens automatically.
+ * Inline-Icon. Icons sind eingebettete SVG (keine Icon-Schrift, kein
+ * Netzwerk-Request) und erben `currentColor`, folgen also automatisch den
+ * Design-Tokens.
  */
 import { iconPaths, type IconName } from '@/lib/icons';
 
@@ -17,6 +18,7 @@ const { name, size = 20, class: className, title } = Astro.props;
 
 <svg
   class={className}
+  style={`--icon-size:${size}px`}
   width={size}
   height={size}
   viewBox="0 0 24 24"
@@ -30,3 +32,17 @@ const { name, size = 20, class: className, title } = Astro.props;
   focusable="false"
   set:html={(title ? `<title>${title}</title>` : '') + iconPaths[name]}
 />
+
+<style>
+  /*
+   * Die globale Regel `svg { max-width: 100%; height: auto }` lässt ein Icon in
+   * einem inhaltsbasierten Flex- oder Grid-Container auf 0×0 zusammenfallen.
+   * Eine echte CSS-Größe verhindert das; Klassen von außen (z. B.
+   * `.empty__icon svg`) stechen diese Regel weiterhin.
+   */
+  svg {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    max-width: none;
+  }
+</style>

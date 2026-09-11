@@ -23,20 +23,20 @@ const [featured, ...rest] = news.items;
 const showFeatured = news.page === 1 && featured;
 ---
 
-<PageLayout title="News" description="News and announcements from Team Fairy Tight.">
+<PageLayout title="Neuigkeiten" description="Neuigkeiten und Ankündigungen aus dem Reitclub Fairy Tight.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Updates</p>
-      <h1>News</h1>
+      <p class="eyebrow">Aktuelles</p>
+      <h1>Neuigkeiten</h1>
 
       <div class="controls">
         <FilterBar
           searchValue={query.search ?? ''}
-          searchPlaceholder="Search news…"
+          searchPlaceholder="Neuigkeiten durchsuchen…"
           groups={[
             {
               name: 'category',
-              label: 'Category',
+              label: 'Kategorie',
               value: query.category,
               options: categories.map((category) => ({
                 value: category.id,
@@ -59,8 +59,8 @@ const showFeatured = news.page === 1 && featured;
           </div>
         ) : (
           <EmptyState
-            title="No news yet."
-            description="Announcements from the clan appear here."
+            title="Noch keine Neuigkeiten."
+            description="Ankündigungen aus dem Club erscheinen hier."
             icon="news"
           />
         )

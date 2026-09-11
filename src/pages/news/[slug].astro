@@ -47,7 +47,7 @@ const published = formatDate(article.publishedAt);
 
     <section class="section">
       <div class="container container-narrow">
-        <a class="back" href="/news">← All news</a>
+        <a class="back" href="/news">← Alle Neuigkeiten</a>
 
         <div class="cluster">
           <Badge tone="accent" size="sm">{article.category}</Badge>
@@ -58,7 +58,7 @@ const published = formatDate(article.publishedAt);
 
         <p class="meta">
           {published && <time datetime={isoAttr(article.publishedAt)}>{published}</time>}
-          {article.authorName && <span>· by {article.authorName}</span>}
+          {article.authorName && <span>· von {article.authorName}</span>}
         </p>
 
         {article.teaser && <p class="teaser">{article.teaser}</p>}
@@ -84,7 +84,7 @@ const published = formatDate(article.publishedAt);
     relatedArticles.length > 0 && (
       <section class="section">
         <div class="container">
-          <h2 class="related__title">Related news</h2>
+          <h2 class="related__title">Weitere Neuigkeiten</h2>
           <div class="grid-auto" style="--min-col:280px">
             {relatedArticles.map((item) => (
               <NewsCard article={item} />

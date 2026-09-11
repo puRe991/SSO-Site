@@ -62,9 +62,9 @@ function cell(row: Record<string, unknown>, key: string): string {
 >
   <AdminHeader
     title={resource.label}
-    description={`${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}.`}
+    description={`${rows.length} ${rows.length === 1 ? 'Eintrag' : 'Einträge'}.`}
     actionHref={resource.canCreate ? `/admin/${resource.key}/new` : undefined}
-    actionLabel={`New ${resource.singular.toLowerCase()}`}
+    actionLabel={`${resource.singular} anlegen`}
   />
 
   {
@@ -76,7 +76,7 @@ function cell(row: Record<string, unknown>, key: string): string {
               {resource.columns.map((column) => (
                 <th scope="col">{column.label}</th>
               ))}
-              <th scope="col"><span class="visually-hidden">Actions</span></th>
+              <th scope="col"><span class="visually-hidden">Aktionen</span></th>
             </tr>
           </thead>
           <tbody>
@@ -98,15 +98,15 @@ function cell(row: Record<string, unknown>, key: string): string {
                   <a
                     class="action"
                     href={`/admin/${resource.key}/${String(row.id)}`}
-                    aria-label="Edit"
+                    aria-label="Bearbeiten"
                   >
                     <Icon name="edit" size={16} />
                   </a>
                   {resource.canDelete && (
-                    <form method="post" data-confirm={`Really delete “${cell(row, resource.columns[0]!.key)}”?`}>
+                    <form method="post" data-confirm={`„${cell(row, resource.columns[0]!.key)}“ wirklich löschen?`}>
                       <input type="hidden" name={CSRF_FIELD} value={Astro.locals.csrfToken} />
                       <input type="hidden" name="id" value={String(row.id)} />
-                      <button class="action action--danger" type="submit" aria-label="Delete">
+                      <button class="action action--danger" type="submit" aria-label="Löschen">
                         <Icon name="trash" size={16} />
                       </button>
                     </form>
@@ -119,17 +119,17 @@ function cell(row: Record<string, unknown>, key: string): string {
       </div>
     ) : (
       <EmptyState
-        title={`No ${resource.label.toLowerCase()} yet.`}
+        title={`Noch keine ${resource.label}.`}
         description={
           resource.canCreate
-            ? 'Create the first entry to get started.'
-            : 'Entries appear here as soon as they arrive.'
+            ? 'Leg den ersten Eintrag an, dann geht es los.'
+            : 'Einträge erscheinen hier, sobald welche eingehen.'
         }
         icon="info"
       >
         {resource.canCreate && (
           <Button href={`/admin/${resource.key}/new`} variant="primary" size="sm">
-            New {resource.singular.toLowerCase()}
+            {resource.singular} anlegen
           </Button>
         )}
       </EmptyState>
@@ -138,10 +138,10 @@ function cell(row: Record<string, unknown>, key: string): string {
 </DashboardLayout>
 
 <script>
-  // Delete is destructive, so confirm before the form submits.
+  // Löschen ist endgültig, deshalb vor dem Absenden nachfragen.
   document.querySelectorAll<HTMLFormElement>('form[data-confirm]').forEach((form) => {
     form.addEventListener('submit', (event) => {
-      if (!window.confirm(form.dataset.confirm ?? 'Delete this entry?')) event.preventDefault();
+      if (!window.confirm(form.dataset.confirm ?? 'Diesen Eintrag löschen?')) event.preventDefault();
     });
   });
 </script>

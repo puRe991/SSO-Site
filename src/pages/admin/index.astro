@@ -11,6 +11,7 @@ import { adminCounts } from '@/server/admin/resources';
 import { adminIcons, visibleAdminNav } from '@/lib/admin-nav';
 import { can } from '@/data/permissions';
 import { formatDate } from '@/lib/format';
+import { applicationStatusLabel, newsStatusLabel } from '@/lib/labels';
 
 const user = Astro.locals.user!;
 const database = getDatabase(Astro.locals);
@@ -33,26 +34,26 @@ const [openApplications, upcomingEvents, latestNews] = database
   : [[], [], []];
 
 const tiles = [
-  { label: 'Members', value: counts.members, href: '/admin/members', permission: 'manage_members' as const },
-  { label: 'Applications', value: counts.applications, href: '/admin/applications', permission: 'manage_applications' as const },
-  { label: 'Events', value: counts.events, href: '/admin/events', permission: 'manage_events' as const },
-  { label: 'News', value: counts.news, href: '/admin/news', permission: 'manage_news' as const },
-  { label: 'Games', value: counts.games, href: '/admin/games', permission: 'manage_games' as const },
-  { label: 'Media', value: counts.media, href: '/admin/media', permission: 'manage_media' as const },
+  { label: 'Mitglieder', value: counts.members, href: '/admin/members', permission: 'manage_members' as const },
+  { label: 'Bewerbungen', value: counts.applications, href: '/admin/applications', permission: 'manage_applications' as const },
+  { label: 'Termine', value: counts.events, href: '/admin/events', permission: 'manage_events' as const },
+  { label: 'Neuigkeiten', value: counts.news, href: '/admin/news', permission: 'manage_news' as const },
+  { label: 'Disziplinen', value: counts.games, href: '/admin/games', permission: 'manage_games' as const },
+  { label: 'Galerie', value: counts.media, href: '/admin/media', permission: 'manage_media' as const },
 ];
 
 const visibleNav = visibleAdminNav(user.role);
 ---
 
 <DashboardLayout title="Admin" heading="Administration" nav={visibleNav} icons={adminIcons}>
-  <AdminHeader title="Overview" description={`Signed in as ${user.email} (${user.role}).`} />
+  <AdminHeader title="Übersicht" description={`Angemeldet als ${user.email} (${user.role}).`} />
 
   {
     !database && (
       <div class="block">
-        <Alert tone="warning" title="No database bound">
-          The D1 binding <code>DB</code> is missing. Content management is unavailable until the
-          database is configured (see README → Deployment).
+        <Alert tone="warning" title="Keine Datenbank verbunden">
+          Die D1-Bindung <code>DB</code> fehlt. Inhalte lassen sich erst pflegen, wenn die
+          Datenbank eingerichtet ist (siehe README → Deployment).
         </Alert>
       </div>
     )
@@ -73,7 +74,7 @@ const visibleNav = visibleAdminNav(user.role);
 
   <div class="columns">
     <Card>
-      <h2 class="h3">Open applications</h2>
+      <h2 class="h3">Offene Bewerbungen</h2>
       {
         openApplications.length > 0 ? (
           <ul class="list" role="list">
@@ -81,19 +82,19 @@ const visibleNav = visibleAdminNav(user.role);
               <li>
                 <a href={`/admin/applications/${application.id}`}>{application.username}</a>
                 <Badge tone="warning" size="sm">
-                  {application.status}
+                  {applicationStatusLabel(application.status)}
                 </Badge>
               </li>
             ))}
           </ul>
         ) : (
-          <EmptyState title="No open applications." icon="inbox" />
+          <EmptyState title="Keine offenen Bewerbungen." icon="inbox" />
         )
       }
     </Card>
 
     <Card>
-      <h2 class="h3">Events</h2>
+      <h2 class="h3">Termine</h2>
       {
         upcomingEvents.length > 0 ? (
           <ul class="list" role="list">
@@ -107,25 +108,25 @@ const visibleNav = visibleAdminNav(user.role);
             ))}
           </ul>
         ) : (
-          <EmptyState title="No events." icon="calendar" />
+          <EmptyState title="Keine Termine." icon="calendar" />
         )
       }
     </Card>
 
     <Card>
-      <h2 class="h3">Latest news</h2>
+      <h2 class="h3">Neueste Beiträge</h2>
       {
         latestNews.length > 0 ? (
           <ul class="list" role="list">
             {latestNews.map((article) => (
               <li>
                 <a href={`/admin/news/${article.id}`}>{article.title}</a>
-                <Badge size="sm">{article.status}</Badge>
+                <Badge size="sm">{newsStatusLabel(article.status)}</Badge>
               </li>
             ))}
           </ul>
         ) : (
-          <EmptyState title="No articles." icon="news" />
+          <EmptyState title="Keine Beiträge." icon="news" />
         )
       }
     </Card>

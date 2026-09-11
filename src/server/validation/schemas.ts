@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-/** Shared validation. Every mutating route parses input through these. */
+/**
+ * Gemeinsame Validierung. Jede schreibende Route parst ihre Eingaben hierüber.
+ *
+ * Zods eingebaute deutsche Fehlermeldungen werden einmal global gesetzt, damit
+ * Standardfehler („Zu klein: …“) nicht auf Englisch im Formular landen.
+ */
+z.config(z.locales.de());
 
 const trimmed = (min: number, max: number) => z.string().trim().min(min).max(max);
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(''));
@@ -17,13 +23,13 @@ export const registerSchema = z
     email: z.string().trim().pipe(z.email().max(254)),
     password: z
       .string()
-      .min(12, 'Use at least 12 characters.')
+      .min(12, 'Bitte mindestens 12 Zeichen verwenden.')
       .max(200)
-      .refine((v) => /[a-zA-Z]/.test(v) && /[0-9]/.test(v), 'Mix letters and numbers.'),
+      .refine((v) => /[a-zA-Z]/.test(v) && /[0-9]/.test(v), 'Bitte Buchstaben und Zahlen mischen.'),
     passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
-    message: 'Passwords do not match.',
+    message: 'Die Passwörter stimmen nicht überein.',
     path: ['passwordConfirm'],
   });
 
@@ -37,9 +43,9 @@ export const applicationSchema = z.object({
   motivation: trimmed(20, 2000),
   referral: optionalText(200),
   /**
-   * Honeypot. Real users never see this field; bots fill it in. It is accepted
-   * by the schema so the request can be silently discarded afterwards — an
-   * error message would tell the bot what tripped it.
+   * Honeypot. Echte Besucher sehen dieses Feld nie, Bots füllen es aus. Das
+   * Schema akzeptiert es trotzdem, damit die Anfrage danach still verworfen
+   * werden kann — eine Fehlermeldung würde dem Bot verraten, woran es lag.
    */
   website: z.string().max(300).optional(),
 });
@@ -49,12 +55,12 @@ export const contactSchema = z.object({
   email: z.string().trim().pipe(z.email().max(254)),
   subject: trimmed(3, 120),
   message: trimmed(10, 2000),
-  /** Honeypot — see applicationSchema. */
+  /** Honeypot — siehe applicationSchema. */
   website: z.string().max(300).optional(),
 });
 
 export const memberSchema = z.object({
-  slug: trimmed(2, 60).regex(/^[a-z0-9-]+$/, 'Lowercase letters, numbers and dashes only.'),
+  slug: trimmed(2, 60).regex(/^[a-z0-9-]+$/, 'Nur Kleinbuchstaben, Zahlen und Bindestriche.'),
   username: trimmed(2, 40),
   displayName: optionalText(60),
   rank: optionalText(40),
@@ -141,15 +147,15 @@ export const profileSchema = z.object({
 export const passwordChangeSchema = z
   .object({
     currentPassword: z.string().min(1).max(200),
-    password: z.string().min(12, 'Use at least 12 characters.').max(200),
+    password: z.string().min(12, 'Bitte mindestens 12 Zeichen verwenden.').max(200),
     passwordConfirm: z.string(),
   })
   .refine((d) => d.password === d.passwordConfirm, {
-    message: 'Passwords do not match.',
+    message: 'Die Passwörter stimmen nicht überein.',
     path: ['passwordConfirm'],
   });
 
-/** Flattens a Zod error into `{ field: message }` for form rendering. */
+/** Macht aus einem Zod-Fehler `{ Feld: Meldung }` für die Formularausgabe. */
 export function fieldErrors(error: z.ZodError): Record<string, string> {
   const result: Record<string, string> = {};
   for (const issue of error.issues) {

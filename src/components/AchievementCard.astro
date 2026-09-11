@@ -19,7 +19,7 @@ const date = formatDate(achievement.achievedAt);
   </span>
   <div class="achievement__body">
     <div class="cluster">
-      {achievement.isDemo && <Badge tone="warning" size="sm">Placeholder</Badge>}
+      {achievement.isDemo && <Badge tone="warning" size="sm">Platzhalter</Badge>}
       {achievement.gameSlug && <Badge size="sm">{achievement.gameSlug}</Badge>}
     </div>
     <h3 class="achievement__title">{achievement.title}</h3>
@@ -44,7 +44,7 @@ const date = formatDate(achievement.achievedAt);
     border-radius: var(--radius);
     border: 1px solid color-mix(in oklab, var(--primary) 35%, transparent);
     background: color-mix(in oklab, var(--primary) 12%, transparent);
-    color: var(--violet-300);
+    color: var(--gold-300);
     font-size: 1.4rem;
   }
 

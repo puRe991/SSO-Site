@@ -27,23 +27,23 @@ const [ranks, games, members] = await Promise.all([
 const hasDemo = members.items.some((member) => member.isDemo);
 ---
 
-<PageLayout title="Members" description="The members of Team Fairy Tight.">
+<PageLayout title="Mitglieder" description="Die Mitglieder des Reitclubs Fairy Tight.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Roster</p>
-      <h1>Members</h1>
+      <p class="eyebrow">Stall</p>
+      <h1>Mitglieder</h1>
       <p class="text-muted intro">
-        {members.total} {members.total === 1 ? 'member' : 'members'} listed.
+        {members.total} {members.total === 1 ? 'Mitglied' : 'Mitglieder'} gelistet.
       </p>
 
       <div class="controls">
         <FilterBar
           searchValue={query.search ?? ''}
-          searchPlaceholder="Search members…"
+          searchPlaceholder="Mitglieder durchsuchen…"
           groups={[
             {
               name: 'rank',
-              label: 'Rank',
+              label: 'Rang',
               value: query.rank,
               options: ranks.map((rank) => ({ value: rank.id, label: rank.label })),
             },
@@ -53,33 +53,33 @@ const hasDemo = members.items.some((member) => member.isDemo);
               value: query.status,
               options: [
                 { value: 'online', label: 'Online' },
-                { value: 'away', label: 'Away' },
-                { value: 'dnd', label: 'Do not disturb' },
+                { value: 'away', label: 'Abwesend' },
+                { value: 'dnd', label: 'Bitte nicht stören' },
                 { value: 'offline', label: 'Offline' },
               ],
             },
             {
               name: 'game',
-              label: 'Game',
+              label: 'Disziplin',
               value: query.game,
               options: games.map((game) => ({ value: game.slug, label: game.name })),
             },
             {
               name: 'sort',
-              label: 'Sort',
-              allLabel: 'Sort: default',
+              label: 'Sortierung',
+              allLabel: 'Sortierung: Standard',
               value: params.get('sort') ?? undefined,
               options: [
-                { value: 'rank', label: 'By rank' },
-                { value: 'name', label: 'By name' },
-                { value: 'joined', label: 'By join date' },
+                { value: 'rank', label: 'Nach Rang' },
+                { value: 'name', label: 'Nach Name' },
+                { value: 'joined', label: 'Nach Eintrittsdatum' },
               ],
             },
           ]}
         />
       </div>
 
-      {hasDemo && <div class="notice"><DemoNotice what="members" /></div>}
+      {hasDemo && <div class="notice"><DemoNotice what="Mitglieder" /></div>}
 
       {
         members.items.length > 0 ? (
@@ -90,8 +90,8 @@ const hasDemo = members.items.some((member) => member.isDemo);
           </div>
         ) : (
           <EmptyState
-            title="No members found."
-            description="Adjust the filters, or add members in the admin area."
+            title="Keine Mitglieder gefunden."
+            description="Ändere die Filter oder leg im Adminbereich Mitglieder an."
             icon="users"
           />
         )

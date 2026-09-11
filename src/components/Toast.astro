@@ -18,7 +18,7 @@ const { message, tone = 'success' } = Astro.props;
     <div class:list={['toast', `toast--${tone}`]} role="status">
       <Icon name={tone === 'danger' ? 'alert' : 'check'} size={16} />
       <span>{message}</span>
-      <button type="button" class="toast__close" aria-label="Dismiss" data-toast-close>
+      <button type="button" class="toast__close" aria-label="Schließen" data-toast-close>
         <Icon name="close" size={14} />
       </button>
     </div>

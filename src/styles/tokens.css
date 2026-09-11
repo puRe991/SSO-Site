@@ -1,67 +1,77 @@
 /*
- * TEAM FAIRY TIGHT — Design tokens
- * =================================
+ * FAIRY TIGHT — Design tokens
+ * ===========================
  * Single source of truth for the whole visual system. Changing the theme means
  * changing values here; no component hardcodes a colour.
  *
- * Dark is the default and the designed-for mode. A light palette exists so the
- * site is usable for visitors who need it, but the clan identity is dark.
+ * The palette follows the world the club rides in: deep forest green like the
+ * woods of Jorvik, warm gold like late sunlight on a tack room, parchment for
+ * text and a soft sky teal as the cool counterpoint. Dark is the default and
+ * the designed-for mode; a warm parchment light theme exists alongside it.
  */
 
 :root {
   color-scheme: dark;
 
-  /* --- Brand ramp: fairy violet → magenta → pink, plus cyan as secondary --- */
-  --violet-300: #c4a8ff;
-  --violet-400: #a87bff;
-  --violet-500: #8b4dff;
-  --violet-600: #6f2fe0;
-  --magenta-400: #f06bd8;
-  --magenta-500: #d93fb8;
-  --pink-400: #ff7ab2;
-  --cyan-400: #4fd8ef;
-  --cyan-500: #18b9d4;
+  /* --- Brand ramp: forest green, gold, parchment, saddle leather --- */
+  --pine-300: #7dc0ae;
+  --pine-400: #4ba38e;
+  --pine-500: #2c806d;
+  --pine-600: #1b5d4f;
+  --pine-700: #12443a;
+  --gold-300: #ffd98a;
+  --gold-400: #f5c151;
+  --gold-500: #e0a32a;
+  --gold-600: #b8811a;
+  --rust-400: #e08a5c;
+  --rust-500: #c2603a;
+  --sky-400: #6fc7d8;
+  --sky-500: #3aa0b4;
 
   /* --- Surfaces --- */
-  --background: #07070c;
-  --background-elevated: #0b0b13;
-  --surface: #101019;
-  --surface-secondary: #171724;
-  --surface-hover: #1d1d2d;
+  --background: #0a1a17;
+  --background-elevated: #0e221d;
+  --surface: #132a24;
+  --surface-secondary: #18332b;
+  --surface-hover: #1f3f35;
 
   /* --- Text --- */
-  --text: #f2f2f7;
-  --text-muted: #a0a0b6;
-  --text-subtle: #6f6f87;
-  --text-inverse: #0a0a12;
+  --text: #f6efe1;
+  --text-muted: #b6c5bb;
+  --text-subtle: #7f9489;
+  --text-inverse: #0a1a17;
 
   /* --- Brand roles --- */
-  --primary: var(--violet-500);
-  --primary-hover: var(--violet-400);
-  --primary-contrast: #ffffff;
-  --secondary: var(--magenta-500);
-  --accent: var(--cyan-400);
+  --primary: var(--gold-500);
+  --primary-hover: var(--gold-400);
+  --primary-contrast: #14241d;
+  --secondary: var(--pine-500);
+  --accent: var(--sky-400);
+  /* Links stehen bewusst nicht auf --primary-hover: sie brauchen auf beiden
+     Hintergründen eigenen Kontrast. */
+  --link: var(--gold-300);
+  --link-hover: var(--text);
 
   /* --- Lines & effects --- */
-  --border: #232334;
-  --border-strong: #34344c;
+  --border: #23433a;
+  --border-strong: #35594d;
   --border-brand: color-mix(in oklab, var(--primary) 45%, transparent);
-  --glow: color-mix(in oklab, var(--primary) 32%, transparent);
-  --glow-accent: color-mix(in oklab, var(--accent) 28%, transparent);
+  --glow: color-mix(in oklab, var(--primary) 30%, transparent);
+  --glow-accent: color-mix(in oklab, var(--accent) 26%, transparent);
 
   /* --- Status --- */
-  --status-online: #43d17c;
-  --status-away: #f2c14e;
-  --status-dnd: #ef5f6b;
-  --status-offline: #6f6f87;
-  --success: #43d17c;
-  --warning: #f2c14e;
-  --danger: #ef5f6b;
-  --info: var(--cyan-400);
+  --status-online: #5fca86;
+  --status-away: var(--gold-400);
+  --status-dnd: #e2675f;
+  --status-offline: #7f9489;
+  --success: #5fca86;
+  --warning: var(--gold-400);
+  --danger: #e2675f;
+  --info: var(--sky-400);
 
   /* --- Typography --- */
-  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
 
   --text-xs: 0.75rem;
@@ -72,13 +82,13 @@
   --text-2xl: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
   --text-3xl: clamp(1.9rem, 1.4rem + 2.2vw, 2.75rem);
   --text-4xl: clamp(2.4rem, 1.5rem + 4vw, 4rem);
-  --text-hero: clamp(2.75rem, 1rem + 9vw, 7rem);
+  --text-hero: clamp(2.6rem, 1.2rem + 7.5vw, 6rem);
 
   --leading-tight: 1.12;
   --leading-snug: 1.3;
   --leading-normal: 1.65;
-  --tracking-wide: 0.08em;
-  --tracking-wider: 0.18em;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.14em;
 
   /* --- Spacing scale --- */
   --space-1: 0.25rem;
@@ -92,18 +102,18 @@
   --space-9: 6rem;
   --section-y: clamp(3.5rem, 2rem + 6vw, 7rem);
 
-  /* --- Radii --- */
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* --- Radii: softer and friendlier than the old angular theme --- */
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
   --radius-full: 999px;
 
   /* --- Elevation --- */
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow: 0 8px 24px -12px rgb(0 0 0 / 0.7);
-  --shadow-lg: 0 24px 60px -24px rgb(0 0 0 / 0.85);
-  --shadow-glow: 0 0 0 1px var(--border-brand), 0 12px 40px -16px var(--glow);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow: 0 10px 26px -14px rgb(0 0 0 / 0.65);
+  --shadow-lg: 0 26px 60px -26px rgb(0 0 0 / 0.8);
+  --shadow-glow: 0 0 0 1px var(--border-brand), 0 14px 40px -18px var(--glow);
 
   /* --- Layout --- */
   --container: 1200px;
@@ -125,23 +135,26 @@
   --z-toast: 500;
 }
 
-/* Optional light theme — the clan identity stays dark, this is for readability. */
+/* Warm parchment theme — daylight version of the same identity. */
 :root[data-theme='light'] {
   color-scheme: light;
-  --background: #f6f6fa;
-  --background-elevated: #ffffff;
-  --surface: #ffffff;
-  --surface-secondary: #f0f0f6;
-  --surface-hover: #e8e8f2;
-  --text: #14141f;
-  --text-muted: #55556b;
-  --text-subtle: #7b7b93;
-  --text-inverse: #ffffff;
-  --primary: var(--violet-600);
-  --primary-hover: var(--violet-500);
-  --secondary: #b52e97;
-  --accent: var(--cyan-500);
-  --border: #dedee8;
-  --border-strong: #c4c4d4;
-  --shadow-lg: 0 24px 60px -28px rgb(20 20 31 / 0.25);
+  --background: #f7f0e1;
+  --background-elevated: #fffaf0;
+  --surface: #fffaf0;
+  --surface-secondary: #f2e9d6;
+  --surface-hover: #eadfc7;
+  --text: #16302a;
+  --text-muted: #4c6459;
+  --text-subtle: #7a8c81;
+  --text-inverse: #fffaf0;
+  --primary: var(--gold-500);
+  --primary-hover: var(--gold-600);
+  --primary-contrast: #16302a;
+  --secondary: var(--pine-600);
+  --accent: var(--sky-500);
+  --link: #8a5c0d;
+  --link-hover: var(--pine-700);
+  --border: #e0d3b8;
+  --border-strong: #c9b894;
+  --shadow-lg: 0 24px 60px -28px rgb(22 48 42 / 0.3);
 }

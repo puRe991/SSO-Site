@@ -10,6 +10,7 @@ import Icon from '@/components/Icon.astro';
 import { getGameBySlug, getRanks } from '@/server/services/content';
 import { orTBD } from '@/data/tbd';
 import { renderRichText } from '@/lib/text';
+import { gameStatusLabel } from '@/lib/labels';
 
 const { slug } = Astro.params;
 const data = slug ? await getGameBySlug(Astro.locals, slug) : null;
@@ -24,14 +25,19 @@ const ranks = await getRanks(Astro.locals);
 
 <PageLayout
   title={game.name}
-  description={game.description ?? `${game.name} in Team Fairy Tight.`}
+  description={game.description ?? `${game.name} im Reitclub Fairy Tight.`}
   structuredData={[
-    { '@context': 'https://schema.org', '@type': 'VideoGame', name: game.name, genre: game.genre ?? undefined },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: game.name,
+      genre: game.genre ?? undefined,
+    },
   ]}
 >
   <section class="section">
     <div class="container">
-      <a class="back" href="/games">← All games</a>
+      <a class="back" href="/games">← Alle Disziplinen</a>
 
       <header class="game-head">
         <div class="game-head__cover">
@@ -40,14 +46,14 @@ const ranks = await getRanks(Astro.locals);
               <img src={game.coverUrl} alt="" loading="eager" />
             ) : (
               <span class="game-head__placeholder" aria-hidden="true">
-                <Icon name="gamepad" size={36} />
+                <Icon name="horseshoe" size={36} />
               </span>
             )
           }
         </div>
         <div class="game-head__body">
           <div class="cluster">
-            <Badge tone="primary">{game.status}</Badge>
+            <Badge tone="primary">{gameStatusLabel(game.status)}</Badge>
             {game.isDemo && <Badge tone="warning">Demo</Badge>}
           </div>
           <h1>{game.name}</h1>
@@ -61,18 +67,18 @@ const ranks = await getRanks(Astro.locals);
       <div class="game-body">
         <div class="game-body__main">
           <Card>
-            <h2 class="h3">About</h2>
+            <h2 class="h3">Beschreibung</h2>
             {
               game.description ? (
                 <div class="prose" set:html={renderRichText(game.description)} />
               ) : (
-                <p class="text-muted">No description written for this game yet.</p>
+                <p class="text-muted">Zu dieser Disziplin ist noch kein Text geschrieben.</p>
               )
             }
           </Card>
 
           <section aria-labelledby="game-members">
-            <h2 class="h3" id="game-members">Clan members</h2>
+            <h2 class="h3" id="game-members">Mitglieder</h2>
             {
               members.length > 0 ? (
                 <div class="grid-auto" style="--min-col:280px">
@@ -81,13 +87,13 @@ const ranks = await getRanks(Astro.locals);
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No members assigned to this game yet." icon="users" />
+                <EmptyState title="Dieser Disziplin ist noch niemand zugeordnet." icon="users" />
               )
             }
           </section>
 
           <section aria-labelledby="game-events">
-            <h2 class="h3" id="game-events">Events</h2>
+            <h2 class="h3" id="game-events">Termine</h2>
             {
               events.length > 0 ? (
                 <div class="grid-auto" style="--min-col:300px">
@@ -96,13 +102,13 @@ const ranks = await getRanks(Astro.locals);
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No events for this game yet." icon="calendar" />
+                <EmptyState title="Für diese Disziplin gibt es noch keine Termine." icon="calendar" />
               )
             }
           </section>
 
           <section aria-labelledby="game-achievements">
-            <h2 class="h3" id="game-achievements">Achievements</h2>
+            <h2 class="h3" id="game-achievements">Erfolge</h2>
             {
               achievements.length > 0 ? (
                 <div class="grid-auto" style="--min-col:320px">
@@ -111,7 +117,7 @@ const ranks = await getRanks(Astro.locals);
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No achievements recorded for this game." icon="trophy" />
+                <EmptyState title="Für diese Disziplin sind noch keine Erfolge eingetragen." icon="trophy" />
               )
             }
           </section>
@@ -119,16 +125,16 @@ const ranks = await getRanks(Astro.locals);
 
         <aside class="game-body__side">
           <Card>
-            <h2 class="h3">Statistics</h2>
+            <h2 class="h3">Statistik</h2>
             <p class="text-muted small">
-              No statistics available yet. Match results and player stats appear here once a data
-              source is connected.
+              Noch keine Statistik vorhanden. Ergebnisse und Werte erscheinen hier, sobald eine
+              Datenquelle angebunden ist.
             </p>
           </Card>
           <Card>
-            <h2 class="h3">Media</h2>
+            <h2 class="h3">Bilder</h2>
             <p class="text-muted small">
-              Screenshots and videos for this game are managed in the <a href="/media">gallery</a>.
+              Screenshots und Videos zu dieser Disziplin liegen in der <a href="/media">Galerie</a>.
             </p>
           </Card>
         </aside>

@@ -1,12 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="40" y2="40">
-      <stop offset="0%" stop-color="#a87bff"/>
-      <stop offset="55%" stop-color="#d93fb8"/>
-      <stop offset="100%" stop-color="#4fd8ef"/>
+    <linearGradient id="g" x1="6" y1="4" x2="34" y2="36">
+      <stop offset="0%" stop-color="#ffd98a"/>
+      <stop offset="55%" stop-color="#e0a32a"/>
+      <stop offset="100%" stop-color="#c2603a"/>
     </linearGradient>
   </defs>
-  <rect width="40" height="40" rx="9" fill="#07070c"/>
-  <path d="M20 5.5 33.5 13v14L20 34.5 6.5 27V13z" fill="none" stroke="url(#g)" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M13.5 16h13M20 16v11" fill="none" stroke="url(#g)" stroke-width="2.6" stroke-linecap="round"/>
+  <rect width="40" height="40" rx="11" fill="#0a1a17"/>
+  <path d="M14.6 32.4C10.8 29.9 8.6 25.8 8.6 21a11.4 11.4 0 0 1 22.8 0c0 4.8-2.2 8.9-6 11.4"
+        fill="none" stroke="url(#g)" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M11.4 32.4h4.2M24.4 32.4h4.2" fill="none" stroke="url(#g)" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="11.9" cy="12.9" r="0.95" fill="url(#g)"/>
+  <circle cx="28.1" cy="12.9" r="0.95" fill="url(#g)"/>
+  <circle cx="8.6" cy="21" r="0.95" fill="url(#g)"/>
+  <circle cx="31.4" cy="21" r="0.95" fill="url(#g)"/>
+  <circle cx="11" cy="28" r="0.95" fill="url(#g)"/>
+  <circle cx="29" cy="28" r="0.95" fill="url(#g)"/>
 </svg>

@@ -3,8 +3,8 @@
  * Imported by astro.config.mjs AND by application code, so it stays plain ESM.
  */
 export const siteConfig = {
-  name: 'Team Fairy Tight',
-  shortName: 'TFT',
+  name: 'Fairy Tight',
+  shortName: 'FT',
   /**
    * Canonical URL, optional. Empty means "not pinned": the site then derives
    * its origin from the incoming request, which is already correct on
@@ -12,9 +12,9 @@ export const siteConfig = {
    * PUBLIC_SITE_URL as a build variable to pin it to one domain.
    */
   url: process.env.PUBLIC_SITE_URL ?? '',
-  tagline: 'Gaming • Community • Teamwork',
+  tagline: 'Reiten • Gemeinschaft • Abenteuer',
   description:
-    'Team Fairy Tight (TFT) is a gaming clan and community. Members, games, events, news and everything around the team — in one place.',
-  locale: 'en',
-  themeColor: '#0a0a0f',
+    'Fairy Tight ist ein Reitclub in Star Stable Online. Mitglieder, Ausritte, Turniere, Neuigkeiten und alles rund um den Club — an einem Ort.',
+  locale: 'de',
+  themeColor: '#0a1a17',
 };
