@@ -5,7 +5,7 @@ import Field from '@/components/Field.astro';
 import Button from '@/components/Button.astro';
 import Alert from '@/components/Alert.astro';
 import Icon from '@/components/Icon.astro';
-import { joinRequirements, joinSteps } from '@/data/clan.config';
+import { joinRequirements, joinSteps, probationRequirements, probationNote } from '@/data/clan.config';
 import { applicationSchema, fieldErrors, formToObject } from '@/server/validation/schemas';
 import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
 import { clientIdentifier, rateLimit } from '@/server/security/rate-limit';
@@ -116,6 +116,24 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                 ))
               }
             </ol>
+          </Card>
+
+          <Card>
+            <h2 class="h3">Anforderungen in der Probezeit 🧚🏻</h2>
+            <ul class="list" role="list">
+              {
+                probationRequirements.map((item) => (
+                  <li>
+                    <Icon name="check" size={16} />
+                    <span>
+                      <strong>{item.title}</strong>
+                      <span class="text-muted"> — {item.text}</span>
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="text-muted small" style="margin-block-start: var(--space-4, 1rem)">{probationNote}</p>
           </Card>
 
           <Card>

@@ -72,3 +72,29 @@ export const joinSteps: { title: string; text: string }[] = [
   { title: 'Gespräch', text: 'Wir laden dich zu einem kurzen Kennenlernen auf Discord ein.' },
   { title: 'Probezeit', text: 'Du spielst eine Weile mit uns mit und wirst Teil des Clubs.' },
 ];
+
+/**
+ * Anforderungen in der Probezeit — vom Club selbst formuliert.
+ * Nur ein Richtwert: jede Probezeit wird individuell betrachtet.
+ */
+export const probationRequirements: { title: string; text: string }[] = [
+  {
+    title: 'Mindestens 2 CTs',
+    text: 'In der Probezeit solltest du es schaffen, bei mindestens zwei CTs dabei zu sein.',
+  },
+  {
+    title: 'Aktiv dabei sein',
+    text: 'Auch außerhalb der CTs freuen wir uns, wenn du dich im Chat beteiligst oder ab und zu bei einem Call dabei bist.',
+  },
+  {
+    title: 'Ins Clubleben einbringen',
+    text: 'Versuch, dich aktiv in die Community einzubringen, mit anderen Mitgliedern zu quatschen und ein Teil des Clublebens zu werden.',
+  },
+  {
+    title: 'Interesse zeigen',
+    text: 'Uns ist wichtig, dass du nicht nur Mitglied bist, sondern wirklich Lust hast, Teil der Gemeinschaft zu sein. 💕',
+  },
+];
+
+export const probationNote =
+  'Diese Liste ist eine Hilfe, damit du weißt, was wir uns wünschen. Wir gehen nicht stur nach ihr vor, sondern schauen bei jeder Probezeit individuell auf das Mitglied. Sie ist ein Richtwert und soll dich in keiner Weise verunsichern. Deine Anwesenheit und weitere Basis-Infos findest du im Anwesenheits-Channel auf Discord.';
