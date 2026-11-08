@@ -20,14 +20,14 @@ const typeIcon: Record<string, IconName> = {
 /** Der Treffertyp kommt englisch aus der Suche und wird erst hier beschriftet. */
 const typeLabel: Record<string, string> = {
   member: 'Mitglied',
-  game: 'Disziplin',
+  game: 'Spiel',
   event: 'Termin',
   news: 'Neuigkeit',
   achievement: 'Erfolg',
 };
 ---
 
-<PageLayout title="Suche" description="Mitglieder, Disziplinen, Termine, Neuigkeiten und Erfolge durchsuchen." noindex>
+<PageLayout title="Suche" description="Mitglieder, Spiele, Termine, Neuigkeiten und Erfolge durchsuchen." noindex>
   <section class="section">
     <div class="container container-narrow">
       <p class="eyebrow">Alles finden</p>
@@ -39,7 +39,7 @@ const typeLabel: Record<string, string> = {
           type="search"
           name="q"
           value={term}
-          placeholder="Mitglieder, Disziplinen, Termine, Neuigkeiten…"
+          placeholder="Mitglieder, Spiele, Termine, Neuigkeiten…"
           aria-label="Suchbegriff"
           autofocus
         />

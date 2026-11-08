@@ -18,20 +18,20 @@ const platforms = [...new Set(games.flatMap((game) => game.platforms))].sort();
 const hasDemo = games.some((game) => game.isDemo);
 ---
 
-<PageLayout title="Disziplinen" description="Die Disziplinen, in denen Fairy Tide Inc. unterwegs ist.">
+<PageLayout title="Spiele" description="Die Spiele, in denen Fairy Tide Inc. unterwegs ist.">
   <section class="section">
     <div class="container">
       <p class="eyebrow">Programm</p>
-      <h1>Disziplinen</h1>
+      <h1>Spiele</h1>
       <p class="text-muted intro">
-        Hier stehen nur Disziplinen, die der Club wirklich reitet — nichts wird automatisch
+        Hier stehen nur Spiele, die der Club wirklich spielt — nichts wird automatisch
         ergänzt.
       </p>
 
       <div class="controls">
         <FilterBar
           searchValue={query.search ?? ''}
-          searchPlaceholder="Disziplinen durchsuchen…"
+          searchPlaceholder="Spiele durchsuchen…"
           groups={[
             {
               name: 'status',
@@ -54,7 +54,7 @@ const hasDemo = games.some((game) => game.isDemo);
         />
       </div>
 
-      {hasDemo && <div class="controls"><DemoNotice what="Disziplinen" /></div>}
+      {hasDemo && <div class="controls"><DemoNotice what="Spiele" /></div>}
 
       {
         games.length > 0 ? (
@@ -65,8 +65,8 @@ const hasDemo = games.some((game) => game.isDemo);
           </div>
         ) : (
           <EmptyState
-            title="Keine Disziplinen gefunden."
-            description="Leg die Disziplinen des Clubs im Adminbereich an oder setz die Filter zurück."
+            title="Keine Spiele gefunden."
+            description="Leg die Spiele des Clubs im Adminbereich an oder setz die Filter zurück."
             icon="horseshoe"
           />
         )

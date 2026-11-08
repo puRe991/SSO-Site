@@ -28,7 +28,7 @@ const name = member.displayName ?? member.username;
 
 <PageLayout
   title={member.username}
-  description={`${name} — Mitglied im Reitclub Fairy Tide Inc..`}
+  description={`${name} — Mitglied im Club Fairy Tide Inc.`}
   structuredData={[
     {
       '@context': 'https://schema.org',
@@ -69,7 +69,7 @@ const name = member.displayName ?? member.username;
           </Card>
 
           <section aria-labelledby="member-games">
-            <h2 class="h3" id="member-games">Disziplinen</h2>
+            <h2 class="h3" id="member-games">Spiele</h2>
             {
               member.games && member.games.length > 0 ? (
                 <div class="grid-auto" style="--min-col:240px">
@@ -78,7 +78,7 @@ const name = member.displayName ?? member.username;
                   ))}
                 </div>
               ) : (
-                <EmptyState title="Noch keine Disziplinen zugeordnet." icon="horseshoe" />
+                <EmptyState title="Noch keine Spiele zugeordnet." icon="horseshoe" />
               )
             }
           </section>
@@ -102,7 +102,7 @@ const name = member.displayName ?? member.username;
                 <dd>{orTBD(member.role)}</dd>
               </div>
               <div>
-                <dt>Hauptdisziplin</dt>
+                <dt>Hauptspiel</dt>
                 <dd>{orTBD(member.mainGame)}</dd>
               </div>
               <div>

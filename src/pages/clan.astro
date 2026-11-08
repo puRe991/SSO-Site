@@ -27,7 +27,7 @@ const goals = settings['clan.goals'];
 
 <PageLayout
   title="Der Club"
-  description={`Über ${clanConfig.name} — der Reitclub, seine Werte und seine Aktivitäten.`}
+  description={`Über ${clanConfig.name} — der Club, seine Werte und seine Aktivitäten.`}
 >
   <section class="section">
     <div class="container">
@@ -49,7 +49,7 @@ const goals = settings['clan.goals'];
           <dd>{stats.totalMembers ?? '—'}</dd>
         </div>
         <div>
-          <dt>Aktive Disziplinen</dt>
+          <dt>Aktive Spiele</dt>
           <dd>{stats.activeGames ?? '—'}</dd>
         </div>
       </dl>
@@ -142,7 +142,7 @@ const goals = settings['clan.goals'];
 
   <section class="section">
     <div class="container">
-      <SectionHeader eyebrow="Aktivitäten" title="Disziplinen und Community" href="/games" />
+      <SectionHeader eyebrow="Aktivitäten" title="Spiele und Community" href="/games" />
       {
         games.length > 0 ? (
           <ul class="games" role="list">
@@ -157,8 +157,8 @@ const goals = settings['clan.goals'];
           </ul>
         ) : (
           <EmptyState
-            title="Noch keine Disziplinen eingetragen."
-            description="Die Disziplinen des Clubs werden im Adminbereich gepflegt."
+            title="Noch keine Spiele eingetragen."
+            description="Die Spiele des Clubs werden im Adminbereich gepflegt."
             icon="horseshoe"
           />
         )
@@ -166,7 +166,7 @@ const goals = settings['clan.goals'];
 
       <div class="cta">
         <Button href="/members" variant="secondary">Mitglieder kennenlernen</Button>
-        <Button href="/join" variant="primary">Mitreiten</Button>
+        <Button href="/join" variant="primary">Mitspielen</Button>
       </div>
     </div>
   </section>

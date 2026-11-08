@@ -71,15 +71,15 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 ---
 
 <PageLayout
-  title="Mitreiten"
+  title="Mitspielen"
   description="Bewirb dich bei Fairy Tide Inc. — Voraussetzungen, Ablauf und Bewerbungsformular."
 >
   <section class="section">
     <div class="container">
       <p class="eyebrow">Aufnahme</p>
-      <h1>Reite bei Fairy Tide Inc. mit</h1>
+      <h1>Spiel bei Fairy Tide Inc. mit</h1>
       <p class="text-muted intro">
-        Wir suchen Reiterinnen und Reiter, die gern gemeinsam unterwegs sind. Lies dir die
+        Wir suchen Spielerinnen und Spieler, die gern gemeinsam unterwegs sind. Lies dir die
         Voraussetzungen durch und schick uns danach deine Bewerbung.
       </p>
 
@@ -184,7 +184,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                       maxlength={60}
                     />
                     <Field
-                      label="Disziplinen, die du reitest"
+                      label="Spiele, die du spielst"
                       name="games"
                       value={values.games}
                       error={errors.games}
@@ -192,7 +192,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                       hint="Mit Komma getrennt."
                     />
                     <Field
-                      label="Hauptdisziplin"
+                      label="Hauptspiel"
                       name="mainGame"
                       value={values.mainGame}
                       error={errors.mainGame}

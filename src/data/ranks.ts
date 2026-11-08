@@ -11,7 +11,7 @@ import type { Rank } from '@/types';
 export const defaultRanks: Rank[] = [
   { id: 'owner', label: 'Clubleitung', order: 10, tone: 'primary' },
   { id: 'co_owner', label: 'Stellvertretende Leitung', order: 20, tone: 'primary' },
-  { id: 'leader', label: 'Stallleitung', order: 30, tone: 'secondary' },
+  { id: 'leader', label: 'Clubleitung', order: 30, tone: 'secondary' },
   { id: 'co_leader', label: 'Trainingsleitung', order: 40, tone: 'secondary' },
   { id: 'admin', label: 'Administration', order: 50, tone: 'accent' },
   { id: 'moderator', label: 'Moderation', order: 60, tone: 'accent' },

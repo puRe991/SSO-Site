@@ -12,7 +12,7 @@ export const siteConfig = {
    * PUBLIC_SITE_URL as a build variable to pin it to one domain.
    */
   url: process.env.PUBLIC_SITE_URL ?? '',
-  tagline: 'Reiten • Gemeinschaft • Abenteuer',
+  tagline: 'Gaming • Gemeinschaft • Abenteuer',
   description:
     'Fairy Tide Inc. ist eine Gaming-Community rund um Star Stable Online, Valorant und Minecraft. Mitglieder, Termine, Neuigkeiten und alles rund um den Club — an einem Ort.',
   locale: 'de',

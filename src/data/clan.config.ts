@@ -62,13 +62,13 @@ export const knownMembers = [
 export const joinRequirements: string[] = [
   'Ein Discord-Account — der Club stimmt sich über Discord ab.',
   'Ein eigener Charakter in Star Stable Online.',
-  'Regelmäßig Zeit für gemeinsame Ausritte und Clubtermine.',
-  'Respektvoller Umgang mit Mitgliedern und anderen Reiterinnen und Reitern.',
+  'Regelmäßig Zeit für gemeinsame Spielabende und Clubtermine.',
+  'Respektvoller Umgang mit Mitgliedern und anderen Spielerinnen und Spielern.',
 ];
 
 export const joinSteps: { title: string; text: string }[] = [
-  { title: 'Bewerbung', text: 'Füll das Formular unten mit deinem Reiterprofil aus.' },
+  { title: 'Bewerbung', text: 'Füll das Formular unten mit deinem Spielerprofil aus.' },
   { title: 'Prüfung', text: 'Jemand aus der Clubleitung sieht sich deine Bewerbung an.' },
   { title: 'Gespräch', text: 'Wir laden dich zu einem kurzen Kennenlernen auf Discord ein.' },
-  { title: 'Proberitt', text: 'Du reitest eine Weile mit uns mit und wirst Teil des Clubs.' },
+  { title: 'Probezeit', text: 'Du spielst eine Weile mit uns mit und wirst Teil des Clubs.' },
 ];
