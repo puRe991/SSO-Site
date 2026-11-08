@@ -79,12 +79,12 @@ export const joinSteps: { title: string; text: string }[] = [
  */
 export const probationRequirements: { title: string; text: string }[] = [
   {
-    title: 'Mindestens 2 CTs',
-    text: 'In der Probezeit solltest du es schaffen, bei mindestens zwei CTs dabei zu sein.',
+    title: 'Mindestens 2 Clubtreffen (CTs)',
+    text: 'In der Probezeit solltest du es schaffen, bei mindestens zwei Clubtreffen (CTs) dabei zu sein.',
   },
   {
     title: 'Aktiv dabei sein',
-    text: 'Auch außerhalb der CTs freuen wir uns, wenn du dich im Chat beteiligst oder ab und zu bei einem Call dabei bist.',
+    text: 'Auch außerhalb der Clubtreffen freuen wir uns, wenn du dich im Chat beteiligst oder ab und zu bei einem Call dabei bist.',
   },
   {
     title: 'Ins Clubleben einbringen',
@@ -98,3 +98,12 @@ export const probationRequirements: { title: string; text: string }[] = [
 
 export const probationNote =
   'Diese Liste ist eine Hilfe, damit du weißt, was wir uns wünschen. Wir gehen nicht stur nach ihr vor, sondern schauen bei jeder Probezeit individuell auf das Mitglied. Sie ist ein Richtwert und soll dich in keiner Weise verunsichern. Deine Anwesenheit und weitere Basis-Infos findest du im Anwesenheits-Channel auf Discord.';
+
+/** Clubregeln — vom Club selbst formuliert. Texte aus dem Admin (settings) haben Vorrang. */
+export const clubRules: string[] = [
+  'Respektvoller Umgang miteinander ist uns sehr wichtig.',
+  'Vermeide Beleidigungen. Stell klar, wenn etwas nicht ernst gemeint war.',
+  'Schreibe bestimmte Themen jeweils in den richtigen Kanal.',
+  'Bitte melde dich ab, wenn du nicht zu einem CT (Clubtreffen) kommen kannst.',
+  'Bitte gib uns (der Leitung) Bescheid, falls du den Club verlassen möchtest.',
+];
