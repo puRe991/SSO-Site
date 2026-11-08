@@ -5,7 +5,7 @@ import Field from '@/components/Field.astro';
 import Button from '@/components/Button.astro';
 import Alert from '@/components/Alert.astro';
 import Icon from '@/components/Icon.astro';
-import { joinRequirements, joinSteps } from '@/data/clan.config';
+import { joinRequirements, joinSteps, probationRequirements, probationNote } from '@/data/clan.config';
 import { applicationSchema, fieldErrors, formToObject } from '@/server/validation/schemas';
 import { CSRF_FIELD, csrfFromForm, verifyCsrf } from '@/server/security/csrf';
 import { clientIdentifier, rateLimit } from '@/server/security/rate-limit';
@@ -71,15 +71,15 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 ---
 
 <PageLayout
-  title="Mitreiten"
-  description="Bewirb dich bei Fairy Tight — Voraussetzungen, Ablauf und Bewerbungsformular."
+  title="Mitspielen"
+  description="Bewirb dich bei Fairy Tide Inc. — Voraussetzungen, Ablauf und Bewerbungsformular."
 >
   <section class="section">
     <div class="container">
       <p class="eyebrow">Aufnahme</p>
-      <h1>Reite bei Fairy Tight mit</h1>
+      <h1>Spiel bei Fairy Tide Inc. mit</h1>
       <p class="text-muted intro">
-        Wir suchen Reiterinnen und Reiter, die gern gemeinsam unterwegs sind. Lies dir die
+        Wir suchen Spielerinnen und Spieler, die gern gemeinsam unterwegs sind. Lies dir die
         Voraussetzungen durch und schick uns danach deine Bewerbung.
       </p>
 
@@ -116,6 +116,24 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                 ))
               }
             </ol>
+          </Card>
+
+          <Card>
+            <h2 class="h3">Anforderungen in der Probezeit 🧚🏻</h2>
+            <ul class="list" role="list">
+              {
+                probationRequirements.map((item) => (
+                  <li>
+                    <Icon name="check" size={16} />
+                    <span>
+                      <strong>{item.title}</strong>
+                      <span class="text-muted"> — {item.text}</span>
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="text-muted small" style="margin-block-start: var(--space-4, 1rem)">{probationNote}</p>
           </Card>
 
           <Card>
@@ -184,7 +202,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                       maxlength={60}
                     />
                     <Field
-                      label="Disziplinen, die du reitest"
+                      label="Spiele, die du spielst"
                       name="games"
                       value={values.games}
                       error={errors.games}
@@ -192,7 +210,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
                       hint="Mit Komma getrennt."
                     />
                     <Field
-                      label="Hauptdisziplin"
+                      label="Hauptspiel"
                       name="mainGame"
                       value={values.mainGame}
                       error={errors.mainGame}

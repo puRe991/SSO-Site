@@ -1,4 +1,4 @@
--- Startdaten für den Reitclub Fairy Tight
+-- Startdaten für Fairy Tide Inc.
 -- =======================================
 -- Enthält drei Arten von Zeilen:
 --   1. Systemvorgaben (Ränge, Beitragskategorien) — können so bleiben.
@@ -13,7 +13,7 @@
 INSERT OR REPLACE INTO ranks (id, label, sort_order, tone) VALUES
   ('owner',      'Clubleitung',              10, 'primary'),
   ('co_owner',   'Stellvertretende Leitung', 20, 'primary'),
-  ('leader',     'Stallleitung',             30, 'secondary'),
+  ('leader',     'Clubleitung',             30, 'secondary'),
   ('co_leader',  'Trainingsleitung',         40, 'secondary'),
   ('admin',      'Administration',           50, 'accent'),
   ('moderator',  'Moderation',               60, 'accent'),
@@ -25,7 +25,7 @@ INSERT OR REPLACE INTO ranks (id, label, sort_order, tone) VALUES
 INSERT OR REPLACE INTO news_categories (id, label, sort_order) VALUES
   ('clan',          'Aus dem Club',   10),
   ('community',     'Community',      20),
-  ('games',         'Disziplinen',    30),
+  ('games',         'Spiele',    30),
   ('events',        'Termine',        40),
   ('updates',       'Updates',        50),
   ('announcements', 'Ankündigungen',  60);
@@ -41,22 +41,27 @@ VALUES ('mbr_florian', 'florian', 'Florian', 'Florian Clever', NULL, 'offline', 
 
 -- 4. Demo-Inhalte (deutlich markiert, bei echten Daten löschen) ---------------
 INSERT OR IGNORE INTO members (id, slug, username, display_name, rank, status, role, main_game, sort_order, is_visible, is_demo)
-VALUES ('mbr_demo1', 'demo-mitglied', 'Demo-Mitglied', 'Demo-Mitglied', 'member', 'online', 'Demo-Aufgabe', 'Demo-Disziplin', 900, 1, 1);
+VALUES ('mbr_demo1', 'demo-mitglied', 'Demo-Mitglied', 'Demo-Mitglied', 'member', 'online', 'Demo-Aufgabe', 'Demo-Spiel', 900, 1, 1);
+
+INSERT OR IGNORE INTO games (id, slug, name, genre, platforms, status, description, sort_order, is_demo) VALUES
+  ('gam_sso',       'star-stable-online', 'Star Stable Online', 'Reit-MMO',        '["PC","Mac"]', 'active', NULL, 10, 0),
+  ('gam_valorant',  'valorant',           'Valorant',           'Taktik-Shooter',  '["PC"]',       'active', NULL, 20, 0),
+  ('gam_minecraft', 'minecraft',          'Minecraft',          'Sandbox',         '["PC"]',       'active', NULL, 30, 0);
 
 INSERT OR IGNORE INTO games (id, slug, name, genre, platforms, status, description, sort_order, is_demo)
-VALUES ('gam_demo1', 'demo-disziplin', 'Demo-Disziplin', 'Demo-Art', '["Training"]', 'planned',
-        'Platzhalter, damit sich das Layout ansehen lässt. Durch die Disziplinen ersetzen, die der Club wirklich reitet.', 900, 1);
+VALUES ('gam_demo1', 'demo-disziplin', 'Demo-Spiel', 'Demo-Art', '["Training"]', 'planned',
+        'Platzhalter, damit sich das Layout ansehen lässt. Durch die Spiele ersetzen, die der Club wirklich spielt.', 900, 1);
 
 INSERT OR IGNORE INTO events (id, slug, title, description, game_id, starts_at, host_name, participant_limit, status, is_demo)
 VALUES ('evt_demo1', 'demo-termin', 'Demo-Termin',
-        'Platzhalter-Termin. Echte Ausritte und Turniere werden im Adminbereich angelegt.',
+        'Platzhalter-Termin. Echte Spielabende und Turniere werden im Adminbereich angelegt.',
         'gam_demo1', unixepoch() + 604800, 'Demo-Mitglied', 10, 'upcoming', 1);
 
 INSERT OR IGNORE INTO news (id, slug, title, teaser, content, category_id, author_name, tags, status, published_at, is_demo)
 VALUES ('nws_demo1', 'demo-beitrag', 'Demo-Beitrag',
         'Platzhalter-Beitrag, der zeigt, wie Neuigkeiten dargestellt werden.',
         'Das hier ist Platzhaltertext.' || char(10) || char(10) ||
-        'Er zeigt das Layout eines Beitrags und ist keine echte Ankündigung von Fairy Tight. Sobald der erste richtige Beitrag steht, im Adminbereich löschen.',
+        'Er zeigt das Layout eines Beitrags und ist keine echte Ankündigung von Fairy Tide Inc.. Sobald der erste richtige Beitrag steht, im Adminbereich löschen.',
         'clan', 'Demo-Mitglied', '["demo"]', 'published', unixepoch(), 1);
 
 INSERT OR IGNORE INTO achievements (id, slug, title, description, icon, game_id, achieved_at, is_demo)

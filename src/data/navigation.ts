@@ -9,12 +9,12 @@ export const mainNav: NavItem[] = [
   { label: 'Start', href: '/', match: '^/$' },
   { label: 'Club', href: '/clan' },
   { label: 'Mitglieder', href: '/members' },
-  { label: 'Disziplinen', href: '/games' },
+  { label: 'Spiele', href: '/games' },
   { label: 'Termine', href: '/events' },
   { label: 'Neuigkeiten', href: '/news' },
   { label: 'Galerie', href: '/media' },
   { label: 'Erfolge', href: '/achievements' },
-  { label: 'Mitreiten', href: '/join' },
+  { label: 'Mitspielen', href: '/join' },
 ];
 
 export const footerNav: { title: string; items: NavItem[] }[] = [
@@ -23,7 +23,7 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'Über den Club', href: '/clan' },
       { label: 'Mitglieder', href: '/members' },
-      { label: 'Disziplinen', href: '/games' },
+      { label: 'Spiele', href: '/games' },
       { label: 'Erfolge', href: '/achievements' },
       { label: 'Rangliste', href: '/leaderboard' },
     ],
@@ -35,7 +35,7 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
       { label: 'Neuigkeiten', href: '/news' },
       { label: 'Galerie', href: '/media' },
       { label: 'Clubregeln', href: '/rules' },
-      { label: 'Mitreiten', href: '/join' },
+      { label: 'Mitspielen', href: '/join' },
     ],
   },
   {
@@ -52,7 +52,7 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
 export const adminNav: NavItem[] = [
   { label: 'Übersicht', href: '/admin' },
   { label: 'Mitglieder', href: '/admin/members' },
-  { label: 'Disziplinen', href: '/admin/games' },
+  { label: 'Spiele', href: '/admin/games' },
   { label: 'Termine', href: '/admin/events' },
   { label: 'Neuigkeiten', href: '/admin/news' },
   { label: 'Galerie', href: '/admin/media' },

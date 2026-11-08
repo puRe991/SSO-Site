@@ -1,7 +1,7 @@
-# Fairy Tight — Website des Reitclubs
+# Fairy Tide Inc. — Website des Clubs
 
-Die Plattform des Reitclubs **Fairy Tight (FT)** in Star Stable Online — Team und Community.
-Mitglieder, Disziplinen, Termine, Neuigkeiten, Galerie, Erfolge, Bewerbungen, ein
+Die Plattform des Clubs **Fairy Tide Inc. (FTI)** rund um Star Stable Online, Valorant und Minecraft — Team und Community.
+Mitglieder, Spiele, Termine, Neuigkeiten, Galerie, Erfolge, Bewerbungen, ein
 Mitgliederbereich und ein vollständiger Adminbereich, gebaut zum Erweitern statt zum Ersetzen.
 
 ---
@@ -140,7 +140,7 @@ Das Schema steht in `src/server/database/schema.ts` (Drizzle). Tabellen:
 
 Die Tabellen- und Spaltennamen bleiben bewusst englisch (`games`, `events`, `status = 'upcoming'`),
 damit Datenbank, API und Filter-URLs stabil bleiben. Übersetzt wird erst bei der Ausgabe, zentral
-in `src/lib/labels.ts`. Aus `games` werden dort die **Disziplinen** des Clubs.
+in `src/lib/labels.ts`. Aus `games` werden dort die **Spiele** des Clubs.
 
 Nach einer Schemaänderung:
 
@@ -185,7 +185,7 @@ Danach unter `/login` anmelden. Rollen und ihre Rechte stehen in `src/data/permi
 | Rolle | Rechte |
 | --- | --- |
 | `owner` | alles |
-| `admin` | Mitglieder, Disziplinen, Neuigkeiten, Termine, Galerie, Erfolge, Bewerbungen |
+| `admin` | Mitglieder, Spiele, Neuigkeiten, Termine, Galerie, Erfolge, Bewerbungen |
 | `moderator` | Neuigkeiten, Termine, Galerie, Bewerbungen |
 | `member` / `user` | nur der Mitgliederbereich |
 | `guest` | nur die öffentlichen Seiten |
@@ -376,8 +376,8 @@ Die Architektur lässt bewusst Platz für:
 - Discord-Widget bzw. Live-Serverstatistik
 - Club-XP, Stufen und Aktivitätsverfolgung (`members.xp` und `data/ranks.ts` modellieren das schon)
 - Forum, Chat, private Nachrichten, Benachrichtigungen (die Tabelle `notifications` existiert)
-- Turnierpläne, Ranglisten pro Disziplin, Teams und Startlisten
-- Pferdeprofile je Mitglied (Name, Rasse, Disziplin) als eigene Ressource
+- Turnierpläne, Ranglisten pro Spiel, Teams und Startlisten
+- Pferdeprofile je Mitglied (Name, Rasse, Spiel) als eigene Ressource
 
 Eine neue verwaltete Entität braucht **einen Eintrag** in `src/server/admin/resources.ts` — Liste,
 Anlegen, Bearbeiten und Löschen werden daraus erzeugt.

@@ -41,12 +41,12 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
 
   <StatsGrid stats={stats} />
 
-  <!-- Was ist Fairy Tight -->
+  <!-- Was ist Fairy Tide Inc. -->
   <section class="section" aria-labelledby="about-title">
     <div class="container">
       <SectionHeader
         eyebrow="Über uns"
-        title="Was ist Fairy Tight?"
+        title="Was ist Fairy Tide Inc.?"
         href="/clan"
         linkLabel="Mehr über den Club"
       />
@@ -68,10 +68,10 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
     </div>
   </section>
 
-  <!-- Disziplinen -->
+  <!-- Spiele -->
   <section class="section" aria-labelledby="games-title">
     <div class="container">
-      <SectionHeader eyebrow="Reiten" title="Unsere Disziplinen" href="/games" />
+      <SectionHeader eyebrow="Spielen" title="Unsere Spiele" href="/games" />
       {
         games.length > 0 ? (
           <div class="grid-auto" style="--min-col:260px">
@@ -81,8 +81,8 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           </div>
         ) : (
           <EmptyState
-            title="Noch keine Disziplinen eingetragen."
-            description="Hier stehen später die Disziplinen, in denen der Club unterwegs ist."
+            title="Noch keine Spiele eingetragen."
+            description="Hier stehen später die Spiele, in denen der Club unterwegs ist."
             icon="horseshoe"
           />
         )
@@ -104,7 +104,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
         ) : (
           <EmptyState
             title="Keine anstehenden Termine."
-            description="Neue Ausritte und Turniere tauchen hier auf, sobald sie geplant sind."
+            description="Neue Termine und Turniere tauchen hier auf, sobald sie geplant sind."
             icon="calendar"
           />
         )
@@ -115,7 +115,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
   <!-- Members -->
   <section class="section" aria-labelledby="members-title">
     <div class="container">
-      <SectionHeader eyebrow="Stall" title="Unsere Mitglieder" href="/members" />
+      <SectionHeader eyebrow="Team" title="Unsere Mitglieder" href="/members" />
       {
         members.items.length > 0 ? (
           <div class="grid-auto" style="--min-col:300px">
@@ -186,7 +186,7 @@ const discord = isTBD(settings['social.discord']) ? null : settings['social.disc
           <p class="eyebrow">Community</p>
           <h2 id="community-title">Komm in die Community</h2>
           <p class="text-muted">
-            Gemeinsame Ausritte, Clubabende, Turniere und der ganz normale Stallalltag — abgestimmt
+            Gemeinsame Spielabende, Clubabende, Turniere und der ganz normale Community-Alltag — abgestimmt
             wird das alles auf Discord.
           </p>
         </div>

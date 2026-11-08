@@ -25,7 +25,7 @@ const ranks = await getRanks(Astro.locals);
 
 <PageLayout
   title={game.name}
-  description={game.description ?? `${game.name} im Reitclub Fairy Tight.`}
+  description={game.description ?? `${game.name} im Club Fairy Tide Inc.`}
   structuredData={[
     {
       '@context': 'https://schema.org',
@@ -37,7 +37,7 @@ const ranks = await getRanks(Astro.locals);
 >
   <section class="section">
     <div class="container">
-      <a class="back" href="/games">← Alle Disziplinen</a>
+      <a class="back" href="/games">← Alle Spiele</a>
 
       <header class="game-head">
         <div class="game-head__cover">
@@ -72,7 +72,7 @@ const ranks = await getRanks(Astro.locals);
               game.description ? (
                 <div class="prose" set:html={renderRichText(game.description)} />
               ) : (
-                <p class="text-muted">Zu dieser Disziplin ist noch kein Text geschrieben.</p>
+                <p class="text-muted">Zu dieser Spiel ist noch kein Text geschrieben.</p>
               )
             }
           </Card>
@@ -87,7 +87,7 @@ const ranks = await getRanks(Astro.locals);
                   ))}
                 </div>
               ) : (
-                <EmptyState title="Dieser Disziplin ist noch niemand zugeordnet." icon="users" />
+                <EmptyState title="Dieser Spiel ist noch niemand zugeordnet." icon="users" />
               )
             }
           </section>
@@ -102,7 +102,7 @@ const ranks = await getRanks(Astro.locals);
                   ))}
                 </div>
               ) : (
-                <EmptyState title="Für diese Disziplin gibt es noch keine Termine." icon="calendar" />
+                <EmptyState title="Für diese Spiel gibt es noch keine Termine." icon="calendar" />
               )
             }
           </section>
@@ -117,7 +117,7 @@ const ranks = await getRanks(Astro.locals);
                   ))}
                 </div>
               ) : (
-                <EmptyState title="Für diese Disziplin sind noch keine Erfolge eingetragen." icon="trophy" />
+                <EmptyState title="Für diese Spiel sind noch keine Erfolge eingetragen." icon="trophy" />
               )
             }
           </section>
@@ -134,7 +134,7 @@ const ranks = await getRanks(Astro.locals);
           <Card>
             <h2 class="h3">Bilder</h2>
             <p class="text-muted small">
-              Screenshots und Videos zu dieser Disziplin liegen in der <a href="/media">Galerie</a>.
+              Screenshots und Videos zu dieser Spiel liegen in der <a href="/media">Galerie</a>.
             </p>
           </Card>
         </aside>

@@ -34,7 +34,7 @@ const toastMessages: Record<string, string> = {
 
 <PageLayout
   title={event.title}
-  description={event.description ?? `Termin des Reitclubs Fairy Tight: ${event.title}`}
+  description={event.description ?? `Termin des Clubs Fairy Tide Inc.: ${event.title}`}
   structuredData={[
     {
       '@context': 'https://schema.org',
@@ -90,7 +90,7 @@ const toastMessages: Record<string, string> = {
                 <dd>{formatTime(event.startsAt) ?? '—'}</dd>
               </div>
               <div>
-                <dt><Icon name="horseshoe" size={15} /> Disziplin</dt>
+                <dt><Icon name="horseshoe" size={15} /> Spiel</dt>
                 <dd>
                   {
                     event.gameSlug ? <a href={`/games/${event.gameSlug}`}>{event.gameName}</a> : '—'

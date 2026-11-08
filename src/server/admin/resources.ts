@@ -28,7 +28,7 @@ export interface FieldDef {
   required?: boolean;
   hint?: string;
   options?: { value: string; label: string }[];
-  /** Optionen, die erst beim Rendern aufgelöst werden (z. B. die Disziplinenliste). */
+  /** Optionen, die erst beim Rendern aufgelöst werden (z. B. die Spieleliste). */
   optionsFrom?: 'games' | 'ranks' | 'newsCategories';
   maxlength?: number;
 }
@@ -95,7 +95,7 @@ const statusOptions = {
     { value: 'screenshots', label: 'Screenshots' },
     { value: 'clan', label: 'Clubleben' },
     { value: 'events', label: 'Termine' },
-    { value: 'games', label: 'Disziplinen' },
+    { value: 'games', label: 'Spiele' },
     { value: 'videos', label: 'Videos' },
     { value: 'artwork', label: 'Artwork' },
   ],
@@ -152,7 +152,7 @@ export const resources: Record<string, ResourceDef> = {
       { name: 'rank', label: 'Rang', type: 'select', optionsFrom: 'ranks' },
       { name: 'status', label: 'Status', type: 'select', options: statusOptions.presence, required: true },
       { name: 'role', label: 'Aufgabe', maxlength: 60, hint: 'Freitext, z. B. „Turnierplanung“ — leer lassen, wenn offen.' },
-      { name: 'mainGame', label: 'Hauptdisziplin', maxlength: 80 },
+      { name: 'mainGame', label: 'Hauptspiel', maxlength: 80 },
       { name: 'avatarUrl', label: 'Avatar-URL', type: 'url' },
       { name: 'joinedAt', label: 'Dabei seit', type: 'datetime-local' },
       { name: 'bio', label: 'Über mich', type: 'textarea', maxlength: 2000 },
@@ -195,8 +195,8 @@ export const resources: Record<string, ResourceDef> = {
 
   games: {
     key: 'games',
-    label: 'Disziplinen',
-    singular: 'Disziplin',
+    label: 'Spiele',
+    singular: 'Spiel',
     permission: 'manage_games',
     idPrefix: 'gam',
     table: schema.games,
@@ -275,7 +275,7 @@ export const resources: Record<string, ResourceDef> = {
     fields: [
       { name: 'title', label: 'Titel', required: true, maxlength: 120 },
       { name: 'slug', label: 'Slug', required: true },
-      { name: 'gameId', label: 'Disziplin', type: 'select', optionsFrom: 'games' },
+      { name: 'gameId', label: 'Spiel', type: 'select', optionsFrom: 'games' },
       { name: 'startsAt', label: 'Beginn', type: 'datetime-local', required: true },
       { name: 'endsAt', label: 'Ende', type: 'datetime-local' },
       { name: 'hostName', label: 'Leitung', maxlength: 80 },
@@ -448,7 +448,7 @@ export const resources: Record<string, ResourceDef> = {
       { name: 'title', label: 'Titel', required: true, maxlength: 120 },
       { name: 'slug', label: 'Slug', required: true },
       { name: 'icon', label: 'Symbol', maxlength: 20, hint: 'Ein einzelnes Emoji, z. B. 🏆.' },
-      { name: 'gameId', label: 'Disziplin', type: 'select', optionsFrom: 'games' },
+      { name: 'gameId', label: 'Spiel', type: 'select', optionsFrom: 'games' },
       { name: 'achievedAt', label: 'Erreicht am', type: 'datetime-local' },
       { name: 'description', label: 'Beschreibung', type: 'textarea', maxlength: 1000 },
       { name: 'isDemo', label: 'Als Platzhalter markieren', type: 'checkbox' },

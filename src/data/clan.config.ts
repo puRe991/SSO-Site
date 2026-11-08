@@ -9,9 +9,9 @@ import type { SocialPlatform } from '@/types';
  * `settings` table override this file at runtime (see `server/services/settings`).
  */
 export const clanConfig = {
-  name: 'Fairy Tight',
-  shortName: 'FT',
-  type: 'Reitclub • Team • Community in Star Stable Online',
+  name: 'Fairy Tide Inc.',
+  shortName: 'FTI',
+  type: 'Gaming-Community • Team • Star Stable Online, Valorant, Minecraft',
 
   /** Long form club text. Editable from /admin → Einstellungen. */
   description: TBD.CLAN_DESCRIPTION,
@@ -62,13 +62,48 @@ export const knownMembers = [
 export const joinRequirements: string[] = [
   'Ein Discord-Account — der Club stimmt sich über Discord ab.',
   'Ein eigener Charakter in Star Stable Online.',
-  'Regelmäßig Zeit für gemeinsame Ausritte und Clubtermine.',
-  'Respektvoller Umgang mit Mitgliedern und anderen Reiterinnen und Reitern.',
+  'Regelmäßig Zeit für gemeinsame Spielabende und Clubtermine.',
+  'Respektvoller Umgang mit Mitgliedern und anderen Spielerinnen und Spielern.',
 ];
 
 export const joinSteps: { title: string; text: string }[] = [
-  { title: 'Bewerbung', text: 'Füll das Formular unten mit deinem Reiterprofil aus.' },
+  { title: 'Bewerbung', text: 'Füll das Formular unten mit deinem Spielerprofil aus.' },
   { title: 'Prüfung', text: 'Jemand aus der Clubleitung sieht sich deine Bewerbung an.' },
   { title: 'Gespräch', text: 'Wir laden dich zu einem kurzen Kennenlernen auf Discord ein.' },
-  { title: 'Proberitt', text: 'Du reitest eine Weile mit uns mit und wirst Teil des Clubs.' },
+  { title: 'Probezeit', text: 'Du spielst eine Weile mit uns mit und wirst Teil des Clubs.' },
+];
+
+/**
+ * Anforderungen in der Probezeit — vom Club selbst formuliert.
+ * Nur ein Richtwert: jede Probezeit wird individuell betrachtet.
+ */
+export const probationRequirements: { title: string; text: string }[] = [
+  {
+    title: 'Mindestens 2 Clubtreffen (CTs)',
+    text: 'In der Probezeit solltest du es schaffen, bei mindestens zwei Clubtreffen (CTs) dabei zu sein.',
+  },
+  {
+    title: 'Aktiv dabei sein',
+    text: 'Auch außerhalb der Clubtreffen freuen wir uns, wenn du dich im Chat beteiligst oder ab und zu bei einem Call dabei bist.',
+  },
+  {
+    title: 'Ins Clubleben einbringen',
+    text: 'Versuch, dich aktiv in die Community einzubringen, mit anderen Mitgliedern zu quatschen und ein Teil des Clublebens zu werden.',
+  },
+  {
+    title: 'Interesse zeigen',
+    text: 'Uns ist wichtig, dass du nicht nur Mitglied bist, sondern wirklich Lust hast, Teil der Gemeinschaft zu sein. 💕',
+  },
+];
+
+export const probationNote =
+  'Diese Liste ist eine Hilfe, damit du weißt, was wir uns wünschen. Wir gehen nicht stur nach ihr vor, sondern schauen bei jeder Probezeit individuell auf das Mitglied. Sie ist ein Richtwert und soll dich in keiner Weise verunsichern. Deine Anwesenheit und weitere Basis-Infos findest du im Anwesenheits-Channel auf Discord.';
+
+/** Clubregeln — vom Club selbst formuliert. Texte aus dem Admin (settings) haben Vorrang. */
+export const clubRules: string[] = [
+  'Respektvoller Umgang miteinander ist uns sehr wichtig.',
+  'Vermeide Beleidigungen. Stell klar, wenn etwas nicht ernst gemeint war.',
+  'Schreibe bestimmte Themen jeweils in den richtigen Kanal.',
+  'Bitte melde dich ab, wenn du nicht zu einem CT (Clubtreffen) kommen kannst.',
+  'Bitte gib uns (der Leitung) Bescheid, falls du den Club verlassen möchtest.',
 ];

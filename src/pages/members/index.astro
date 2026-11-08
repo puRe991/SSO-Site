@@ -27,10 +27,10 @@ const [ranks, games, members] = await Promise.all([
 const hasDemo = members.items.some((member) => member.isDemo);
 ---
 
-<PageLayout title="Mitglieder" description="Die Mitglieder des Reitclubs Fairy Tight.">
+<PageLayout title="Mitglieder" description="Die Mitglieder des Clubs Fairy Tide Inc.">
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Stall</p>
+      <p class="eyebrow">Team</p>
       <h1>Mitglieder</h1>
       <p class="text-muted intro">
         {members.total} {members.total === 1 ? 'Mitglied' : 'Mitglieder'} gelistet.
@@ -60,7 +60,7 @@ const hasDemo = members.items.some((member) => member.isDemo);
             },
             {
               name: 'game',
-              label: 'Disziplin',
+              label: 'Spiel',
               value: query.game,
               options: games.map((game) => ({ value: game.slug, label: game.name })),
             },
