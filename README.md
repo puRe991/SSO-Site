@@ -1,6 +1,6 @@
-# Fairy Tight — Website des Reitclubs
+# Fairy Tide Inc. — Website des Reitclubs
 
-Die Plattform des Reitclubs **Fairy Tight (FT)** in Star Stable Online — Team und Community.
+Die Plattform des Reitclubs **Fairy Tide Inc. (FT)** in Star Stable Online — Team und Community.
 Mitglieder, Disziplinen, Termine, Neuigkeiten, Galerie, Erfolge, Bewerbungen, ein
 Mitgliederbereich und ein vollständiger Adminbereich, gebaut zum Erweitern statt zum Ersetzen.
 

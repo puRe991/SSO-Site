@@ -9,9 +9,9 @@ import type { SocialPlatform } from '@/types';
  * `settings` table override this file at runtime (see `server/services/settings`).
  */
 export const clanConfig = {
-  name: 'Fairy Tight',
-  shortName: 'FT',
-  type: 'Reitclub • Team • Community in Star Stable Online',
+  name: 'Fairy Tide Inc.',
+  shortName: 'FTI',
+  type: 'Gaming-Community • Team • Star Stable Online, Valorant, Minecraft',
 
   /** Long form club text. Editable from /admin → Einstellungen. */
   description: TBD.CLAN_DESCRIPTION,

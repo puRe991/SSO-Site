@@ -43,6 +43,11 @@ VALUES ('mbr_florian', 'florian', 'Florian', 'Florian Clever', NULL, 'offline', 
 INSERT OR IGNORE INTO members (id, slug, username, display_name, rank, status, role, main_game, sort_order, is_visible, is_demo)
 VALUES ('mbr_demo1', 'demo-mitglied', 'Demo-Mitglied', 'Demo-Mitglied', 'member', 'online', 'Demo-Aufgabe', 'Demo-Disziplin', 900, 1, 1);
 
+INSERT OR IGNORE INTO games (id, slug, name, genre, platforms, status, description, sort_order, is_demo) VALUES
+  ('gam_sso',       'star-stable-online', 'Star Stable Online', 'Reit-MMO',        '["PC","Mac"]', 'active', NULL, 10, 0),
+  ('gam_valorant',  'valorant',           'Valorant',           'Taktik-Shooter',  '["PC"]',       'active', NULL, 20, 0),
+  ('gam_minecraft', 'minecraft',          'Minecraft',          'Sandbox',         '["PC"]',       'active', NULL, 30, 0);
+
 INSERT OR IGNORE INTO games (id, slug, name, genre, platforms, status, description, sort_order, is_demo)
 VALUES ('gam_demo1', 'demo-disziplin', 'Demo-Disziplin', 'Demo-Art', '["Training"]', 'planned',
         'Platzhalter, damit sich das Layout ansehen lässt. Durch die Disziplinen ersetzen, die der Club wirklich reitet.', 900, 1);
