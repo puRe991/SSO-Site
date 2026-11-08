@@ -16,5 +16,5 @@ export const siteConfig = {
   description:
     'Fairy Tide Inc. ist eine Gaming-Community rund um Star Stable Online, Valorant und Minecraft. Mitglieder, Termine, Neuigkeiten und alles rund um den Club — an einem Ort.',
   locale: 'de',
-  themeColor: '#0a1a17',
+  themeColor: '#1a1024',
 };

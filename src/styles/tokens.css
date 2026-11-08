@@ -4,47 +4,48 @@
  * Single source of truth for the whole visual system. Changing the theme means
  * changing values here; no component hardcodes a colour.
  *
- * The palette follows the world the club rides in: deep forest green like the
- * woods of Jorvik, warm gold like late sunlight on a tack room, parchment for
- * text and a soft sky teal as the cool counterpoint. Dark is the default and
- * the designed-for mode; a warm parchment light theme exists alongside it.
+ * Palette: deep plum surfaces, rose pink as the primary, orchid/lilac as the
+ * secondary, baby blue as the cool counterpoint, peach as a warm accent. The
+ * token names (pine/gold/rust/sky) are kept from the old theme so no component
+ * changes: pine = lilac ramp, gold = rose ramp, rust = peach, sky = baby blue.
+ * Dark is the default; a blush light theme exists alongside it.
  */
 
 :root {
   color-scheme: dark;
 
   /* --- Brand ramp: forest green, gold, parchment, saddle leather --- */
-  --pine-300: #7dc0ae;
-  --pine-400: #4ba38e;
-  --pine-500: #2c806d;
-  --pine-600: #1b5d4f;
-  --pine-700: #12443a;
-  --gold-300: #ffd98a;
-  --gold-400: #f5c151;
-  --gold-500: #e0a32a;
-  --gold-600: #b8811a;
-  --rust-400: #e08a5c;
-  --rust-500: #c2603a;
-  --sky-400: #6fc7d8;
-  --sky-500: #3aa0b4;
+  --pine-300: #d9b8ff;
+  --pine-400: #bf8df5;
+  --pine-500: #a468e0;
+  --pine-600: #7c43b5;
+  --pine-700: #582d85;
+  --gold-300: #ffc2dc;
+  --gold-400: #ff9cc6;
+  --gold-500: #f46fa8;
+  --gold-600: #c9407f;
+  --rust-400: #ffb199;
+  --rust-500: #f0809a;
+  --sky-400: #a9c8ff;
+  --sky-500: #6f9be8;
 
   /* --- Surfaces --- */
-  --background: #0a1a17;
-  --background-elevated: #0e221d;
-  --surface: #132a24;
-  --surface-secondary: #18332b;
-  --surface-hover: #1f3f35;
+  --background: #1a1024;
+  --background-elevated: #21142e;
+  --surface: #2a1a3a;
+  --surface-secondary: #34214a;
+  --surface-hover: #402a59;
 
   /* --- Text --- */
-  --text: #f6efe1;
-  --text-muted: #b6c5bb;
-  --text-subtle: #7f9489;
-  --text-inverse: #0a1a17;
+  --text: #fff1f7;
+  --text-muted: #d9c6e0;
+  --text-subtle: #a58fb5;
+  --text-inverse: #1a1024;
 
   /* --- Brand roles --- */
   --primary: var(--gold-500);
   --primary-hover: var(--gold-400);
-  --primary-contrast: #14241d;
+  --primary-contrast: #2b0f20;
   --secondary: var(--pine-500);
   --accent: var(--sky-400);
   /* Links stehen bewusst nicht auf --primary-hover: sie brauchen auf beiden
@@ -53,8 +54,8 @@
   --link-hover: var(--text);
 
   /* --- Lines & effects --- */
-  --border: #23433a;
-  --border-strong: #35594d;
+  --border: #46305f;
+  --border-strong: #61457f;
   --border-brand: color-mix(in oklab, var(--primary) 45%, transparent);
   --glow: color-mix(in oklab, var(--primary) 30%, transparent);
   --glow-accent: color-mix(in oklab, var(--accent) 26%, transparent);
@@ -63,7 +64,7 @@
   --status-online: #5fca86;
   --status-away: var(--gold-400);
   --status-dnd: #e2675f;
-  --status-offline: #7f9489;
+  --status-offline: #a58fb5;
   --success: #5fca86;
   --warning: var(--gold-400);
   --danger: #e2675f;
@@ -102,11 +103,11 @@
   --space-9: 6rem;
   --section-y: clamp(3.5rem, 2rem + 6vw, 7rem);
 
-  /* --- Radii: softer and friendlier than the old angular theme --- */
-  --radius-sm: 8px;
-  --radius: 14px;
-  --radius-lg: 22px;
-  --radius-xl: 32px;
+  /* --- Radii: soft and round --- */
+  --radius-sm: 10px;
+  --radius: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 36px;
   --radius-full: 999px;
 
   /* --- Elevation --- */
@@ -138,23 +139,23 @@
 /* Warm parchment theme — daylight version of the same identity. */
 :root[data-theme='light'] {
   color-scheme: light;
-  --background: #f7f0e1;
-  --background-elevated: #fffaf0;
-  --surface: #fffaf0;
-  --surface-secondary: #f2e9d6;
-  --surface-hover: #eadfc7;
-  --text: #16302a;
-  --text-muted: #4c6459;
-  --text-subtle: #7a8c81;
-  --text-inverse: #fffaf0;
+  --background: #fff0f6;
+  --background-elevated: #fff8fb;
+  --surface: #fff8fb;
+  --surface-secondary: #fde4ef;
+  --surface-hover: #f9d3e4;
+  --text: #3a1f33;
+  --text-muted: #6d4a63;
+  --text-subtle: #9a7a90;
+  --text-inverse: #fff8fb;
   --primary: var(--gold-500);
   --primary-hover: var(--gold-600);
-  --primary-contrast: #16302a;
+  --primary-contrast: #ffffff;
   --secondary: var(--pine-600);
   --accent: var(--sky-500);
-  --link: #8a5c0d;
+  --link: #b02f6c;
   --link-hover: var(--pine-700);
-  --border: #e0d3b8;
-  --border-strong: #c9b894;
-  --shadow-lg: 0 24px 60px -28px rgb(22 48 42 / 0.3);
+  --border: #f1c9dc;
+  --border-strong: #e3a8c5;
+  --shadow-lg: 0 24px 60px -28px rgb(120 40 90 / 0.25);
 }
